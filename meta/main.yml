@@ -6,10 +6,13 @@ dependencies:
     version: master
 galaxy_info:
   author: EA31337 Ltd
-  description: Role to run Expert Advisors in MetaTrader platform
+  description: |
+    Role to run MetaTrader platform
+    (with Expert Advisors, Script and Indicators)
   galaxy_tags:
+    - linux
     - windows
-  issue_tracker_url: https://github.com/EA31337/ansible-role-ea-runner
+  issue_tracker_url: https://github.com/EA31337/ansible-role-mt-runner
   license: GPLv3
   min_ansible_version: 2.7
   namespace: ea31337
