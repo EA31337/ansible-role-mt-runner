@@ -1,0 +1,23 @@
+---
+- name: Query MT platform path
+  changed_when: false
+  command: >-
+    {{ ea_runner_cmd_prefix }}
+    reg query
+    'HKLM\Software\Microsoft\Windows NT\CurrentVersion\ProfileList' # @changeme
+    /v ProgramData
+  register: cmd_reg_mt_path
+- name: Set MT platform path
+  set_fact:
+    ea_runner_mt_path: >-
+      "{{ cmd_reg_mt_path
+      | regex_search('C:\.*', multiline=True, ignorecase=True)
+      }}"
+- name: Convert MT path to Unix
+  command: "winepath {{ ea_runner_mt_path }}"
+  register: cmd_winepath_mt_path
+  when: ansible_os_family != "Windows"
+- name: Set MT platform path for Unix
+  set_fact:
+    ea_runner_mt_path: "{{ cmd_winepath_mt_path.stdout }}"
+  when: ansible_os_family != "Windows"
