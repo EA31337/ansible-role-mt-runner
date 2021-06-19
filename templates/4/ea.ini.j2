@@ -1,9 +1,7 @@
 <common>
-positions=2
-deposit=10000
-currency=USD
-fitnes=0
-genetic=1
+{%- for key, value in ea_runner_bt_mt4_common.items() %}
+{{ key ~ '=' ~ value }}
+{%- endfor -%}
 </common>
 <inputs>
 foo=bar
