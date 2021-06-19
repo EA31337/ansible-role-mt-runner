@@ -1,0 +1,36 @@
+---
+repos:
+
+  - repo: https://github.com/ansible-community/ansible-lint
+    rev: v5.0.11
+    hooks:
+      - id: ansible-lint
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.0.1
+    hooks:
+      - id: check-added-large-files
+      - id: check-byte-order-marker
+      - id: check-case-conflict
+      - id: check-executables-have-shebangs
+      - id: check-merge-conflict
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
+  - repo: https://github.com/igorshubovych/markdownlint-cli.git
+    rev: v0.27.1
+    hooks:
+      - id: markdownlint
+
+  - repo: https://github.com/jumanjihouse/pre-commit-hooks
+    rev: 2.1.5  # or specific git tag
+    hooks:
+      - id: forbid-binary
+      - id: git-check     # Configure in .gitattributes
+      - id: require-ascii
+
+  - repo: https://github.com/adrienverge/yamllint.git
+    rev: v1.26.1
+    hooks:
+      - id: yamllint
