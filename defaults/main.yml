@@ -55,23 +55,23 @@ ea_runner_bt_mt4_config:
   TestToDate: 2019.01.31
   TestVisualEnable: false
 ea_runner_bt_mt4_inputs:
-  - foo: bar
+  foo: bar
 ea_runner_bt_mt4_limits:
-  - balance: 200.00
-  - balance_enable: 0
-  - consecloss: 5000.00
-  - consecloss_enable: 0
-  - conseclossdeals: 20.00
-  - conseclossdeals_enable: 0
-  - consecwin: 10000.00
-  - consecwin_enable: 0
-  - consecwindeals: 30.00
-  - consecwindeals_enable: 0
-  - marginlevel: 30.00
-  - marginlevel_enable: 0
-  - maxdrawdown: 50.00
-  - maxdrawdown_enable: 1
-  - profit: 10000.00
-  - profit_enable: 0
+  balance: 200.00
+  balance_enable: 0
+  consecloss: 5000.00
+  consecloss_enable: 0
+  conseclossdeals: 20.00
+  conseclossdeals_enable: 0
+  consecwin: 10000.00
+  consecwin_enable: 0
+  consecwindeals: 30.00
+  consecwindeals_enable: 0
+  marginlevel: 30.00
+  marginlevel_enable: 0
+  maxdrawdown: 50.00
+  maxdrawdown_enable: 1
+  profit: 10000.00
+  profit_enable: 0
 ea_runner_cmd_prefix: wine
 ea_runner_mt_version: 5
