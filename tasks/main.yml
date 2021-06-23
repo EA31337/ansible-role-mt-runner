@@ -4,7 +4,7 @@
   command: >-
     {{ ea_runner_cmd_prefix }}
     reg query
-    'HKLM\Software\Microsoft\Windows NT\CurrentVersion\ProfileList' # @changeme
+    'HKLM\Software\MetaQuotes Software'
     /v ProgramData
   register: cmd_reg_mt_path
 - name: Set MT platform path
