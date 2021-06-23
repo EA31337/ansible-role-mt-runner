@@ -1,23 +1,42 @@
 ---
 - name: Query MT platform path
   changed_when: false
-  command: >-
-    {{ ea_runner_cmd_prefix }}
-    reg query
-    'HKLM\Software\MetaQuotes Software'
-    /v ProgramData
+  find:
+    paths: '{{ ansible_env.HOME }}/.wine'
+    patterns: terminal*.exe
+    recurse: yes
   register: cmd_reg_mt_path
 - name: Set MT platform path
   set_fact:
-    ea_runner_mt_path: >-
-      "{{ cmd_reg_mt_path
-      | regex_search('C:\.*', multiline=True, ignorecase=True)
-      }}"
-- name: Convert MT path to Unix
-  command: "winepath {{ ea_runner_mt_path }}"
+    ea_runner_mt_path: "{{ cmd_reg_mt_path.files[0].path | dirname }}"
+- name: Set MT platform's Terminal path
+  set_fact:
+    ea_runner_mt_terminal_path: "{{ cmd_reg_mt_path.files[0].path }}"
+- name: Convert MT path 1 to Unix
+  changed_when: false
+  shell: 'DISPLAY={{ xvfb_display }} winepath "{{ ea_runner_mt_path }}"'
   register: cmd_winepath_mt_path
   when: ansible_os_family != "Windows"
-- name: Set MT platform path for Unix
+- name: Convert MT path 2 to Unix
+  changed_when: false
+  shell: 'DISPLAY={{ xvfb_display }} winepath "{{ ea_runner_mt_terminal_path }}"'
+  register: cmd_winepath_mt_terminal_path
+  when: ansible_os_family != "Windows"
+- name: Set MT platform path 1 for Unix
   set_fact:
     ea_runner_mt_path: "{{ cmd_winepath_mt_path.stdout }}"
   when: ansible_os_family != "Windows"
+- name: Set MT platform path 2 for Unix
+  set_fact:
+    ea_runner_mt_terminal_path: "{{ cmd_winepath_mt_terminal_path.stdout }}"
+  when: ansible_os_family != "Windows"
+- name: Copy tester.ini template
+  ansible.builtin.template:
+    dest: '{{ ea_runner_mt_path }}/tester.ini'
+    mode: 0644
+    src: '{{ ea_runner_mt_version }}/tester.ini.j2'
+- name: Debug
+  ansible.builtin.debug:
+    msg: 'DISPLAY={{ xvfb_display }} {{ ea_runner_cmd_prefix }} "{{ ea_runner_mt_terminal_path }}" "{{ ea_runner_mt_path }}/tester.ini"'
+- name: Running terminal
+  shell: 'DISPLAY={{ xvfb_display }} {{ ea_runner_cmd_prefix }} "{{ ea_runner_mt_terminal_path }}" "{{ ea_runner_mt_path }}/tester.ini"'
