@@ -73,5 +73,73 @@ ea_runner_bt_mt4_limits:
   maxdrawdown_enable: 1
   profit: 10000.00
   profit_enable: 0
+ea_runner_bt_mt5_config:
+  Common:
+    CertInstall: 0
+    CertPassword:
+    KeepPrivate: 1
+    Login: 12345
+    NewsEnable: 0
+    Password: 12345
+    ProxyEnable: 0
+    ProxyLogin:
+    ProxyPassword:
+    ProxyServer:
+    ProxyType: SOCKS5
+    Server:
+  Charts:
+    PrintColor: 1
+    SaveDeleted: 1
+  Experts:
+    Account: 1
+    AllowDllImport: 1
+    AllowLiveTrading: 1
+    Enabled: 1
+    Profile: 1
+  Objects:
+    MagnetSens: 1
+    SelectOneClick: 1
+    ShowPropertiesOnCreate: 1
+  Email:
+    Auth:
+    Enable: 1
+    From:
+    Login:
+    Password:
+    Server:
+    To:
+  StartUp:
+    Expert:
+    ExpertParameters:
+    Period:
+    Script:
+    ScriptParameters:
+    Symbol:
+    Template:
+  Tester:
+    Currency:
+    Deposit:
+    ExecutionMode:
+    Expert:
+    ExpertParameters:
+    ForwardDate:
+    ForwardMode:
+    FromDate:
+    Leverage:
+    Login:
+    Model:
+    Optimization:
+    OptimizationCriterion:
+    Period:
+    Port:
+    ReplaceReport:
+    Report:
+    ShutdownTerminal: 1
+    Symbol:
+    ToDate:
+    UseCloud: 0
+    UseLocal: 1
+    UseRemote:
+    Visual: 0
 ea_runner_cmd_prefix: wine
 ea_runner_mt_version: 5

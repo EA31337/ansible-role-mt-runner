@@ -1,10 +1,20 @@
 ---
+- name: Install winbind package
+  ansible.builtin.apt:
+    allow_unauthenticated: true
+    install_recommends: "{{ 'yes' if wine_install_recommends else 'no' }}"
+    name: '{{ item }}'
+    state: present
+    update_cache: true
+  become: true
+  with_items:
+    - winbind
 - name: Query MT platform path
   changed_when: false
   find:
     paths: '{{ ansible_env.HOME }}/.wine'
     patterns: terminal*.exe
-    recurse: yes
+    recurse: true
   register: cmd_reg_mt_path
 - name: Set MT platform path
   set_fact:
@@ -14,12 +24,13 @@
     ea_runner_mt_terminal_path: "{{ cmd_reg_mt_path.files[0].path }}"
 - name: Convert MT path 1 to Unix
   changed_when: false
-  shell: 'DISPLAY={{ xvfb_display }} winepath "{{ ea_runner_mt_path }}"'
+  shell: 'DISPLAY={{ xvfb_display }} winepath {{ ea_runner_mt_path | quote }}'
   register: cmd_winepath_mt_path
   when: ansible_os_family != "Windows"
 - name: Convert MT path 2 to Unix
   changed_when: false
-  shell: 'DISPLAY={{ xvfb_display }} winepath "{{ ea_runner_mt_terminal_path }}"'
+  shell: 'DISPLAY={{ xvfb_display }} winepath
+    {{ ea_runner_mt_terminal_path | quote }}'
   register: cmd_winepath_mt_terminal_path
   when: ansible_os_family != "Windows"
 - name: Set MT platform path 1 for Unix
@@ -37,6 +48,11 @@
     src: '{{ ea_runner_mt_version }}/tester.ini.j2'
 - name: Debug
   ansible.builtin.debug:
-    msg: 'DISPLAY={{ xvfb_display }} {{ ea_runner_cmd_prefix }} "{{ ea_runner_mt_terminal_path }}" "{{ ea_runner_mt_path }}/tester.ini"'
+    msg: 'cd {{ ea_runner_mt_path | quote }} && DISPLAY={{ xvfb_display }}
+      {{ ea_runner_cmd_prefix | quote }}
+      {{ ea_runner_mt_terminal_path | quote }} "/config:tester.ini"'
 - name: Running terminal
-  shell: 'DISPLAY={{ xvfb_display }} {{ ea_runner_cmd_prefix }} "{{ ea_runner_mt_terminal_path }}" "{{ ea_runner_mt_path }}/tester.ini"'
+  changed_when: false
+  shell: 'cd {{ ea_runner_mt_path | quote }} && DISPLAY={{ xvfb_display }}
+    {{ ea_runner_cmd_prefix | quote }} {{ ea_runner_mt_terminal_path | quote }}
+    "/config:tester.ini"'
