@@ -142,4 +142,4 @@ ea_runner_bt_mt5_config:
     UseRemote:
     Visual: 0
 ea_runner_cmd_prefix: wine
-ea_runner_mt_version: 5
+ea_runner_mt_version: 4
