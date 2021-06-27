@@ -13,7 +13,9 @@
   changed_when: false
   find:
     paths: '{{ ansible_env.HOME }}/.wine'
-    patterns: '{{ "terminal.exe" if ea_runner_mt_version == 4 else "terminal64.exe" }}'
+    patterns: >-
+      '{{ "terminal.exe" if ea_runner_mt_version == 4 \
+      else "terminal64.exe" }}'
     recurse: true
   register: cmd_reg_mt_path
 - name: Set MT platform path
@@ -24,11 +26,13 @@
     ea_runner_mt_terminal_path: "{{ cmd_reg_mt_path.files[0].path }}"
 - name: Convert MT path 1 to Unix
   changed_when: false
+  # noqa command-instead-of-shell
   shell: 'DISPLAY={{ xvfb_display }} winepath {{ ea_runner_mt_path | quote }}'
   register: cmd_winepath_mt_path
   when: ansible_os_family != "Windows"
 - name: Convert MT path 2 to Unix
   changed_when: false
+  # noqa command-instead-of-shell
   shell: 'DISPLAY={{ xvfb_display }} winepath
     {{ ea_runner_mt_terminal_path | quote }}'
   register: cmd_winepath_mt_terminal_path
@@ -53,6 +57,7 @@
       {{ ea_runner_mt_terminal_path | quote }} "/config:tester.ini"'
 - name: Running terminal
   changed_when: false
+  # noqa command-instead-of-shell
   shell: 'cd {{ ea_runner_mt_path | quote }} && DISPLAY={{ xvfb_display }}
     {{ ea_runner_cmd_prefix | quote }} {{ ea_runner_mt_terminal_path | quote }}
     "/config:tester.ini"'
