@@ -2,7 +2,7 @@
 ; Terminal Configuration at Startup
 ; @see: https://www.metatrader5.com/en/terminal/help/start_advanced/start
 
-{%- for group_key, group in ea_runner_bt_mt5_config.items() %}
+{%- for group_key, group in mt_runner_bt_mt5_config.items() %}
 [{{ group_key }}]
 {%- for key, value in group.items() %}
 {{ key ~ '=' ~ (value or '') }}

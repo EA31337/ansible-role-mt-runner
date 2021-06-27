@@ -2,6 +2,6 @@
 ; Terminal Configuration at Startup
 ; See: http://www.metatrader4.com/en/trading-platform/help/service/start_conf_file
 
-{%- for key, value in ea_runner_bt_mt4_config.items() %}
+{%- for key, value in mt_runner_bt_mt4_config.items() %}
 {{ key ~ '=' ~ (value or '') }}
 {%- endfor -%}
