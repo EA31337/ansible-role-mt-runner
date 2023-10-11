@@ -25,14 +25,20 @@
 - name: Convert MT path 1 to Unix
   changed_when: false
   # noqa command-instead-of-shell
-  ansible.builtin.shell: 'DISPLAY={{ xvfb_display }} winepath {{ mt_runner_mt_path | quote }}'
+  ansible.builtin.shell: >-
+    winepath {{ mt_runner_mt_path | quote }}
+  environment:
+    DISPLAY: "{{ xvfb_display }}"
   register: cmd_winepath_mt_path
   when: ansible_os_family != "Windows"
 - name: Convert MT path 2 to Unix
   changed_when: false
   # noqa command-instead-of-shell
-  ansible.builtin.shell: 'DISPLAY={{ xvfb_display }} winepath
-    {{ mt_runner_mt_terminal_path | quote }}'
+  ansible.builtin.shell: >-
+    DISPLAY={{ xvfb_display }} winepath
+    {{ mt_runner_mt_terminal_path | quote }}
+  environment:
+    DISPLAY: "{{ xvfb_display }}"
   register: cmd_winepath_mt_terminal_path
   when: ansible_os_family != "Windows"
 - name: Set MT platform path 1 for Unix
@@ -54,7 +60,8 @@
   ansible.builtin.shell:
     chdir: '{{ mt_runner_mt_path }}'
     cmd: >-
-      DISPLAY={{ xvfb_display }}
       {{ mt_runner_cmd_prefix | quote }}
       {{ mt_runner_mt_terminal_path | quote }}
       "/config:tester.ini"
+  environment:
+    DISPLAY: "{{ xvfb_display }}"
