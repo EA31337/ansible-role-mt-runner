@@ -3,7 +3,7 @@
   hosts: all
   tasks:
     - name: Include main role
-      include_role:
+      ansible.builtin.include_role:
         name: ansible-role-mt-runner
       vars:
         metatrader_setup_url: |

@@ -11,47 +11,47 @@
     - winbind
 - name: Query MT platform path
   changed_when: false
-  find:
+  ansible.builtin.find:
     paths: '{{ ansible_env.HOME }}/.wine'
     patterns: '{{ mt_runner_mt_files[mt_runner_mt_version].terminal }}'
     recurse: true
   register: mt_path_terminal
 - name: Set MT platform path
-  set_fact:
+  ansible.builtin.set_fact:
     mt_runner_mt_path: "{{ mt_path_terminal.files[0].path | dirname }}"
 - name: Set MT platform's Terminal path
-  set_fact:
+  ansible.builtin.set_fact:
     mt_runner_mt_terminal_path: "{{ mt_path_terminal.files[0].path }}"
 - name: Convert MT path 1 to Unix
   changed_when: false
   # noqa command-instead-of-shell
-  shell: 'DISPLAY={{ xvfb_display }} winepath {{ mt_runner_mt_path | quote }}'
+  ansible.builtin.shell: 'DISPLAY={{ xvfb_display }} winepath {{ mt_runner_mt_path | quote }}'
   register: cmd_winepath_mt_path
   when: ansible_os_family != "Windows"
 - name: Convert MT path 2 to Unix
   changed_when: false
   # noqa command-instead-of-shell
-  shell: 'DISPLAY={{ xvfb_display }} winepath
+  ansible.builtin.shell: 'DISPLAY={{ xvfb_display }} winepath
     {{ mt_runner_mt_terminal_path | quote }}'
   register: cmd_winepath_mt_terminal_path
   when: ansible_os_family != "Windows"
 - name: Set MT platform path 1 for Unix
-  set_fact:
+  ansible.builtin.set_fact:
     mt_runner_mt_path: "{{ cmd_winepath_mt_path.stdout }}"
   when: ansible_os_family != "Windows"
 - name: Set MT platform path 2 for Unix
-  set_fact:
+  ansible.builtin.set_fact:
     mt_runner_mt_terminal_path: "{{ cmd_winepath_mt_terminal_path.stdout }}"
   when: ansible_os_family != "Windows"
 - name: Copy tester.ini template
   ansible.builtin.template:
     dest: '{{ mt_runner_mt_path }}/tester.ini'
-    mode: 0644
+    mode: "0644"
     src: '{{ mt_runner_mt_version }}/tester.ini.j2'
 - name: Run Terminal
   changed_when: false
   # noqa command-instead-of-shell
-  shell:
+  ansible.builtin.shell:
     chdir: '{{ mt_runner_mt_path }}'
     cmd: >-
       DISPLAY={{ xvfb_display }}
