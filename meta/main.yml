@@ -26,4 +26,4 @@ galaxy_info:
     - name: Ubuntu
       versions:
         - all
-  role_name: metatrader
+  role_name: mt_runner
