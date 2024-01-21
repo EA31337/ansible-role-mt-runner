@@ -1,6 +1,6 @@
 # Molecule's requirements file.
 ---
-- name: metatrader
+- name: ea31337.metatrader
   scm: git
   src: https://github.com/EA31337/ansible-role-metatrader.git
   version: dev
