@@ -13,7 +13,7 @@
   changed_when: false
   ansible.builtin.find:
     paths: '{{ ansible_env.HOME }}/.wine'
-    patterns: '{{ mt_runner_mt_files[mt_runner_mt_version|int].terminal }}'
+    patterns: '{{ mt_runner_mt_files[mt_runner_mt_version | int].terminal }}'
     recurse: true
   register: mt_path_terminal
 - name: Set MT platform path
@@ -54,14 +54,30 @@
     dest: '{{ mt_runner_mt_path }}/tester.ini'
     mode: "0644"
     src: '{{ mt_runner_mt_version }}/tester.ini.j2'
-- name: Run Terminal
-  changed_when: false
-  # noqa command-instead-of-shell
-  ansible.builtin.shell:
-    chdir: '{{ mt_runner_mt_path }}'
-    cmd: >-
-      {{ mt_runner_cmd_prefix | quote }}
-      {{ mt_runner_mt_terminal_path | quote }}
-      "/config:tester.ini"
-  environment:
-    DISPLAY: "{{ xvfb_display }}"
+- name: Run test
+  block:
+    - name: Run Terminal
+      changed_when: false
+      ansible.builtin.command:
+        argv:
+          - "{{ mt_runner_cmd_prefix }}"
+          - "{{ mt_runner_mt_terminal_path }}"
+          - /config:tester.ini
+      args:
+        chdir: '{{ mt_runner_mt_path }}'
+      environment:
+        DISPLAY: "{{ xvfb_display }}"
+      register: cmd_terminal_res
+  rescue:
+    - name: Print message after failure
+      ansible.builtin.debug:
+        msg: Test failed!
+    - name: Make sure all handlers run
+      ansible.builtin.meta: flush_handlers
+    - name: Fail
+      ansible.builtin.command: /bin/false
+      changed_when: false
+  always:
+    - name: Always do this
+      ansible.builtin.debug:
+        msg: This always executes
