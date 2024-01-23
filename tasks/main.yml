@@ -13,7 +13,7 @@
   changed_when: false
   ansible.builtin.find:
     paths: '{{ ansible_env.HOME }}/.wine'
-    patterns: '{{ mt_runner_mt_files[mt_runner_mt_version].terminal }}'
+    patterns: '{{ mt_runner_mt_files[mt_runner_mt_version|int].terminal }}'
     recurse: true
   register: mt_path_terminal
 - name: Set MT platform path
