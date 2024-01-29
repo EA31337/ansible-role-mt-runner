@@ -74,6 +74,23 @@
         msg: Test failed!
     - name: Make sure all handlers run
       ansible.builtin.meta: flush_handlers
+    - name: Prints logs
+      block:
+        - name: Finds all log files
+          ansible.builtin.find:
+            paths: "{{ mt_runner_mt_path }}"
+            patterns: "*.log"
+            recurse: true
+          register: mt_log_files
+        - name: Fetches log files
+          ansible.builtin.slurp:
+            src: "{{ item.path }}"
+          loop: "{{ mt_log_files.files }}"
+          register: mt_log_content
+        - name: Prints log file
+          ansible.builtin.debug:
+            msg: "{{ lookup('convert_to_utf16', item.content).split('\n') }}"
+          loop: "{{ mt_log_content.results }}"
     - name: Fail
       ansible.builtin.command: /bin/false
       changed_when: false
