@@ -89,7 +89,7 @@
           register: mt_log_content
         - name: Prints log file
           ansible.builtin.debug:
-            msg: "{{ lookup('convert_to_utf16', item.content).split('\n') }}"
+            msg: "{{ lookup('decode_utf16', item.content) }}"
           loop: "{{ mt_log_content.results }}"
     - name: Fail
       ansible.builtin.command: /bin/false
