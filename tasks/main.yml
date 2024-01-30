@@ -80,47 +80,68 @@
         state: absent
       loop: "{{ mt_old_logs.files }}"
 
-- name: Run test
+
+- name: Runs terminal
+  async: 600
+  poll: 0
+  changed_when: false
+  ansible.builtin.command:
+    argv:
+      - "{{ mt_runner_cmd_prefix }}"
+      - "{{ mt_runner_mt_terminal_path }}"
+      - /config:tester.ini
+  args:
+    chdir: '{{ mt_runner_mt_path }}'
+  environment:
+    DISPLAY: "{{ xvfb_display }}"
+  register: cmd_terminal_async
+
+- name: Wait for the tester log file to be created
+  ansible.builtin.wait_for:
+    delay: 10
+    path: |-
+      {{ mt_runner_mt_path ~ '/logs/' ~ ('%Y%m%d' | strftime(ansible_date_time.epoch | int)) }}.log
+    state: present
+    timeout: 60
+  register: task_wait_for_tester_logs
+
+- name: Fetches tester log file
+  ansible.builtin.slurp:
+    src: "{{ task_wait_for_tester_logs.path }}"
+  register: slurp_mt_tester_log_content
+
+- name: Prints tester log file
+  ansible.builtin.debug:
+    msg: "{{ lookup('decode_utf16', slurp_mt_tester_log_content.content) }}"
+  failed_when: |
+    'tester not started' in debug_tester_log.msg
+  register: debug_tester_log
+
+- name: Wait until terminal exists
+  ansible.builtin.async_status:
+    jid: '{{ cmd_terminal_async.ansible_job_id }}'
+  delay: 10
+  register: cmd_terminal_async_status
+  until: cmd_terminal_async_status is finished
+  retries: 60
+
+- name: Process logs
   block:
-    - name: Run Terminal
-      changed_when: false
-      ansible.builtin.command:
-        argv:
-          - "{{ mt_runner_cmd_prefix }}"
-          - "{{ mt_runner_mt_terminal_path }}"
-          - /config:tester.ini
-      args:
-        chdir: '{{ mt_runner_mt_path }}'
-      environment:
-        DISPLAY: "{{ xvfb_display }}"
-      register: cmd_terminal_res
-  rescue:
-    - name: Print message after failure
+    - name: Finds all log files
+      ansible.builtin.find:
+        paths: "{{ mt_runner_mt_path }}"
+        patterns: "*.log"
+        recurse: true
+      register: mt_log_files
+    - name: Fetches log files
+      ansible.builtin.slurp:
+        src: "{{ item.path }}"
+      loop: "{{ mt_log_files.files }}"
+      register: mt_log_content
+    - name: Prints log file
       ansible.builtin.debug:
-        msg: Test failed!
-    - name: Make sure all handlers run
-      ansible.builtin.meta: flush_handlers
-    - name: Prints logs
-      block:
-        - name: Finds all log files
-          ansible.builtin.find:
-            paths: "{{ mt_runner_mt_path }}"
-            patterns: "*.log"
-            recurse: true
-          register: mt_log_files
-        - name: Fetches log files
-          ansible.builtin.slurp:
-            src: "{{ item.path }}"
-          loop: "{{ mt_log_files.files }}"
-          register: mt_log_content
-        - name: Prints log file
-          ansible.builtin.debug:
-            msg: "{{ lookup('decode_utf16', item.content) }}"
-          loop: "{{ mt_log_content.results }}"
-    - name: Fail
-      ansible.builtin.command: /bin/false
-      changed_when: false
-  always:
-    - name: Always do this
-      ansible.builtin.debug:
-        msg: This always executes
+        msg: "{{ lookup('decode_utf16', item.content) }}"
+      loop: "{{ mt_log_content.results }}"
+
+- name: Make sure all handlers run
+  ansible.builtin.meta: flush_handlers
