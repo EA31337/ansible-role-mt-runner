@@ -33,7 +33,7 @@
     - name: Converts platform's path to Unix
       changed_when: false
       # noqa command-instead-of-shell
-      ansible.builtin.shell: >-
+      ansible.builtin.command: >-
         winepath {{ mt_runner_mt_path | quote }}
       environment:
         DISPLAY: "{{ xvfb_display }}"
@@ -41,7 +41,7 @@
     - name: Converts platform's terminal path to Unix
       changed_when: false
       # noqa command-instead-of-shell
-      ansible.builtin.shell: >-
+      ansible.builtin.command: >-
         winepath {{ mt_runner_mt_terminal_path | quote }}
       environment:
         DISPLAY: "{{ xvfb_display }}"
@@ -53,12 +53,18 @@
       ansible.builtin.set_fact:
         mt_runner_mt_terminal_path: "{{ cmd_winepath_mt_terminal_path.stdout }}"
 
-
 - name: Creates tester.ini
   ansible.builtin.template:
     dest: '{{ mt_runner_mt_path }}/tester.ini'
     mode: "0644"
     src: '{{ mt_runner_mt_version }}/tester.ini.j2'
+
+- name: Preparations before the test (non-Windows)
+  when: ansible_os_family != "Windows"
+  block:
+    - name: Kills existing terminal processes
+      changed_when: false
+      ansible.builtin.command: pkill terminal
 
 - name: Run test
   block:
