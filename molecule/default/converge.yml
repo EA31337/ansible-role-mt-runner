@@ -4,7 +4,7 @@
   tasks:
     - name: Include main role
       ansible.builtin.import_role:
-        name: ansible-role-mt-runner
+        name: ea31337.mt_runner
       vars:
         mt_runner_bt_mt5_config:
           Tester:
