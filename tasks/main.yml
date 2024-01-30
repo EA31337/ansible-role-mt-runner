@@ -1,5 +1,5 @@
 ---
-- name: Check platform (Linux)
+- name: Check platform (non-Windows)
   when: ansible_os_family != "Windows"
   block:
     - name: Install winbind package
@@ -20,16 +20,14 @@
           '{{ mt_runner_mt_files[mt_runner_mt_version | int].terminal }}'
         recurse: true
       register: mt_path_terminal
+    - name: Set platform's path
+      ansible.builtin.set_fact:
+        mt_runner_mt_path: "{{ mt_path_terminal.files[0].path | dirname }}"
+    - name: Set platform's terminal path
+      ansible.builtin.set_fact:
+        mt_runner_mt_terminal_path: "{{ mt_path_terminal.files[0].path }}"
 
-- name: Set platform's path
-  ansible.builtin.set_fact:
-    mt_runner_mt_path: "{{ mt_path_terminal.files[0].path | dirname }}"
-
-- name: Set platform's terminal path
-  ansible.builtin.set_fact:
-    mt_runner_mt_terminal_path: "{{ mt_path_terminal.files[0].path }}"
-
-- name: Convert paths (Linux)
+- name: Convert paths (non-Windows)
   when: ansible_os_family != "Windows"
   block:
     - name: Converts platform's path to Unix
