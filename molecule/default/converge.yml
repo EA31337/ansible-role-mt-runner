@@ -8,4 +8,4 @@
       vars:
         mt_runner_bt_mt5_config:
           Tester:
-            Expert: Advisors/ExpertMACD
+            Expert: Advisors\ExpertMACD
