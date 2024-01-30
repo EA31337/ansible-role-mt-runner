@@ -5,3 +5,7 @@
     - name: Include main role
       ansible.builtin.import_role:
         name: ansible-role-mt-runner
+      vars:
+        mt_runner_bt_mt5_config:
+          Tester:
+            Expert: Advisors/ExpertMACD
