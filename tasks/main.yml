@@ -101,6 +101,7 @@
     delay: 30
     path: |-
       {{ mt_runner_mt_path ~ '/logs/' ~ ('%Y%m%d' | strftime(ansible_date_time.epoch | int)) }}.log
+    sleep: 10
     state: present
     timeout: 60
   register: task_wait_for_tester_logs
