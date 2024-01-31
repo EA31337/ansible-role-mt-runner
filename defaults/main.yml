@@ -86,7 +86,7 @@ mt_runner_bt_mt5_config:
     ProxyPassword:
     ProxyServer:
     ProxyType: SOCKS5
-    Server:
+    Server: MetaQuotes-Demo
   Charts:
     PrintColor: 1
     SaveDeleted: 1

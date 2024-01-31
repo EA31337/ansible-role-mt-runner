@@ -7,5 +7,14 @@
         name: ea31337.mt_runner
       vars:
         mt_runner_bt_mt5_config:
+          Common:
+            Server: MetaQuotes-Demo
           Tester:
+            ExecutionMode: 0
             Expert: Advisors\ExpertMACD
+            FromDate: 2024.01.01
+            Login: 12345
+            Model: 1
+            ShutdownTerminal: 1
+            Symbol: EURUSD
+            ToDate: 2024.01.11
