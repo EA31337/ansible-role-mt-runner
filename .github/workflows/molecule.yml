@@ -16,6 +16,7 @@ jobs:
       - uses: robertdebock/molecule-action@master
         with:
           scenario: mt4
+    timeout-minutes: 20
   Test-MT5:
     runs-on: ubuntu-latest
     steps:
@@ -25,3 +26,4 @@ jobs:
       - uses: robertdebock/molecule-action@6.0.1
         with:
           scenario: default
+    timeout-minutes: 20
