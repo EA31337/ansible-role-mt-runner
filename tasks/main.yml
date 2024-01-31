@@ -98,7 +98,7 @@
 
 - name: Wait for the tester log file to be created
   ansible.builtin.wait_for:
-    delay: 10
+    delay: 30
     path: |-
       {{ mt_runner_mt_path ~ '/logs/' ~ ('%Y%m%d' | strftime(ansible_date_time.epoch | int)) }}.log
     state: present
