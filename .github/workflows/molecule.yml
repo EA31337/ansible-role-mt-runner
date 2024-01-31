@@ -10,7 +10,7 @@ jobs:
   Test-MT4:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           path: "${{ github.repository }}"
       - uses: robertdebock/molecule-action@master
@@ -19,9 +19,9 @@ jobs:
   Test-MT5:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           path: "${{ github.repository }}"
-      - uses: robertdebock/molecule-action@master
+      - uses: robertdebock/molecule-action@6.0.1
         with:
           scenario: default
