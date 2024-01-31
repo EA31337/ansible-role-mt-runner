@@ -2,6 +2,8 @@
 # Usage:
 # ansible-galaxy install -r requirements.yml
 ---
+collections:
+  - name: community.general  # For unixy.
 roles:
   - name: ea31337.metatrader
     scm: git
