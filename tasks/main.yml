@@ -95,7 +95,7 @@
     chdir: '{{ mt_runner_mt_path }}'
   environment:
     DISPLAY: "{{ xvfb_display }}"
-    WINEDEBUG: warn-all,fixme-all,err-alsa,-ole,-toolbar
+    WINEDEBUG: warn-all,fixme-all,-alsa,-ole,-toolbar
   register: cmd_terminal_async
 
 - name: Check for terminal log
