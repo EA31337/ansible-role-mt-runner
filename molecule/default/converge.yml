@@ -8,13 +8,19 @@
       vars:
         mt_runner_bt_mt5_config:
           Common:
+            Login: '{{ "Nzg3MjEyMTM=" | b64decode }}'
+            Password: '{{ "WnlVYlJiQDE=" | b64decode }}'
             Server: MetaQuotes-Demo
           Tester:
+            Deposit: 10000
             ExecutionMode: 0
             Expert: Advisors\ExpertMACD
             FromDate: 2024.01.01
+            Leverage: 1:500
             Login: 12345
             Model: 1
+            Report: report.html
+            ReplaceReport: 1
             ShutdownTerminal: 1
             Symbol: EURUSD
             ToDate: 2024.01.11
