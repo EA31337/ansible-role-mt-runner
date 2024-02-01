@@ -117,7 +117,8 @@
       ansible.builtin.debug:
         msg: "{{ lookup('decode_utf16', slurp_mt_terminal_log_content.content) }}"
       failed_when: |
-        'tester not started' in debug_terminal_log.msg
+        ('tester not started' in debug_terminal_log) or
+        ('not found' in debug_terminal_log)
       register: debug_terminal_log
 
 - name: Wait until terminal exits
@@ -142,9 +143,9 @@
         src: "{{ item.path }}"
       loop: "{{ mt_log_files.files }}"
       register: mt_log_content
-    - name: Prints log file
+    - name: Prints log files
       ansible.builtin.debug:
-        msg: "{{ lookup('decode_utf16', item.content) }}"
+        var: lookup('decode_utf16', item.content)
       loop: "{{ mt_log_content.results }}"
 
 - name: Make sure all handlers run
