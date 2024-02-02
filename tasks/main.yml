@@ -82,12 +82,20 @@
       tags:
         - molecule-idempotence-notest
 
-- name: Ensure required files are fetched
-  ansible.builtin.get_url:
-    dest: "{{ item.dest }}"
-    mode: "{{ item.mode | default('u=rw,g=r') }}"
-    url: "{{ item.url }}"
-  loop: "{{ mt_runner_get_url_list }}"
+- name: Ensures specified files are present
+  block:
+    - name: Ensures destination directories are present
+      ansible.builtin.file:
+        mode: '0755'
+        path: "{{ item.dest }}"
+        state: directory
+      loop: "{{ mt_runner_get_url_list }}"
+    - name: Ensures files are present
+      ansible.builtin.get_url:
+        dest: "{{ item.dest }}"
+        mode: "{{ item.mode | default('u=rw,g=r') }}"
+        url: "{{ item.url }}"
+      loop: "{{ mt_runner_get_url_list }}"
 
 - name: Runs terminal
   async: 600
