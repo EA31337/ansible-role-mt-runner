@@ -119,7 +119,7 @@
     - name: Prints terminal log file
       ansible.builtin.command:
         cmd: iconv -f utf-16 -t utf-8 "{{ task_wait_for_terminal_logs.path }}"
-        removes: "{{ task_wait_for_terminal_logs.path }}"
+      changed_when: false
       failed_when: |
         cmd_iconv_res.stderr | length > 0
         or ('tester not started' in cmd_iconv_res.stdout)
@@ -146,7 +146,7 @@
     - name: Prints all logs
       ansible.builtin.command:
         cmd: iconv -f utf-16 -t utf-8 "{{ item.path }}"
-        removes: "{{ item.path }}"
+      changed_when: false
       loop: "{{ mt_log_files.files }}"
 
 - name: Make sure all handlers run
