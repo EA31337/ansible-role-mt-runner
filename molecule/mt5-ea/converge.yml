@@ -14,7 +14,7 @@
           Tester:
             Deposit: 10000
             ExecutionMode: 0
-            Expert: Advisors\ExpertMACD
+            Expert: EA31337-Elite-v3.000-rc1.ex5
             FromDate: 2024.01.01
             Leverage: 1:500
             Login: 12345
