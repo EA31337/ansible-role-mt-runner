@@ -130,8 +130,10 @@
       changed_when: false
       failed_when: |
         cmd_iconv_res.stderr | length > 0
-        or ('tester not started' in cmd_iconv_res.stdout)
-        or ('not found' in cmd_iconv_res.stdout)
+        or ("exit with code -" in cmd_iconv_res.stdout)
+        or ("not found" in cmd_iconv_res.stdout)
+        or ("tester didn't start" in cmd_iconv_res.stdout)
+        or ("tester not started" in cmd_iconv_res.stdout)
       register: cmd_iconv_res
 
 - name: Wait until terminal exits
