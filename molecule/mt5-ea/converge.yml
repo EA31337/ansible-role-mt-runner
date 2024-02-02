@@ -19,6 +19,7 @@
             Leverage: 1:500
             Login: 12345
             Model: 1
+            Period: M15
             Report: report.html
             ReplaceReport: 1
             ShutdownTerminal: 1

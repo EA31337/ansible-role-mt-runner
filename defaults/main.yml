@@ -28,7 +28,7 @@ mt_runner_bt_mt4_config:
   FTPServer: ftp.example.com
   Login: 12345
   Password: 12345
-  Period: M30
+  Period: M15
   Profile: default
   ProxyEnable: false
   ProxyLogin: user45
@@ -118,25 +118,25 @@ mt_runner_bt_mt5_config:
     Template:
   Tester:
     Currency:
-    Deposit:
-    ExecutionMode:
+    Deposit: 10000
+    ExecutionMode: 0
     Expert:
     ExpertParameters:
     ForwardDate:
     ForwardMode:
-    FromDate:
-    Leverage:
+    FromDate: 2024.01.01
+    Leverage: 1:100
     Login:
-    Model:
+    Model: 1
     Optimization:
     OptimizationCriterion:
-    Period:
+    Period: M15
     Port:
-    ReplaceReport:
-    Report:
+    ReplaceReport: 1
+    Report: report.html
     ShutdownTerminal: 1
-    Symbol:
-    ToDate:
+    Symbol: EURUSD
+    ToDate: 2024.01.11
     UseCloud: 0
     UseLocal: 1
     UseRemote:
