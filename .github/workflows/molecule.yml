@@ -13,8 +13,9 @@ jobs:
       fail-fast: false
       matrix:
         scenario:
-          - mt4
           - default
+          - mt4
+          - mt5-ea
     steps:
       - uses: actions/checkout@v4
         with:
