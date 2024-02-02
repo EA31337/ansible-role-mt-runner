@@ -142,4 +142,5 @@ mt_runner_bt_mt5_config:
     UseRemote:
     Visual: 0
 mt_runner_cmd_prefix: wine
+mt_runner_get_url_list: []
 mt_runner_mt_version: '{{ metatrader_version | default(5) | int }}'

@@ -82,6 +82,13 @@
       tags:
         - molecule-idempotence-notest
 
+- name: Ensure required files are fetched
+  # noqa: args[module]
+  ansible.builtin.get_url: "{{ item }}"
+  args:
+    mode: u=rw,g=r
+  loop: "{{ mt_runner_get_url_list }}"
+
 - name: Runs terminal
   async: 600
   poll: 0
