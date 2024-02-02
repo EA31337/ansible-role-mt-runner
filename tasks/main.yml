@@ -135,19 +135,17 @@
   until: cmd_terminal_async_status is finished
   retries: 60
 
-- name: Process logs
+- name: Checks logs
   block:
-    - name: Finds all log files
-      ansible.builtin.find:
-        paths: "{{ mt_runner_mt_path }}"
-        patterns: "*.log"
-        recurse: true
-      register: mt_log_files
-    - name: Prints all logs
+    - name: Prints final terminal log file
       ansible.builtin.command:
-        cmd: iconv -f utf-16 -t utf-8 "{{ item.path }}"
+        cmd: iconv -f utf-16 -t utf-8 "{{ task_wait_for_terminal_logs.path }}"
       changed_when: false
-      loop: "{{ mt_log_files.files }}"
+      failed_when: |
+        cmd_iconv_res.stderr | length > 0
+        or ('tester not started' in cmd_iconv_res.stdout)
+        or ('not found' in cmd_iconv_res.stdout)
+      register: cmd_iconv_res
 
 - name: Make sure all handlers run
   ansible.builtin.meta: flush_handlers
