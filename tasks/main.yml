@@ -109,17 +109,15 @@
         state: present
         timeout: 60
       register: task_wait_for_terminal_logs
-    - name: Fetches terminal log file
-      ansible.builtin.slurp:
-        src: "{{ task_wait_for_terminal_logs.path }}"
-      register: slurp_mt_terminal_log_content
-    - name: Prints tester log file
-      ansible.builtin.debug:
-        msg: "{{ lookup('decode_utf16', slurp_mt_terminal_log_content.content) }}"
+    - name: Prints terminal log file
+      ansible.builtin.command:
+        cmd: iconv -f utf-16 -t utf-8 "{{ task_wait_for_terminal_logs.path }}"
+        removes: "{{ task_wait_for_terminal_logs.path }}"
       failed_when: |
-        ('tester not started' in debug_terminal_log) or
-        ('not found' in debug_terminal_log)
-      register: debug_terminal_log
+        cmd_iconv_res.stderr | length > 0
+        or ('tester not started' in cmd_iconv_res.stdout)
+        or ('not found' in cmd_iconv_res.stdout)
+      register: cmd_iconv_res
 
 - name: Wait until terminal exits
   ansible.builtin.async_status:
@@ -138,15 +136,11 @@
         patterns: "*.log"
         recurse: true
       register: mt_log_files
-    - name: Fetches log files
-      ansible.builtin.slurp:
-        src: "{{ item.path }}"
+    - name: Prints all logs
+      ansible.builtin.command:
+        cmd: iconv -f utf-16 -t utf-8 "{{ item.path }}"
+        removes: "{{ item.path }}"
       loop: "{{ mt_log_files.files }}"
-      register: mt_log_content
-    - name: Prints log files
-      ansible.builtin.debug:
-        var: lookup('decode_utf16', item.content)
-      loop: "{{ mt_log_content.results }}"
 
 - name: Make sure all handlers run
   ansible.builtin.meta: flush_handlers
