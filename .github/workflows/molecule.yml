@@ -23,7 +23,7 @@ jobs:
       - uses: gofrolist/molecule-action@v2
         env:
           ANSIBLE_FORCE_COLOR: '1'
-          ANSIBLE_STDOUT_CALLBACK: debug
+          ANSIBLE_STDOUT_CALLBACK: yaml
         with:
           molecule_args: --scenario-name ${{ matrix.scenario }}
           molecule_command: test
