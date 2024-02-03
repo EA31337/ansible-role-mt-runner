@@ -14,7 +14,7 @@
           Tester:
             Deposit: 10000
             ExecutionMode: 0
-            Expert: Advisors\ExpertMACD.ex5
+            Expert: Advisors\EA31337-Libre-v1.013.ex5
             FromDate: 2024.01.01
             Leverage: 1:500
             Login: 12345
@@ -24,3 +24,6 @@
             ShutdownTerminal: 1
             Symbol: EURUSD
             ToDate: 2024.01.11
+        mt_runner_get_url_list:
+          - dest: "{{ mt_runner_mt_path }}/MQL5/Experts/Advisors"
+            url: https://github.com/EA31337/EA31337-Libre/releases/download/v1.013/EA31337-Libre-v1.013.ex5
