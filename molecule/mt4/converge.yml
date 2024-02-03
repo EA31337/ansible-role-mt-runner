@@ -1,0 +1,26 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: Include main role
+      ansible.builtin.include_role:
+        name: ea31337.mt_runner
+      vars:
+        mt_runner_bt_mt4_config:
+          Login: 12345
+          Password: 12345
+          Profile: default
+          Server:
+          TestExpert: MACD Sample.ex4
+          TestFromDate: 2020.01.01
+          TestModel: 1
+          TestPeriod: M15
+          TestReport: report.html
+          TestShutdownTerminal: true
+          TestSymbol: EURUSD
+          TestToDate: 2020.01.11
+          TestSpread: 10
+        # noqa: var-naming[no-role-prefix]
+        metatrader_setup_url: |
+          https://download.mql5.com/cdn/web/3315/mt4/xm4setup.exe
+        metatrader_version: 4

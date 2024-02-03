@@ -1,0 +1,32 @@
+---
+name: Molecule
+
+# yamllint disable-line rule:truthy
+on:
+  pull_request:
+  push:
+
+jobs:
+  Test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        scenario:
+          - default
+          - mt4
+          - mt5-ea
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: "${{ github.repository }}"
+      - uses: gofrolist/molecule-action@v2
+        env:
+          ANSIBLE_FORCE_COLOR: '1'
+          ANSIBLE_STDOUT_CALLBACK: yaml
+        with:
+          molecule_args: --scenario-name ${{ matrix.scenario }}
+          molecule_command: test
+          molecule_options: --verbose
+          molecule_working_dir: "${{ github.repository }}"
+    timeout-minutes: 20

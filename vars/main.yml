@@ -1,0 +1,6 @@
+---
+mt_runner_mt_files:
+  4:
+    terminal: terminal.exe
+  5:
+    terminal: terminal64.exe

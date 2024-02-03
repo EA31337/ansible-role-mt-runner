@@ -1,0 +1,29 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: Include main role
+      ansible.builtin.import_role:
+        name: ea31337.mt_runner
+      vars:
+        mt_runner_bt_mt5_config:
+          Common:
+            Login: '{{ "Nzg3MjEyMTM=" | b64decode }}'
+            Password: '{{ "WnlVYlJiQDE=" | b64decode }}'
+            Server: MetaQuotes-Demo
+          Tester:
+            Deposit: 10000
+            ExecutionMode: 0
+            Expert: Advisors\EA31337-Libre-v1.013.ex5
+            FromDate: 2024.01.01
+            Leverage: 1:500
+            Login: 12345
+            Model: 1
+            Report: report.html
+            ReplaceReport: 1
+            ShutdownTerminal: 1
+            Symbol: EURUSD
+            ToDate: 2024.01.11
+        mt_runner_get_url_list:
+          - dest: "{{ mt_runner_mt_path }}/MQL5/Experts/Advisors"
+            url: https://github.com/EA31337/EA31337-Libre/releases/download/v1.013/EA31337-Libre-v1.013.ex5

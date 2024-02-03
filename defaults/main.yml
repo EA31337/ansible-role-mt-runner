@@ -1,11 +1,11 @@
 ---
-ea_runner_bt_mt4_common:
+mt_runner_bt_mt4_common:
   currency: USD
   deposit: 10000
   fitnes: 0
   genetic: 1
   positions: 2
-ea_runner_bt_mt4_config:
+mt_runner_bt_mt4_config:
   AutoConfiguration: false
   DataServer: 127.0.0.1:443
   EnableDDE: false
@@ -28,7 +28,7 @@ ea_runner_bt_mt4_config:
   FTPServer: ftp.example.com
   Login: 12345
   Password: 12345
-  Period: M30
+  Period: M15
   Profile: default
   ProxyEnable: false
   ProxyLogin: user45
@@ -54,24 +54,94 @@ ea_runner_bt_mt4_config:
   TestSymbol: EURUSD
   TestToDate: 2019.01.31
   TestVisualEnable: false
-ea_runner_bt_mt4_inputs:
-  - foo: bar
-ea_runner_bt_mt4_limits:
-  - balance: 200.00
-  - balance_enable: 0
-  - consecloss: 5000.00
-  - consecloss_enable: 0
-  - conseclossdeals: 20.00
-  - conseclossdeals_enable: 0
-  - consecwin: 10000.00
-  - consecwin_enable: 0
-  - consecwindeals: 30.00
-  - consecwindeals_enable: 0
-  - marginlevel: 30.00
-  - marginlevel_enable: 0
-  - maxdrawdown: 50.00
-  - maxdrawdown_enable: 1
-  - profit: 10000.00
-  - profit_enable: 0
-ea_runner_cmd_prefix: wine
-ea_runner_mt_version: 5
+mt_runner_bt_mt4_inputs:
+  foo: bar
+mt_runner_bt_mt4_limits:
+  balance: 200.00
+  balance_enable: 0
+  consecloss: 5000.00
+  consecloss_enable: 0
+  conseclossdeals: 20.00
+  conseclossdeals_enable: 0
+  consecwin: 10000.00
+  consecwin_enable: 0
+  consecwindeals: 30.00
+  consecwindeals_enable: 0
+  marginlevel: 30.00
+  marginlevel_enable: 0
+  maxdrawdown: 50.00
+  maxdrawdown_enable: 1
+  profit: 10000.00
+  profit_enable: 0
+mt_runner_bt_mt5_config:
+  Common:
+    CertInstall: 0
+    CertPassword:
+    KeepPrivate: 1
+    Login: 12345
+    NewsEnable: 0
+    Password: 12345
+    ProxyEnable: 0
+    ProxyLogin:
+    ProxyPassword:
+    ProxyServer:
+    ProxyType: SOCKS5
+    Server: MetaQuotes-Demo
+  Charts:
+    PrintColor: 1
+    SaveDeleted: 1
+  Experts:
+    Account: 1
+    AllowDllImport: 1
+    AllowLiveTrading: 1
+    Enabled: 1
+    Profile: 1
+  Objects:
+    MagnetSens: 1
+    SelectOneClick: 1
+    ShowPropertiesOnCreate: 1
+  Email:
+    Auth:
+    Enable: 1
+    From:
+    Login:
+    Password:
+    Server:
+    To:
+  StartUp:
+    Expert:
+    ExpertParameters:
+    Period:
+    Script:
+    ScriptParameters:
+    Symbol:
+    Template:
+  Tester:
+    Currency:
+    Deposit: 10000
+    ExecutionMode: 0
+    Expert:
+    ExpertParameters:
+    ForwardDate:
+    ForwardMode:
+    FromDate: 2024.01.01
+    Leverage: 1:100
+    Login:
+    Model: 1
+    Optimization:
+    OptimizationCriterion:
+    Period: M15
+    Port:
+    ReplaceReport: 1
+    Report: report.html
+    ShutdownTerminal: 1
+    Symbol: EURUSD
+    ToDate: 2024.01.11
+    UseCloud: 0
+    UseLocal: 1
+    UseRemote:
+    Visual: 0
+mt_runner_cmd_prefix: wine
+mt_runner_get_url_list: []
+mt_runner_mt_version: '{{ metatrader_version | default(5) | int }}'
+mt_runner_timeout: 60
