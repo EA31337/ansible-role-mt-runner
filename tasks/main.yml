@@ -153,7 +153,12 @@
 
 - name: Checks logs
   block:
-    - name: Prints final terminal log file
+    - name: Prints final terminal log file (MT4)
+      ansible.builtin.command:
+        cmd: cat "{{ task_wait_for_terminal_logs.path }}"
+      changed_when: false
+      when: (mt_runner_mt_version | int) == 4
+    - name: Prints final terminal log file (MT5)
       ansible.builtin.command:
         cmd: iconv -f utf-16 -t utf-8 "{{ task_wait_for_terminal_logs.path }}"
       changed_when: false
@@ -162,6 +167,7 @@
         or ('tester not started' in cmd_iconv_res.stdout)
         or ('not found' in cmd_iconv_res.stdout)
       register: cmd_iconv_res
+      when: (mt_runner_mt_version | int) == 5
 
 - name: Make sure all handlers run
   ansible.builtin.meta: flush_handlers
