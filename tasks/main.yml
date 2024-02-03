@@ -149,7 +149,7 @@
   delay: 10
   register: cmd_terminal_async_status
   until: cmd_terminal_async_status is finished
-  retries: 60
+  retries: "{{ mt_runner_timeout // 10 }}"
 
 - name: Checks logs
   block:
