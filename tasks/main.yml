@@ -105,7 +105,7 @@
     argv:
       - "{{ mt_runner_cmd_prefix }}"
       - "{{ mt_runner_mt_terminal_path }}"
-      - /config:tester.ini
+      - "{{ '/config:tester.ini' if  mt_runner_mt_version == 5 else 'tester.ini' }}"
   args:
     chdir: '{{ mt_runner_mt_path }}'
   environment:
@@ -124,7 +124,12 @@
         state: present
         timeout: 60
       register: task_wait_for_terminal_logs
-    - name: Prints terminal log file
+    - name: Prints terminal log file (MT4)
+      ansible.builtin.command:
+        cmd: cat "{{ task_wait_for_terminal_logs.path }}"
+      changed_when: false
+      when: (mt_runner_mt_version | int) == 4
+    - name: Prints terminal log file (MT5)
       ansible.builtin.command:
         cmd: iconv -f utf-16 -t utf-8 "{{ task_wait_for_terminal_logs.path }}"
       changed_when: false
@@ -135,6 +140,7 @@
         or ("tester didn't start" in cmd_iconv_res.stdout)
         or ("tester not started" in cmd_iconv_res.stdout)
       register: cmd_iconv_res
+      when: (mt_runner_mt_version | int) == 5
 
 - name: Wait until terminal exits
   ansible.builtin.async_status:
