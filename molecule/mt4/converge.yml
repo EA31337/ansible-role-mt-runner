@@ -7,8 +7,6 @@
         name: ea31337.mt_runner
       vars:
         mt_runner_bt_mt4_config:
-          Login: 12345
-          Password: 12345
           Profile: default
           Server:
           TestExpert: MACD Sample.ex4
