@@ -24,6 +24,8 @@ jobs:
         env:
           ANSIBLE_FORCE_COLOR: '1'
           ANSIBLE_STDOUT_CALLBACK: yaml
+          MT_RUNNER_MT5_LOGIN: ${{ secrets.MT_RUNNER_MT5_LOGIN || '12345' }}
+          MT_RUNNER_MT5_PASSWORD: ${{ secrets.MT_RUNNER_MT5_PASSWORD || '12345' }}
         with:
           molecule_args: --scenario-name ${{ matrix.scenario }}
           molecule_command: test
