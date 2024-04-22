@@ -15,6 +15,7 @@
             Expert: EA31337-Elite-v3.000-rc1.ex5
             FromDate: 2024.01.01
             Leverage: 1:500
+            Login: "{{ ansible_facts.env.MT_RUNNER_MT5_LOGIN }}"
             Model: 1
             Period: M15
             Report: report.html

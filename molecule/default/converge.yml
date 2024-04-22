@@ -8,6 +8,8 @@
       vars:
         mt_runner_bt_mt5_config:
           Common:
+            Login: "{{ ansible_facts.env.MT_RUNNER_MT5_LOGIN }}"
+            Password: "{{ ansible_facts.env.MT_RUNNER_MT5_PASSWORD }}"
             Server: MetaQuotes-Demo
           Tester:
             Deposit: 10000
@@ -15,6 +17,7 @@
             Expert: Advisors\EA31337-Libre-v1.013.ex5
             FromDate: 2024.01.01
             Leverage: 1:500
+            Login: "{{ ansible_facts.env.MT_RUNNER_MT5_LOGIN }}"
             Model: 1
             Report: report.html
             ReplaceReport: 1
