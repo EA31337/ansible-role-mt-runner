@@ -146,7 +146,7 @@
   ansible.builtin.async_status:
     jid: '{{ cmd_terminal_async.ansible_job_id }}'
   changed_when: false
-  delay: 10
+  delay: 10  # How much time to wait between retries.
   register: cmd_terminal_async_status
   until: cmd_terminal_async_status is finished
   retries: "{{ mt_runner_timeout // 10 }}"
