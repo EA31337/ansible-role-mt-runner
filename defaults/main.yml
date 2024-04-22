@@ -26,8 +26,8 @@ mt_runner_bt_mt4_config:
   FTPPath: /inetpub
   FTPPeriod: 10
   FTPServer: ftp.example.com
-  Login: 12345
-  Password: 12345
+  Login: "{{ ansible_facts.env.MT_RUNNER_LOGIN | default('12345') }}"
+  Password: "{{ ansible_facts.env.MT_RUNNER_PASSWORD | default('12345') }}"
   Period: M15
   Profile: default
   ProxyEnable: false
@@ -78,9 +78,9 @@ mt_runner_bt_mt5_config:
     CertInstall: 0
     CertPassword:
     KeepPrivate: 1
-    Login: 12345
+    Login: "{{ ansible_facts.env.MT_RUNNER_LOGIN | default('12345') }}"
     NewsEnable: 0
-    Password: 12345
+    Password: "{{ ansible_facts.env.MT_RUNNER_PASSWORD | default('12345') }}"
     ProxyEnable: 0
     ProxyLogin:
     ProxyPassword:
@@ -126,7 +126,7 @@ mt_runner_bt_mt5_config:
     ForwardMode:
     FromDate: 2024.01.01
     Leverage: 1:100
-    Login:
+    Login: "{{ ansible_facts.env.MT_RUNNER_PASSWORD | default('12345') }}"
     Model: 1
     Optimization:
     OptimizationCriterion:
