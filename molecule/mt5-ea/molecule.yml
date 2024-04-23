@@ -6,15 +6,17 @@ lint: |
   #  yamllint .
   #  ansible-lint
 platforms:
-  - name: ubuntu-latest
+  - env:
+      MT_RUNNER_MT5_LOGIN: "${MT_RUNNER_MT5_LOGIN:-SETME}"
+      MT_RUNNER_MT5_PASSWORD: "${MT_RUNNER_MT5_PASSWORD:-SETME}"
+    groups:
+      - mt5
     image: ubuntu:latest
+    name: ubuntu-latest
 provisioner:
   config_options:
     defaults:
       remote_tmp: /tmp/.ansible-tmp-$${USER}
-  env:
-    MT_RUNNER_MT5_LOGIN: "${MT_RUNNER_MT5_LOGIN}"
-    MT_RUNNER_MT5_PASSWORD: "${MT_RUNNER_MT5_PASSWORD}"
   name: ansible
   inventory:
     group_vars:
