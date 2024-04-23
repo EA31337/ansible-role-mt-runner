@@ -12,6 +12,9 @@ provisioner:
   config_options:
     defaults:
       remote_tmp: /tmp/.ansible-tmp-$${USER}
+  env:
+    MT_RUNNER_MT5_LOGIN: "${MT_RUNNER_MT5_LOGIN}"
+    MT_RUNNER_MT5_PASSWORD: "${MT_RUNNER_MT5_PASSWORD}"
   name: ansible
   inventory:
     group_vars:
