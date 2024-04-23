@@ -8,6 +8,8 @@
       vars:
         mt_runner_bt_mt5_config:
           Common:
+            Login: "{{ ansible_facts.env.MT_RUNNER_MT5_LOGIN }}"
+            Password: "{{ ansible_facts.env.MT_RUNNER_MT5_PASSWORD }}"
             Server: MetaQuotes-Demo
           Tester:
             Deposit: 10000
