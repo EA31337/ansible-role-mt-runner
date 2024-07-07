@@ -33,4 +33,6 @@ jobs:
           molecule_command: test
           molecule_options: --verbose
           molecule_working_dir: "${{ github.repository }}"
+      - if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3
     timeout-minutes: 20
