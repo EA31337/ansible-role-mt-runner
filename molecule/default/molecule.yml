@@ -11,8 +11,8 @@ platforms:
       MT_RUNNER_MT5_PASSWORD: "${MT_RUNNER_MT5_PASSWORD:-SETME}"
     groups:
       - mt5
-    image: ubuntu:latest
-    name: ubuntu-latest
+    image: ubuntu:jammy
+    name: ubuntu-jammy
 provisioner:
   config_options:
     defaults:
