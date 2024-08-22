@@ -3,12 +3,12 @@
   hosts: all
   tasks:
     - name: Include main role
-      ansible.builtin.include_role:
+      ansible.builtin.import_role:
         name: ea31337.mt_runner
       vars:
         mt_runner_bt_mt4_config:
-          Login: 12345
-          Password: 12345
+          Login: "{{ ansible_facts.env.MT_RUNNER_MT4_LOGIN }}"
+          Password: "{{ ansible_facts.env.MT_RUNNER_MT4_PASSWORD }}"
           Profile: default
           Server:
           TestExpert: MACD Sample.ex4
@@ -17,9 +17,9 @@
           TestPeriod: M15
           TestReport: report.html
           TestShutdownTerminal: true
+          TestSpread: 10
           TestSymbol: EURUSD
           TestToDate: 2020.01.11
-          TestSpread: 10
         # noqa: var-naming[no-role-prefix]
         metatrader_setup_url: |
           https://download.mql5.com/cdn/web/3315/mt4/xm4setup.exe

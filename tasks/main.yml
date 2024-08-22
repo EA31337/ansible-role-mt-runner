@@ -142,17 +142,17 @@
       register: cmd_iconv_res
       when: (mt_runner_mt_version | int) == 5
 
-- name: Wait until terminal exits
-  ansible.builtin.async_status:
-    jid: '{{ cmd_terminal_async.ansible_job_id }}'
-  changed_when: false
-  delay: 10
-  register: cmd_terminal_async_status
-  until: cmd_terminal_async_status is finished
-  retries: "{{ mt_runner_timeout // 10 }}"
-
-- name: Checks logs
+- name: Wait for test results
   block:
+    - name: Wait until terminal exits
+      ansible.builtin.async_status:
+        jid: '{{ cmd_terminal_async.ansible_job_id }}'
+      changed_when: false
+      delay: 10  # How much time to wait between retries.
+      register: cmd_terminal_async_status
+      until: cmd_terminal_async_status is finished
+      retries: "{{ mt_runner_timeout // 10 }}"
+  always:
     - name: Prints final terminal log file (MT4)
       ansible.builtin.command:
         cmd: cat "{{ task_wait_for_terminal_logs.path }}"

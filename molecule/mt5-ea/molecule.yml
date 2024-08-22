@@ -6,8 +6,13 @@ lint: |
   #  yamllint .
   #  ansible-lint
 platforms:
-  - name: ubuntu-latest
-    image: ubuntu:latest
+  - env:
+      MT_RUNNER_MT5_LOGIN: "${MT_RUNNER_MT5_LOGIN:-12345}"
+      MT_RUNNER_MT5_PASSWORD: "${MT_RUNNER_MT5_PASSWORD:-SETME}"
+    groups:
+      - mt5
+    image: ubuntu:jammy
+    name: ubuntu-jammy
 provisioner:
   config_options:
     defaults:
