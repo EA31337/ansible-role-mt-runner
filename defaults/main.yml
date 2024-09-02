@@ -144,4 +144,4 @@ mt_runner_bt_mt5_config:
 mt_runner_cmd_prefix: wine
 mt_runner_get_url_list: []
 mt_runner_mt_version: '{{ metatrader_version | default(5) | int }}'
-mt_runner_timeout: 120
+mt_runner_timeout: 600
