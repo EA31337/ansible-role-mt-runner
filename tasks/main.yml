@@ -169,5 +169,37 @@
       register: cmd_iconv_res
       when: (mt_runner_mt_version | int) == 5
 
+- name: Converts report to CSV (Orders)
+  copy:
+    content: |
+      {{ lookup('parse_mt_report', "{{ mt_runner_mt_path }}/{{ mt_runner_bt_mt5_config.Tester.Report }}", 'orders', True) }}
+    dest: "{{ mt_runner_mt_path }}/{{ mt_runner_bt_mt5_config.Tester.Report }}-Orders.csv"
+  become: true
+  become_user: root
+
+- name: Converts report to CSV (Deals)Z
+  copy:
+    content: |
+      {{ lookup('parse_mt_report', "{{ mt_runner_mt_path }}/{{ mt_runner_bt_mt5_config.Tester.Report }}", 'deals', True) }}
+    dest: "{{ mt_runner_mt_path }}/{{ mt_runner_bt_mt5_config.Tester.Report }}-Deals.csv"
+  become: true
+  become_user: root
+
+- name: Converts report to CSV (Header)
+  copy:
+    content: |
+      {{ lookup('parse_mt_report', "{{ mt_runner_mt_path }}/{{ mt_runner_bt_mt5_config.Tester.Report }}", 'header', True) }}
+    dest: "{{ mt_runner_mt_path }}/{{ mt_runner_bt_mt5_config.Tester.Report }}-Header.csv"
+  become: true
+  become_user: root
+
+- name: Converts report to CSV (Optimization)
+  copy:
+    content: |
+      {{ lookup('parse_mt_report', "{{ mt_runner_mt_path }}/{{ mt_runner_bt_mt5_config.Tester.Report }}", 'opt', True) }}
+    dest: "{{ mt_runner_mt_path }}/{{ mt_runner_bt_mt5_config.Tester.Report }}-Optimization.csv"
+  become: true
+  become_user: root
+
 - name: Make sure all handlers run
   ansible.builtin.meta: flush_handlers
