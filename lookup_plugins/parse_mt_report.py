@@ -32,12 +32,11 @@ def parse_prc_val(value):
     match = re.match(r'(-*\d+(\.\d+)*)%\s+\((-*\d+(\.\d+)*)\)', value)
     if match:
         return {
-            "value": convert_value(match.group(3)),
-            "percentage": convert_value(match.group(1))
+            "value": convert_value(match[3]),
+            "percentage": convert_value(match[1])
         }
-    else:
-        print("Could not parse value for parse_prc_val()! Passed: \"%s\"" % value, file=sys.stderr)
-        exit(1)
+    print("Could not parse value for parse_prc_val()! Passed: \"%s\"" % value, file=sys.stderr)
+    exit(1)
 
 def parse_val_of(value):
     match = re.match(r'(-*\d+(\.\d+)*)\s+\((-*\d+(\.\d+)*)\)', value)
