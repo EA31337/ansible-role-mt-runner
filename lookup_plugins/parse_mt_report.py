@@ -240,7 +240,7 @@ def extract_orders_table(html_content):
     for row in rows:
         columns = [td.get_text(strip=True) for td in row.find_all("td")]
 
-        if len(columns) == 0:
+        if not columns:
             break
 
         # Stop/Loss, Take/Profil columns.
