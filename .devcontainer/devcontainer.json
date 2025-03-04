@@ -15,7 +15,8 @@
                 "DavidAnson.vscode-markdownlint",
                 "GitHub.copilot-chat",
                 "GitHub.copilot",
-                "ms-python.python"
+                "ms-python.python",
+                "sourcery.sourcery"
             ],
         }
     },
