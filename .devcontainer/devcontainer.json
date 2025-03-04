@@ -14,7 +14,8 @@
                 "vscodevim.vim",
                 "DavidAnson.vscode-markdownlint",
                 "GitHub.copilot-chat",
-                "GitHub.copilot"
+                "GitHub.copilot",
+                "ms-python.python"
             ],
         }
     },
