@@ -177,7 +177,7 @@
   become: true
   become_user: root
 
-- name: Converts report to CSV (Deals)Z
+- name: Converts report to CSV (Deals)
   copy:
     content: |
       {{ lookup('parse_mt_report', "{{ mt_runner_mt_path }}/{{ mt_runner_bt_mt5_config.Tester.Report }}", 'deals', True) }}
