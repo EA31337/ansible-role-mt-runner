@@ -12,19 +12,10 @@ def parse_period(value):
     # Regular expression pattern to extract values
     pattern = r'(\w+)\s*\((\d{4}\.\d{2}\.\d{2})\s*-\s*(\d{4}\.\d{2}\.\d{2})\)'
 
-    # Using regex to match the pattern.
-    match = re.match(pattern, value)
-
-    # Extracting values.
-    if match:
-        return {
-            "period": match.group(1),
-            "date_start": match.group(2),
-            "date_end": match.group(3)
-        }
-    else:
-        print("Could not parse date for parse_period()! Passed: \"%s\"" % value, file=sys.stderr)
-        exit(1)
+    if match := re.match(pattern, value):
+        return {"period": match[1], "date_start": match[2], "date_end": match[3]}
+    print("Could not parse date for parse_period()! Passed: \"%s\"" % value, file=sys.stderr)
+    exit(1)
 
 def parse_val_prc(value):
     match = re.match(r'(-*\d+(\.\d+)*)\s+\((-*\d+(\.\d+)*)%\)', value)
