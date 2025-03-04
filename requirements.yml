@@ -4,6 +4,8 @@
 ---
 collections:
   - name: community.general  # For unixy.
+  - name: community.windows
+  - name: ansible.windows
 roles:
   - name: ea31337.metatrader
     scm: git
