@@ -1,0 +1,27 @@
+# CodeRabbit configuration
+version: 1
+reviews:
+  request_changes_workflow: false
+  auto_review:
+    enabled: true
+    ignore_title_patterns:
+      - "WIP"
+      - "DO NOT MERGE"
+    drafts: false
+    base_branches:
+      - "dev*"
+      - "master"
+  path_filters:
+    - "**/*.yml"
+    - "**/*.yaml"
+    - "**/*.j2"
+    - "**/*.py"
+    - "tasks/**"
+    - "defaults/**"
+    - "vars/**"
+    - "meta/**"
+  tools:
+    yamllint:
+      enabled: true
+    shellcheck:
+      enabled: true
