@@ -97,7 +97,7 @@ def extract_header_table(html_content):
         rows.append(values)
 
     data = {}
-    
+
     # Extracting settings.
 
     now_inputs = False
@@ -256,8 +256,8 @@ def write_to_csv(data, output_file, include_titles=True, type=None, return_strin
     if return_string:
         csvfile = io.StringIO()
     else:
-        csvfile = open(output_file, "w", newline="", encoding="utf-8")    
-    
+        csvfile = open(output_file, "w", newline="", encoding="utf-8")
+
     writer = csv.writer(csvfile)
 
     # Define columns.
@@ -275,7 +275,7 @@ def write_to_csv(data, output_file, include_titles=True, type=None, return_strin
 
     if include_titles:
         writer.writerow(columns)  # Write header
-        
+
     for row in rows:
         writer.writerow(row)
 
@@ -289,7 +289,7 @@ def write_to_json(html_content, output_file, type, return_string=False):
         jsonfile = io.StringIO()
     else:
         jsonfile = open(output_file, "w", newline="\n", encoding="utf-8")
-    
+
     if type == "header":
         obj = extract_header_table(html_content)
     else:
@@ -342,7 +342,7 @@ def main(input_file_path, output_file_path, include_titles = False, type = None,
         return write_to_json(html_content, output_file_path, type, return_string=return_string)
     elif type in ["opt"]:
         return write_opt(input_file_path, output_file_path, include_titles, return_string=return_string)
-    
+
     raise ValueError('Incorrect type passed. Allowed value: "orders" OR "deals" OR "header" OR "opt".')
 
 class LookupModule(LookupBase):
