@@ -13,9 +13,11 @@
 	"customizations": {
         "vscode": {
             "extensions": [
-				"vscodevim.vim",
-				"DavidAnson.vscode-markdownlint",
-			],
+                "vscodevim.vim",
+                "DavidAnson.vscode-markdownlint",
+                "GitHub.copilot-chat",
+                "GitHub.copilot"
+            ],
         }
     },
     // Features to add to the dev container. More info: https://containers.dev/features.
