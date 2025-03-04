@@ -51,15 +51,10 @@ def parse_val_of(value):
         exit(1)
 
 def parse_val_diff(value):
-    match = re.match(r'(-*\d+(\.\d+)*)\s+\((-*\d+(\.\d+)*)\)', value)
-    if match:
-        return {
-            "value": convert_value(match.group(1)),
-            "diff": convert_value(match.group(3))
-        }
-    else:
-        print("Could not parse value for parse_val_diff()! Passed: \"%s\"" % value, file=sys.stderr)
-        exit(1)
+    if match := re.match(r'(-*\d+(\.\d+)*)\s+\((-*\d+(\.\d+)*)\)', value):
+        return {"value": convert_value(match[1]), "diff": convert_value(match[3])}
+    print("Could not parse value for parse_val_diff()! Passed: \"%s\"" % value, file=sys.stderr)
+    exit(1)
 
 def parse_time(value):
     match = re.match(r'(\d+):(\d+):(\d+)', value)
