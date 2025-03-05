@@ -22,5 +22,6 @@ provisioner:
     group_vars:
       all:
         wine_install_winetricks: true
+        wine_release: stable
 verifier:
   name: ansible
