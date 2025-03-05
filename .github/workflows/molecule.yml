@@ -17,9 +17,39 @@ jobs:
           - mt4
           - mt5-ea
     steps:
+      - name: Debug with tmate
+        uses: mxschmitt/action-tmate@v3
+        with:
+          detached: true
       - uses: actions/checkout@v4
         with:
           path: "${{ github.repository }}"
+      - name: Install required tools
+        run: |
+          sudo apt update
+          sudo apt install -y x11-apps imagemagick
+      - name: Start background screenshot loop
+        run: |
+          cd $GITHUB_WORKSPACE
+          mkdir -p screenshots
+          echo "Starting screenshot loop..."
+          while true; do
+            sleep 120
+            TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+            SCREENSHOT_FILE="screenshots/latest_screenshot.png"
+
+            # Take screenshot
+            DISPLAY=:0 xwd -root -out temp_screenshot.xwd || true
+            convert temp_screenshot.xwd "$SCREENSHOT_FILE"  || true
+            rm temp_screenshot.xwd  || true
+
+            if [ -f "$SCREENSHOT_FILE" ]; then
+              # Commit latest screenshot with amend
+              git add "$SCREENSHOT_FILE"
+              git commit --amend -m "Update latest screenshot taken at $TIMESTAMP"
+              git push --force-with-lease
+            fi
+          done &
       - uses: gofrolist/molecule-action@v2
         env:
           ANSIBLE_FORCE_COLOR: '1'
