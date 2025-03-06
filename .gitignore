@@ -1,3 +1,4 @@
+*.png
 .ansible
 .cache
 __pycache__
