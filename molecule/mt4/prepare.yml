@@ -1,10 +1,27 @@
 ---
 - name: Prepare
   hosts: all
-  gather_facts: false
+  gather_facts: true
   tasks:
-    - name: Install Python packages
-      pip:
-        name:
-          - bs4
+    - name: Ensure Apt cache is up-to-date
+      ansible.builtin.apt:
+        update_cache: true
+      when: ansible_os_family == "Debian"
+    - name: Ensure required system packages are installed
+      ansible.builtin.package:
+        name: "{{ item }}"
         state: present
+      loop:
+        - python3-pip
+      become: true
+    - name: Install required Python packages
+      ansible.builtin.pip:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - bs4
+    - name: Clean Apt cache
+      ansible.builtin.apt:
+        autoclean: true
+        autoremove: true
+      when: ansible_os_family == "Debian"
