@@ -11,12 +11,13 @@
     "customizations": {
         "vscode": {
             "extensions": [
-                "vscodevim.vim",
                 "DavidAnson.vscode-markdownlint",
-                "GitHub.copilot-chat",
                 "GitHub.copilot",
+                "GitHub.copilot-chat",
+                "github.vscode-github-actions"
                 "ms-python.python",
-                "sourcery.sourcery"
+                "sourcery.sourcery",
+                "vscodevim.vim"
             ],
         }
     },
