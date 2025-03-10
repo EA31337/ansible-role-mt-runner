@@ -1,5 +1,6 @@
 ansible
 ansible-lint
+bs4
 molecule
 molecule-docker
 pre-commit
