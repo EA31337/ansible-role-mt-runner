@@ -2,3 +2,9 @@
 - name: Prepare
   hosts: all
   gather_facts: false
+  tasks:
+    - name: Install Python packages
+      pip:
+        name:
+          - bs4
+        state: present
