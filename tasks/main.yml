@@ -140,6 +140,7 @@
       failed_when: |
         cmd_iconv_res.stderr | length > 0
         or ("exit with code -" in cmd_iconv_res.stdout)
+        or ("Invalid account" in cmd_iconv_res.stdout)
         or ("not found" in cmd_iconv_res.stdout)
         or ("tester didn't start" in cmd_iconv_res.stdout)
         or ("tester not started" in cmd_iconv_res.stdout)
