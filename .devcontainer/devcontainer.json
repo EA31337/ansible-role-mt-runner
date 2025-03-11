@@ -14,7 +14,7 @@
                 "DavidAnson.vscode-markdownlint",
                 "GitHub.copilot",
                 "GitHub.copilot-chat",
-                "github.vscode-github-actions"
+                "github.vscode-github-actions",
                 "ms-python.python",
                 "sourcery.sourcery",
                 "vscodevim.vim"
