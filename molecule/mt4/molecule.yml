@@ -8,8 +8,8 @@ driver:
   name: docker
 lint: |
   set -e
-  #  yamllint .
-  #  ansible-lint
+  ansible-lint
+  yamllint .
 platforms:
   - env:
       MT_RUNNER_MT4_LOGIN: "${MT_RUNNER_MT4_LOGIN:-12345}"
