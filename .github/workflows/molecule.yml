@@ -24,7 +24,7 @@ jobs:
       - uses: insightsengineering/pip-action@v2
         with:
           packages: package
-          requirements: "${{ github.repository }}/molecule/requirements.txt"
+          requirements: "${{ github.workspace }}/molecule/requirements.txt"
       - uses: gofrolist/molecule-action@v2
         env:
           ANSIBLE_FORCE_COLOR: '1'
