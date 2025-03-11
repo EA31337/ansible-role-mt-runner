@@ -1,8 +1,9 @@
 ---
 dependency:
-  name: galaxy
-  options:
-    role-file: ../requirements.yml
+  command: >-
+    ansible-galaxy install -r "${MOLECULE_SCENARIO_DIRECTORY}"/../requirements.yml
+    && pip install -r "${MOLECULE_SCENARIO_DIRECTORY}"/../requirements.txt
+  name: shell
 driver:
   name: docker
 lint: |
