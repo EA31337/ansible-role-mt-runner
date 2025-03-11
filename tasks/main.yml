@@ -174,47 +174,42 @@
       when: (mt_runner_mt_version | int) == 5
 
 - name: Process test results
+  when: cmd_terminal_async_status is finished
   block:
-    - name: Install bs4 module
-      ansible.builtin.pip:
-        name: beautifulsoup4
-      become: true
 
     - name: Converts report to CSV (Orders)
       ansible.builtin.copy:
         content: |
-          {{ lookup('parse_mt_report', mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report, 'orders', True) }}
+          {{ lookup('parse_mt_report',
+            mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report, 'orders', True) }}
         dest: >-
-          {{ mt_runner_mt_path }}/{{ mt_runner_bt_mt5_config.Tester.Report }}-Orders.csv
+          {{ mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report ~ '-Orders.csv' }}
         mode: '0644'
-      become_user: root
-
     - name: Converts report to CSV (Deals)
       ansible.builtin.copy:
         content: |
-          {{ lookup('parse_mt_report', mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report, 'deals', True) }}
+          {{ lookup('parse_mt_report', mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report,
+            'deals', True) }}
         dest: >-
-          {{ mt_runner_mt_path }}/{{ mt_runner_bt_mt5_config.Tester.Report }}-Deals.csv
+          {{ mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report }}-Deals.csv
         mode: '0644'
-      become_user: root
 
     - name: Converts report to CSV (Header)
       ansible.builtin.copy:
         content: |
-          {{ lookup('parse_mt_report', mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report, 'header', True) }}
+          {{ lookup('parse_mt_report', mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report,
+            'header', True) }}
         dest: >-
-          {{ mt_runner_mt_path }}/{{ mt_runner_bt_mt5_config.Tester.Report }}-Header.csv
+          {{ mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report }}-Header.csv
         mode: '0644'
-      become_user: root
 
     - name: Converts report to CSV (Optimization)
       ansible.builtin.copy:
         content: |
           {{ lookup('parse_mt_report', mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report, 'opt', True) }}
         dest: >-
-          {{ mt_runner_mt_path }}/{{ mt_runner_bt_mt5_config.Tester.Report }}-Optimization.csv
+          {{ mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report }}-Optimization.csv
         mode: '0644'
-      become_user: root
 
 - name: Make sure all handlers run
   ansible.builtin.meta: flush_handlers
