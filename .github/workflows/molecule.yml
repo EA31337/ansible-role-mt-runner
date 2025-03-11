@@ -21,10 +21,10 @@ jobs:
         with:
           path: "${{ github.repository }}"
       - uses: actions/setup-python@v4
-      - uses: insightsengineering/pip-action@v2
-        with:
-          packages: package
-          requirements: "${{ github.workspace }}/${{ github.repository }}/molecule/requirements.txt"
+      - name: Install Python dependencies
+        run: |
+          pip install -r molecule/requirements.txt
+        working-directory: ${{ github.workspace }}/${{ github.repository }}
       - uses: gofrolist/molecule-action@v2
         env:
           ANSIBLE_FORCE_COLOR: '1'
