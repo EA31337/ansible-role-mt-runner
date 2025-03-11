@@ -4,3 +4,10 @@ mt_runner_mt_files:
     terminal: terminal.exe
   5:
     terminal: terminal64.exe
+
+mt_runner_mt_error_messages:
+  - exit with code -
+  - Invalid account
+  - not found
+  - tester didn't start
+  - tester not started

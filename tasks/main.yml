@@ -137,14 +137,10 @@
       ansible.builtin.command:
         cmd: iconv -f utf-16 -t utf-8 "{{ task_wait_for_terminal_logs.path }}"
       changed_when: false
+      register: cmd_iconv_res
       failed_when: |
         cmd_iconv_res.stderr | length > 0
-        or ("exit with code -" in cmd_iconv_res.stdout)
-        or ("Invalid account" in cmd_iconv_res.stdout)
-        or ("not found" in cmd_iconv_res.stdout)
-        or ("tester didn't start" in cmd_iconv_res.stdout)
-        or ("tester not started" in cmd_iconv_res.stdout)
-      register: cmd_iconv_res
+        or (cmd_iconv_res.stdout | map('regex_search', mt_runner_mt_error_messages) | select | list | length > 0)
       when: (mt_runner_mt_version | int) == 5
 
 - name: Wait for test results
@@ -167,11 +163,10 @@
       ansible.builtin.command:
         cmd: iconv -f utf-16 -t utf-8 "{{ task_wait_for_terminal_logs.path }}"
       changed_when: false
+      register: cmd_iconv_res
       failed_when: |
         cmd_iconv_res.stderr | length > 0
-        or ('tester not started' in cmd_iconv_res.stdout)
-        or ('not found' in cmd_iconv_res.stdout)
-      register: cmd_iconv_res
+        or (cmd_iconv_res.stdout | map('regex_search', mt_runner_mt_error_messages) | select | list | length > 0)
       when: (mt_runner_mt_version | int) == 5
 
 - name: Process test results
