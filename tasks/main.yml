@@ -140,7 +140,7 @@
       register: cmd_iconv_res
       failed_when: |
         cmd_iconv_res.stderr | length > 0
-        or (cmd_iconv_res.stdout | map('regex_search', mt_runner_mt_error_messages) | select | list | length > 0)
+        or (cmd_iconv_res.stdout | join('') | regex_search(mt_runner_mt_error_messages) | select | list | length > 0)
       when: (mt_runner_mt_version | int) == 5
 
 - name: Wait for test results
@@ -166,7 +166,7 @@
       register: cmd_iconv_res
       failed_when: |
         cmd_iconv_res.stderr | length > 0
-        or (cmd_iconv_res.stdout | map('regex_search', mt_runner_mt_error_messages) | select | list | length > 0)
+        or (cmd_iconv_res.stdout | join('') | regex_search(mt_runner_mt_error_messages) | select | list | length > 0)
       when: (mt_runner_mt_version | int) == 5
 
 - name: Process test results
