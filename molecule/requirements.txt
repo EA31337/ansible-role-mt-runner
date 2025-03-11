@@ -2,5 +2,6 @@
 # Usage: pip install -r requirements.txt
 bs4
 docker==7.1.0
+flake8
 molecule
 molecule-docker

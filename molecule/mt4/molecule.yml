@@ -10,6 +10,7 @@ lint: |
   set -e
   ansible-lint
   yamllint .
+  # flake8
 platforms:
   - env:
       MT_RUNNER_MT4_LOGIN: "${MT_RUNNER_MT4_LOGIN:-12345}"
