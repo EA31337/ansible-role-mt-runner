@@ -1,4 +1,8 @@
 ---
+dependency:
+  name: galaxy
+  options:
+    role-file: ../requirements.yml
 driver:
   name: docker
 lint: |
@@ -13,6 +17,9 @@ platforms:
       - mt4
     image: ubuntu:jammy
     name: ubuntu-jammy
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
 provisioner:
   config_options:
     defaults:
