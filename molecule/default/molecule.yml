@@ -3,8 +3,8 @@ driver:
   name: docker
 lint: |
   set -e
-  #  yamllint .
-  #  ansible-lint
+  yamllint .
+  ansible-lint
 platforms:
   - env:
       MT_RUNNER_MT5_LOGIN: "${MT_RUNNER_MT5_LOGIN:-12345}"
@@ -16,6 +16,9 @@ platforms:
 provisioner:
   config_options:
     defaults:
+      # Use the built-in default callback with result_format instead of community.general.yaml
+      stdout_callback: ansible.builtin.default
+      result_format: yaml
       remote_tmp: /tmp/.ansible-tmp-$${USER}
   name: ansible
   inventory:
