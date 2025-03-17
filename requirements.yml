@@ -3,12 +3,12 @@
 # ansible-galaxy install -r requirements.yml
 ---
 collections:
-  - name: community.general  # For unixy.
+  - name: community.general  # Required by apk module.
   - name: community.windows
   - name: ansible.windows
 
 roles:
   - name: ea31337.metatrader
     scm: git
-    src: https://github.com/EA31337/ansible-role-metatrader.git
-    version: dev
+    src: git+https://github.com/EA31337/ansible-role-metatrader.git
+    version: v1.0.1
