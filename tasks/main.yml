@@ -122,7 +122,7 @@
           {{ mt_runner_mt_path ~ '/logs/' ~ ('%Y%m%d' | strftime(ansible_date_time.epoch | int)) }}.log
         sleep: 10
         state: present
-        timeout: 60
+        timeout: 120
       register: task_wait_for_terminal_logs
     - name: Prints terminal log file (MT4)
       ansible.builtin.command:
