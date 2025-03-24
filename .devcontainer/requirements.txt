@@ -1,6 +1,11 @@
+# Python's requirements
+# Usage: pip install -r requirements.txt
 ansible
 ansible-lint
 bs4
+docker>=7.1
 molecule
 molecule-docker
+pipenv
 pre-commit
+requests==2.31.0
