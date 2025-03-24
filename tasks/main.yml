@@ -132,16 +132,29 @@
       ansible.builtin.command:
         cmd: cat "{{ task_wait_for_terminal_logs.path }}"
       changed_when: false
+      failed_when:
+        res_terminal_logs.rc != 0
+        or res_terminal_logs.stderr | length > 0
+      register: res_terminal_logs
       when: (mt_runner_mt_version | int) == 4
     - name: Prints terminal log file (MT5)
       ansible.builtin.command:
         cmd: iconv -f utf-16 -t utf-8 "{{ task_wait_for_terminal_logs.path }}"
       changed_when: false
-      register: cmd_iconv_res
-      failed_when: |
-        cmd_iconv_res.stderr | length > 0
-        or (cmd_iconv_res.stdout | join('') | regex_search(mt_runner_mt_error_messages) | select | list | length > 0)
+      failed_when:
+        res_terminal_logs.rc != 0
+        or res_terminal_logs.stderr | length > 0
+      register: res_terminal_logs
       when: (mt_runner_mt_version | int) == 5
+    - name: Capture terminal errors
+      ansible.builtin.set_fact:
+        terminal_errors: >-
+          {{ (res_terminal_logs.stdout | join('')
+          | regex_search(mt_runner_terminal_errors_regex)) | default([]) }}
+    - name: Checks for errors in the terminal log
+      ansible.builtin.fail:
+        msg: "Error found in terminal log file: {{ task_wait_for_terminal_logs.path }}"
+      when: terminal_errors | length > 0
 
 - name: Wait for test results
   block:
@@ -158,16 +171,29 @@
       ansible.builtin.command:
         cmd: cat "{{ task_wait_for_terminal_logs.path }}"
       changed_when: false
+      failed_when:
+        res_terminal_logs.rc != 0
+        or res_terminal_logs.stderr | length > 0
+      register: res_terminal_logs
       when: (mt_runner_mt_version | int) == 4
     - name: Prints final terminal log file (MT5)
       ansible.builtin.command:
         cmd: iconv -f utf-16 -t utf-8 "{{ task_wait_for_terminal_logs.path }}"
       changed_when: false
-      register: cmd_iconv_res
-      failed_when: |
-        cmd_iconv_res.stderr | length > 0
-        or (cmd_iconv_res.stdout | join('') | regex_search(mt_runner_mt_error_messages) | select | list | length > 0)
+      register: res_terminal_logs
+      failed_when:
+        res_terminal_logs.rc != 0
+        or res_terminal_logs.stderr | length > 0
       when: (mt_runner_mt_version | int) == 5
+    - name: Capture terminal errors
+      ansible.builtin.set_fact:
+        terminal_errors: >-
+          {{ (res_terminal_logs.stdout | join('')
+          | regex_search(mt_runner_terminal_errors_regex)) | default([]) }}
+    - name: Checks for errors in the terminal log
+      ansible.builtin.fail:
+        msg: "Error found in terminal log file: {{ task_wait_for_terminal_logs.path }}"
+      when: terminal_errors | length > 0
 
 - name: Process test results
   when: cmd_terminal_async_status is finished

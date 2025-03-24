@@ -5,9 +5,5 @@ mt_runner_mt_files:
   5:
     terminal: terminal64.exe
 
-mt_runner_mt_error_messages:
-  - exit with code -
-  - Invalid account
-  - not found
-  - tester didn't start
-  - tester not started
+mt_runner_terminal_errors_regex: >-
+  (exit with code -|Invalid account|not found|tester didn\'t start|tester not started)
