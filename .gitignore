@@ -1,4 +1,6 @@
+*.bak
 *.html
+*.orig
 *.png
 .ansible
 .cache
