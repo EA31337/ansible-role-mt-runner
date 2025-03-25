@@ -328,8 +328,13 @@ def main(input_file_path, output_file_path, include_titles = False, type = None,
         exit(1)
     if type in ["orders", "deals", "header"]:
         try:
-            with open(input_file_path, "rb") as f:
-                html_content = f.read().decode("utf-16le")
+            # Report file could be in UTF-16LE or UTF-8 encoding.
+            try:
+                with open(input_file_path, "rb") as f:
+                    html_content = f.read().decode("utf-16le")
+            except UnicodeDecodeError:
+                with open(input_file_path, "r", encoding="utf-8") as f:
+                    html_content = f.read()
         except FileNotFoundError:
             raise AnsibleError("File not found: " + input_file_path)
         except Exception as e:
