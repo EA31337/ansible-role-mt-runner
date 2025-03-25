@@ -3,8 +3,8 @@
   ansible.builtin.debug:
     msg: Starting test...
 
-- name: Check platform (non-Windows)
-  when: ansible_os_family != "Windows"
+- name: Check platform (Linux)
+  when: ansible_system == "Linux"
   block:
     - name: Install winbind package
       ansible.builtin.apt:
@@ -31,8 +31,8 @@
       ansible.builtin.set_fact:
         mt_runner_mt_terminal_path: "{{ mt_path_terminal.files[0].path }}"
 
-- name: Convert paths (non-Windows)
-  when: ansible_os_family != "Windows"
+- name: Convert paths (Linux)
+  when: ansible_system == "Linux"
   block:
     - name: Converts platform's path to Unix
       changed_when: false
@@ -63,8 +63,8 @@
     mode: "0644"
     src: '{{ mt_runner_mt_version }}/tester.ini.j2'
 
-- name: Clean-up before the test (non-Windows)
-  when: ansible_os_family != "Windows"
+- name: Clean-up before the test (Linux)
+  when: ansible_system == "Linux"
   block:
     - name: Kills any existing terminal processes
       ansible.builtin.command: pkill terminal
