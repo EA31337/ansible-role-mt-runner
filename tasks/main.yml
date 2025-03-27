@@ -24,9 +24,11 @@
           {{ mt_runner_mt_files[mt_runner_mt_version | int].terminal }}
         recurse: true
       register: mt_path_terminal
+
     - name: Set platform's directory path
       ansible.builtin.set_fact:
         mt_runner_mt_path: "{{ mt_path_terminal.files[0].path | dirname }}"
+
     - name: Set platform's terminal filepath
       ansible.builtin.set_fact:
         mt_runner_mt_terminal_path: "{{ mt_path_terminal.files[0].path }}"
@@ -216,35 +218,28 @@
 - name: Process test results
   when: cmd_terminal_async_status is finished
   block:
-    - name: Slurp MT5 report file
-      ansible.builtin.slurp:
-        src: "/root/.wine/dosdevices/c:/Program Files/MetaTrader 5/report.html"
-      register: mt5_report_content
-
-    - name: Create temporary file with content
-      ansible.builtin.copy:
-        content: "{{ mt5_report_content['content'] | b64decode }}"
-        dest: "/tmp/mt5_report.html"
-        mode: "0644"
+    - name: Store temporary report path in the mt_report_temp_path variable
+      ansible.builtin.set_fact:
+        mt_report_temp_path: "{{ ansible_env.TMPDIR | default('/tmp') }}/mt5_report.html"
 
     - name: Fetch the report file to control node
       ansible.builtin.fetch:
-        src: "/tmp/mt5_report.html"
-        dest: "/tmp/mt5_report.html"
-        flat: yes
+        src: "{{ mt_runner_mt_path }}/report.html"
+        dest: "{{ mt_report_temp_path }}"
+        flat: true
 
     - name: Converts report to CSV (Orders)
       ansible.builtin.copy:
         content: |
-          {{ lookup('parse_mt_report', '/tmp/mt5_report.html', 'orders', True) }}
+          {{ lookup('parse_mt_report', mt_report_temp_path, 'orders', True) }}
         dest: >-
           {{ mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report }}-Orders.csv
         mode: '0644'
-      
+
     - name: Converts report to CSV (Deals)
       ansible.builtin.copy:
         content: |
-          {{ lookup('parse_mt_report', '/tmp/mt5_report.html', 'deals', True) }}
+          {{ lookup('parse_mt_report', mt_report_temp_path, 'deals', True) }}
         dest: >-
           {{ mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report }}-Deals.csv
         mode: '0644'
@@ -252,7 +247,7 @@
     - name: Converts report to JSON (Header)
       ansible.builtin.copy:
         content: |
-          {{ lookup('parse_mt_report', '/tmp/mt5_report.html', 'header', True) }}
+          {{ lookup('parse_mt_report', mt_report_temp_path, 'header', True) }}
         dest: >-
           {{ mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report }}-Header.json
         mode: '0644'
@@ -260,7 +255,7 @@
     - name: Converts report to CSV (Optimization)
       ansible.builtin.copy:
         content: |
-          {{ lookup('parse_mt_report', '/tmp/mt5_report.html', 'opt', True) }}
+          {{ lookup('parse_mt_report', mt_report_temp_path, 'opt', True) }}
         dest: >-
           {{ mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report }}-Optimization.csv
         mode: '0644'

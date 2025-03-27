@@ -306,7 +306,7 @@ def write_to_json(html_content, output_file, type, return_string=False):
 def write_opt(input_file, output_file, include_titles, return_string=False):
     with open(input_file, "r", encoding="utf-16le") as f:
         content = f.read()
-    
+
     soup = BeautifulSoup(content, "html.parser")
     content = soup.prettify()
 
