@@ -34,7 +34,7 @@ jobs:
           path: |
             ~/.cache
             /var/cache
-          key: ${{ runner.os }}-${{ matrix.scenario }}-${{ hashFiles('**/requirements.txt') }}
+          key: ${{ runner.os }}-${{ matrix.scenario }}-${{ hashFiles('requirements.yml') }}
       - uses: gofrolist/molecule-action@v2
         env:
           ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
