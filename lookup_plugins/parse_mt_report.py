@@ -218,7 +218,12 @@ def extract_header_table(html_content):
 
 
 def extract_orders_table(html_content):
-    html_content = "<div>" + re.findall(pattern='Orders<.*?Comment</b>.*?</td>.*?</tr>(.*?)<tr>', string=html_content, flags=re.S)[0] + "</div>"
+    re_orders = re.findall(pattern='Orders<.*?Comment</b>.*?</td>.*?</tr>(.*?)<tr>', string=html_content, flags=re.S)
+    if not re_orders or len(re_orders[0]) == 0:
+        # If no orders found, return empty list.
+        return []
+
+    html_content = "<div>" + re_orders[0] + "</div>"
     soup = BeautifulSoup(html_content, "html.parser")
     rows = soup.find_all("tr", {"bgcolor": ["#FFFFFF", "#F7F7F7"]})
     data = []
@@ -239,19 +244,39 @@ def extract_orders_table(html_content):
     return data
 
 def extract_deals_table(html_content):
-    html_content = "<div>" + re.findall(pattern='Deals<.*?Comment</b>.*?</td>.*?</tr>(.*?)<tr>', string=html_content, flags=re.S)[0] + "</div>"
+    re_deals = re.findall(pattern='Deals<.*?Comment</b>.*?</td>.*?</tr>(.*?)<tr>', string=html_content, flags=re.S);
+
+    print("Stage 1", file=sys.stderr)
+
+    if not re_deals or len(re_deals[0]) == 0:
+        # If no deals found, return empty list.
+        return []
+    
+    print("Stage 2", file=sys.stderr)
+
+    html_content = "<div>" + re_deals[0] + "</div>"
+    print("Stage 3", file=sys.stderr)
     soup = BeautifulSoup(html_content, "html.parser")
+    print("Stage 4", file=sys.stderr)
     rows = soup.find_all("tr", {"bgcolor": ["#FFFFFF", "#F7F7F7"]})
+    print("Stage 5", file=sys.stderr)
 
     data = []
 
     for row in rows:
+        print("Stage 6", file=sys.stderr)
         columns = [td.get_text(strip=True) for td in row.find_all("td")]
+        print("Stage 7", file=sys.stderr)
         data.append(columns)
+
+    print("Stage 8", file=sys.stderr)
 
     return data
 
 def write_to_csv(data, output_file, include_titles=True, type=None, return_string=False):
+    print(type, file=sys.stderr)
+    print(data, file=sys.stderr)
+
     # Write data to CSV
     if return_string:
         csvfile = io.StringIO()
