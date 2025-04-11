@@ -222,11 +222,24 @@
       ansible.builtin.set_fact:
         mt_report_temp_path: "{{ ansible_env.TMPDIR | default('/tmp') }}/mt5_report.html"
 
+    - name: Store temporary optimization report path in the mt_opt_report_temp_path variable
+      ansible.builtin.set_fact:
+        mt_opt_report_temp_path: "{{ ansible_env.TMPDIR | default('/tmp') }}/mt5_opt_report.html"
+
     - name: Fetch the report file to control node
       ansible.builtin.fetch:
         src: "{{ mt_runner_mt_path }}/report.html"
         dest: "{{ mt_report_temp_path }}"
         flat: true
+
+    # TODO: Generate optimization report remove failed_when and changed_when.
+    - name: Fetch the optimization report file to control node
+      ansible.builtin.fetch:
+        src: "{{ mt_runner_mt_path }}/optimization.html"
+        dest: "{{ mt_opt_report_temp_path }}"
+        flat: true
+      failed_when: false
+      changed_when: false
 
     - name: Converts report to CSV (Orders)
       ansible.builtin.copy:
@@ -252,13 +265,13 @@
           {{ mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report }}-Header.json
         mode: '0644'
 
-    - name: Converts report to CSV (Optimization)
-      ansible.builtin.copy:
-        content: |
-          {{ lookup('parse_mt_report', mt_report_temp_path, 'opt', True) }}
-        dest: >-
-          {{ mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report }}-Optimization.csv
-        mode: '0644'
+    # - name: Converts report to CSV (Optimization)
+    #   ansible.builtin.copy:
+    #     content: |
+    #       {{ lookup('parse_mt_report', mt_opt_report_temp_path, 'opt', True) }}
+    #     dest: >-
+    #       {{ mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report }}-Optimization.csv
+    #     mode: '0644'
 
 - name: Make sure all handlers run
   ansible.builtin.meta: flush_handlers
