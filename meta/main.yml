@@ -5,15 +5,15 @@ dependencies:
     src: https://github.com/EA31337/ansible-role-metatrader.git
     version: v1.0.1
 galaxy_info:
-  author: EA31337 Ltd
+  author: kenorb
+  company: EA31337 Ltd
   description: |
     Role to run MetaTrader platform
     (with Expert Advisors, Script and Indicators)
   galaxy_tags:
     - linux
     - windows
-  issue_tracker_url: https://github.com/EA31337/ansible-role-mt-runner
-  license: GPLv3
+  license: GPL-3.0-only
   min_ansible_version: "2.7"
   namespace: ea31337
   platforms:
