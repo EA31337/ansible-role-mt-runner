@@ -3,7 +3,8 @@
 # ansible-galaxy install -r requirements.yml
 ---
 collections:
-  - name: community.general  # Required by apk module.
+  - name: community.docker
+  - name: community.general  # Required for apk and from_ini modules.
   - name: community.windows
   - name: ansible.windows
 
