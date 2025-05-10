@@ -5,13 +5,15 @@ name: Molecule
 on:
   pull_request:
     paths-ignore:
-      - '**.md'
-      - '*.yaml'
+      - '**/*.cfg'
+      - '**/*.md'
+      - '**/.*'
       - Pipfile*
   push:
     paths-ignore:
-      - '**.md'
-      - '*.yaml'
+      - '**/*.cfg'
+      - '**/*.md'
+      - '**/.*'
       - Pipfile*
 
 jobs:
@@ -32,7 +34,7 @@ jobs:
       - uses: gofrolist/molecule-action@v2
         env:
           ANSIBLE_FORCE_COLOR: '1'
-          ANSIBLE_STDOUT_CALLBACK: ${{ runner.debug == '1' && 'debug' || 'oneline' }}
+          ANSIBLE_STDOUT_CALLBACK: ${{ runner.debug == '1' && 'debug' || 'yaml' }}
           MOLECULE_REPORT: molecule-${{ matrix.scenario }}-report.html
           MT_RUNNER_MT4_PASSWORD: ${{ secrets.MT_RUNNER_MT4_PASSWORD || 'SETME' }}
           MT_RUNNER_MT5_LOGIN: ${{ secrets.MT_RUNNER_MT5_LOGIN || '12345' }}
