@@ -1,4 +1,5 @@
 ---
+# Vars file for mt_runner role.
 mt_runner_mt_files:
   4:
     terminal: terminal.exe
