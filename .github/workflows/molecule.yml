@@ -5,15 +5,19 @@ name: Molecule
 on:
   pull_request:
     paths-ignore:
-      - '**/*.cfg'
-      - '**/*.md'
-      - '**/.*'
+      - '!.github/workflows/**'
+      - '**.cfg'
+      - '**.md'
+      - '.*'
+      - LICENSE
       - Pipfile*
   push:
     paths-ignore:
-      - '**/*.cfg'
-      - '**/*.md'
-      - '**/.*'
+      - '!.github/workflows/**'
+      - '**.cfg'
+      - '**.md'
+      - '.*'
+      - LICENSE
       - Pipfile*
 
 jobs:
