@@ -22,17 +22,17 @@ mt_runner_bt_mt4_config:
   FTPEnable: false
   FTPLogin: anonymous
   FTPPassiveMode: false
-  FTPPassword: anonymous
+  FTPPassword: anonymous  # pragma: allowlist secret
   FTPPath: /inetpub
   FTPPeriod: 10
   FTPServer: ftp.example.com
-  Login: "{{ ansible_facts.env.MT_RUNNER_MT4_LOGIN | default('12345') }}"
-  Password: "{{ ansible_facts.env.MT_RUNNER_MT4_PASSWORD | default('12345') }}"
+  Login: "{{ ansible_facts.env.MT_RUNNER_MT4_LOGIN | default('12345') }}"  # pragma: allowlist secret
+  Password: "{{ ansible_facts.env.MT_RUNNER_MT4_PASSWORD | default('12345') }}"  # pragma: allowlist secret
   Period: M15
   Profile: default
   ProxyEnable: false
   ProxyLogin: user45
-  ProxyPassword: xxx
+  ProxyPassword:
   ProxyServer: example.com:3128
   ProxyType: HTTP
   Script:
