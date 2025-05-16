@@ -3,7 +3,7 @@ dependencies:
   - name: ea31337.metatrader
     scm: git
     src: git+https://github.com/EA31337/ansible-role-metatrader.git
-    version: v1.0.1  # This should match version in requirements.yml
+    version: v1.0.3  # This should match version in requirements.yml
 galaxy_info:
   author: kenorb
   company: EA31337 Ltd

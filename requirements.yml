@@ -14,4 +14,4 @@ roles:
     scm: git
     src: git+https://github.com/EA31337/ansible-role-metatrader.git
     # This should match version in meta/main.yml
-    version: v1.0.2
+    version: v1.0.3
