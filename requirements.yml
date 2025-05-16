@@ -5,6 +5,7 @@
 collections:
   - name: community.docker
   - name: community.general  # Required for apk, from_ini and supervisorctl modules.
+    version: ">=6.0.0"
   - name: community.windows
   - name: ansible.windows
 
@@ -12,4 +13,5 @@ roles:
   - name: ea31337.metatrader
     scm: git
     src: git+https://github.com/EA31337/ansible-role-metatrader.git
+    # This should match version in meta/main.yml
     version: v1.0.2
