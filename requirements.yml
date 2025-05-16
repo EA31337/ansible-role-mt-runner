@@ -12,6 +12,6 @@ collections:
 roles:
   - name: ea31337.metatrader
     scm: git
-    src: git+https://github.com/EA31337/ansible-role-metatrader.git
+    src: https://github.com/EA31337/ansible-role-metatrader.git
     # This should match version in meta/main.yml
     version: v1.0.3
