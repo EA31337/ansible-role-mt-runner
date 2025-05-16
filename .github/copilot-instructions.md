@@ -47,7 +47,7 @@ Ensure enforcing the following rules:
 
 Ensure the following rules are strictly followed:
 
-- yaml[empty-lines]: Avoid too many blank lines (1 > 0)
+- yaml[empty-lines]: Avoid too many blank lines
 - yaml[indentation]: Avoid wrong indentation
 - yaml[line-length]: No long lines (max. 120 characters)
 - yaml[new-line-at-end-of-file]: Enforce new line character at the end of file
