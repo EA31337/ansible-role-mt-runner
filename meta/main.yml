@@ -2,8 +2,8 @@
 dependencies:
   - name: ea31337.metatrader
     scm: git
-    src: https://github.com/EA31337/ansible-role-metatrader.git
-    version: v1.0.1
+    src: git+https://github.com/EA31337/ansible-role-metatrader.git
+    version: v1.0.1  # This should match version in requirements.yml
 galaxy_info:
   author: kenorb
   company: EA31337 Ltd
@@ -11,9 +11,19 @@ galaxy_info:
     Role to run MetaTrader platform
     (with Expert Advisors, Script and Indicators)
   galaxy_tags:
+    - desktop
+    - development
+    - docker
+    - emulator
+    - forex
+    - graphics
+    - gui
     - linux
+    - trading
+    - ubuntu
     - windows
-  license: GPL-3.0-only
+    - wine
+  license: GPL-3.0-or-later
   min_ansible_version: "2.7"
   namespace: ea31337
   platforms:
@@ -23,7 +33,20 @@ galaxy_info:
     - name: Debian
       versions:
         - all
+        - bullseye
+        - buster
+        - jessie
+        - stretch
+        - wheezy
+    # - name: NixOS
+    #   versions:
+    #     - all
     - name: Ubuntu
       versions:
         - all
+        - artful
+        - bionic
+        - focal
+        - trusty
+        - xenial
   role_name: mt_runner
