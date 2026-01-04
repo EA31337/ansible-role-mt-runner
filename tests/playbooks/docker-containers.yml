@@ -19,6 +19,9 @@
         state: started
         command: sleep infinity
       delegate_to: localhost
+      vars:
+        # Use system Python with requests installed for controller-side Docker modules.
+        ansible_python_interpreter: "{{ controller_python }}"
 
     - name: Wait for container to be ready
       community.docker.docker_container_info:
@@ -31,6 +34,9 @@
       delay: 2
       delegate_to: localhost
       retries: 10
+      vars:
+        # Use system Python with requests installed for controller-side Docker modules.
+        ansible_python_interpreter: "{{ controller_python }}"
 
     - name: Install Python 3 on Alpine
       ansible.builtin.raw: |
@@ -65,6 +71,7 @@
 
   tags: always
   vars:
+    controller_python: "{{ ansible_playbook_python }}"
     container_image_map:
       mt-runner-on-alpine-latest: alpine:latest
       mt-runner-on-debian-latest: debian:latest
@@ -80,6 +87,8 @@
   hosts: docker_containers
   gather_facts: true
   tags: always
+  vars:
+    controller_python: "{{ ansible_playbook_python }}"
   tasks:
     - name: Installs ea31337.mt_runner role
       ansible.builtin.import_role:
