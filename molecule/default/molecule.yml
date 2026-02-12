@@ -9,6 +9,8 @@ platforms:
   - env:
       MT_RUNNER_MT5_LOGIN: "${MT_RUNNER_MT5_LOGIN:-12345}"
       MT_RUNNER_MT5_PASSWORD: "${MT_RUNNER_MT5_PASSWORD:-SETME}"
+      MT_RUNNER_MT5_SERVER: "${MT_RUNNER_MT5_SERVER:-MetaQuotes-Demo}"
+      WINEDLLOVERRIDES: "mscoree,mshtml=,winebrowser.exe=,dbghelp=n"
     groups:
       - mt5
     image: ubuntu:jammy
@@ -16,11 +18,23 @@ platforms:
 provisioner:
   config_options:
     defaults:
-      remote_tmp: /tmp/.ansible-tmp-$${USER}
+      deprecation_warnings: False
   name: ansible
   inventory:
     group_vars:
       all:
         wine_install_winetricks: true
+scenario:
+  test_sequence:
+    - dependency
+    - syntax
+    - create
+    - prepare
+    - converge
+    - idempotence
+    - verify
+    - destroy
+  destroy_sequence:
+    - destroy
 verifier:
   name: ansible

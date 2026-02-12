@@ -9,18 +9,29 @@ platforms:
   - env:
       MT_RUNNER_MT4_LOGIN: "${MT_RUNNER_MT4_LOGIN:-12345}"
       MT_RUNNER_MT4_PASSWORD: "${MT_RUNNER_MT4_PASSWORD:-SETME}"
+      MT_RUNNER_MT4_SERVER: "${MT_RUNNER_MT4_SERVER:-MetaQuotes-Demo}"
+      WINEDLLOVERRIDES: "mscoree,mshtml=,winebrowser.exe=,dbghelp=n"
     groups:
       - mt4
     image: ubuntu:jammy
     name: ubuntu-jammy
 provisioner:
-  config_options:
-    defaults:
-      remote_tmp: /tmp/.ansible-tmp-$${USER}
   name: ansible
   inventory:
     group_vars:
       all:
         wine_install_winetricks: true
+scenario:
+  test_sequence:
+    - dependency
+    - syntax
+    - create
+    - prepare
+    - converge
+    - idempotence
+    - verify
+    - destroy
+  destroy_sequence:
+    - destroy
 verifier:
   name: ansible

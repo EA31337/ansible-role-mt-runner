@@ -6,11 +6,13 @@
       ansible.builtin.import_role:
         name: ea31337.mt_runner
       vars:
+        # noqa: var-naming[no-role-prefix]
+        metatrader_version: 5
         mt_runner_bt_mt5_config:
           Common:
             Login: "{{ ansible_facts.env.MT_RUNNER_MT5_LOGIN }}"
             Password: "{{ ansible_facts.env.MT_RUNNER_MT5_PASSWORD }}"
-            Server: MetaQuotes-Demo
+            Server: "{{ ansible_facts.env.MT_RUNNER_MT5_SERVER | default('MetaQuotes-Demo') }}"
           Tester:
             Deposit: 10000
             ExecutionMode: 0
