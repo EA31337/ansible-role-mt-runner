@@ -3,7 +3,12 @@
 # ansible-galaxy install -r requirements.yml
 ---
 collections:
-  - name: community.general  # For unixy.
+  - name: community.docker
+  - name: community.general  # Required for apk, from_ini and supervisorctl modules.
+    version: ">=6.0.0"
+  - name: community.windows
+  - name: ansible.windows
+
 roles:
   - name: ea31337.metatrader
     scm: git

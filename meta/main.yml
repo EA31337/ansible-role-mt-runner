@@ -1,3 +1,5 @@
+# Documentation: https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html
+# Note: Ensure the list is sorted alphabetically.
 ---
 dependencies:
   - name: ea31337.metatrader
@@ -5,15 +7,25 @@ dependencies:
     src: https://github.com/nseam/ansible-role-metatrader.git
     version: test/testing-after-wine-role-changes
 galaxy_info:
-  author: EA31337 Ltd
+  author: kenorb
+  company: EA31337 Ltd
   description: |
     Role to run MetaTrader platform
     (with Expert Advisors, Script and Indicators)
   galaxy_tags:
+    - desktop
+    - development
+    - docker
+    - emulator
+    - forex
+    - graphics
+    - gui
     - linux
+    - trading
+    - ubuntu
     - windows
-  issue_tracker_url: https://github.com/EA31337/ansible-role-mt-runner
-  license: GPLv3
+    - wine
+  license: GPL-3.0-or-later
   min_ansible_version: "2.7"
   namespace: ea31337
   platforms:
@@ -23,7 +35,16 @@ galaxy_info:
     - name: Debian
       versions:
         - all
+        - bullseye
+        - buster
+        - stretch
+    # - name: NixOS
+    #   versions:
+    #     - all
     - name: Ubuntu
       versions:
         - all
+        - bionic
+        - focal
+        - xenial
   role_name: mt_runner
