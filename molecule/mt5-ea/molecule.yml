@@ -44,8 +44,13 @@ provisioner:
         wine_install_winetricks: true
         wine_release: stable
     host_vars:
+      alpine-latest:
+        wine_version: '9'
       nixos-latest:
         ansible_python_interpreter: /root/.nix-profile/bin/python3
+        wine_version: '10.0'
+      ubuntu-jammy:
+        wine_version: '10.0'
   ssh_connection:
     pipelining: true
   name: ansible
