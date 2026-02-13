@@ -67,7 +67,7 @@
   vars:
     controller_python: "{{ ansible_playbook_python }}"
     container_image_map:
-      mt-runner-on-alpine-latest: alpine:latest
+      mt-runner-on-alpine-latest: alpine:3.20
       mt-runner-on-debian-latest: debian:latest
       mt-runner-on-nixos-latest: nixos/nix
       mt-runner-on-ubuntu-jammy: ubuntu:jammy
