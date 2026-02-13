@@ -18,6 +18,24 @@
         image: "{{ container_image }}"
         state: started
         command: sleep infinity
+        tmpfs:
+          - /tmp:exec
+          - /run:exec
+        env:
+          TMPDIR: /tmp
+      when: container_image is search("nixos")
+      delegate_to: localhost
+      vars:
+        # Use system Python with requests installed for controller-side Docker modules.
+        ansible_python_interpreter: "{{ controller_python }}"
+
+    - name: Ensure container is started
+      community.docker.docker_container:
+        name: "{{ inventory_hostname }}"
+        image: "{{ container_image }}"
+        state: started
+        command: sleep infinity
+      when: not (container_image is search("nixos"))
       delegate_to: localhost
       vars:
         # Use system Python with requests installed for controller-side Docker modules.
@@ -49,6 +67,14 @@
         test -e "{{ ansible_python_interpreter }}" || (apt-get update && apt-get install -y python3 python3-pip)
       changed_when: false
       when: container_image is search("ubuntu") or container_image is search("debian")
+
+    - name: Install Python 3 and bash on NixOS
+      ansible.builtin.raw: |
+        if [ ! -e "{{ ansible_python_interpreter }}" ]; then
+          nix-env -iA nixpkgs.python3 || nix-env -i python3
+        fi
+      changed_when: false
+      when: container_image is search("nixos")
 
     - name: Gather facts
       ansible.builtin.setup:
