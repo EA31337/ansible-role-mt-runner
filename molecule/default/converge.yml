@@ -12,7 +12,7 @@
           Common:
             Login: "{{ ansible_facts.env.MT_RUNNER_MT5_LOGIN }}"
             Password: "{{ ansible_facts.env.MT_RUNNER_MT5_PASSWORD }}"
-            Server: "{{ ansible_facts.env.MT_RUNNER_MT5_SERVER || 'MetaQuotes-Demo' }}"
+            Server: "{{ ansible_facts.env.MT_RUNNER_MT5_SERVER | default('MetaQuotes-Demo') }}"
           Tester:
             Deposit: 10000
             ExecutionMode: 0
