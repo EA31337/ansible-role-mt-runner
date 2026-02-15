@@ -57,7 +57,7 @@ jobs:
 
       - name: Run Ansible playbook
         run: |
-          ansible-playbook -i tests/inventory/docker-containers.yml tests/playbooks/docker-containers.yml
+          ansible-playbook -i tests/inventory/docker-containers.yml tests/playbooks/docker-containers.yml -vvv
         working-directory: ${{ github.repository }}
 
       # Debug with tmate on failure when debug logging is enabled.

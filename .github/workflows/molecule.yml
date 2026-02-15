@@ -37,9 +37,10 @@ jobs:
           path: ${{ github.repository }}
       - uses: gofrolist/molecule-action@v2
         env:
+          ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
           ANSIBLE_FORCE_COLOR: '1'
           ANSIBLE_STDOUT_CALLBACK: ${{ runner.debug == '1' && 'debug' || 'ansible.builtin.default' }}
-          ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
+          ANSIBLE_VERBOSITY: '3'
           DOCKER_API_VERSION: '1.44'
           MOLECULE_REPORT: molecule-${{ matrix.scenario }}-report.html
           MT_RUNNER_MT4_PASSWORD: ${{ secrets.MT_RUNNER_MT4_PASSWORD || 'SETME' }}
@@ -50,7 +51,7 @@ jobs:
           molecule_args: >-
             --scenario-name ${{ matrix.scenario }}
           molecule_command: test
-          molecule_options: ${{ runner.debug == '1' && '--verbose' || '' }}
+          molecule_options: --verbose
           molecule_working_dir: ${{ github.repository }}
       - if: always()
         name: Ensure report file permissions are correct
