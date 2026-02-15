@@ -18,10 +18,12 @@
         image: "{{ container_image }}"
         state: started
         command: sleep infinity
+        privileged: true
         tmpfs:
           - /tmp:exec
           - /run:exec
         env:
+          NIX_CONFIG: "sandbox = false"
           TMPDIR: /tmp
       when: container_image is search("nixos")
       delegate_to: localhost
@@ -68,13 +70,21 @@
       changed_when: false
       when: container_image is search("ubuntu") or container_image is search("debian")
 
-    - name: Install Python 3 and bash on NixOS
-      ansible.builtin.raw: |
-        if [ ! -e "{{ ansible_python_interpreter }}" ]; then
-          nix-env -iA nixpkgs.python3 || nix-env -i python3
-        fi
+    - name: Install Python 3 on NixOS (from host)
+      ansible.builtin.shell:
+        cmd: |
+          docker exec {{ inventory_hostname }} /nix/var/nix/profiles/default/bin/sh -c '
+          if ! command -v python3 >/dev/null 2>&1; then
+            mkdir -p /etc/nix
+            echo "sandbox = false" > /etc/nix/nix.conf
+            export NIX_CONFIG="sandbox = false"
+            /nix/var/nix/profiles/default/bin/nix-env --option sandbox false -iA nixpkgs.python3
+          fi'
       changed_when: false
+      delegate_to: localhost
       when: container_image is search("nixos")
+      vars:
+        ansible_python_interpreter: "{{ controller_python }}"
 
     - name: Gather facts
       ansible.builtin.setup:

@@ -27,8 +27,5 @@ all:
           ansible_connection: docker
           ansible_distribution: NixOS
           ansible_host: mt-runner-on-nixos-latest
-          ansible_python_interpreter: /root/.nix-profile/bin/python3
+          ansible_python_interpreter: /run/current-system/sw/bin/python3
           ansible_remote_tmp: /tmp/.ansible/tmp
-          ansible_shell_executable: /bin/sh
-          ansible_shell_type: sh
-          ansible_docker_extra_args: --tmpfs /tmp:exec --tmpfs /run:exec
