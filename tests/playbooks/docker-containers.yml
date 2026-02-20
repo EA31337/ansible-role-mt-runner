@@ -113,6 +113,7 @@
 
 - name: Install ea31337.mt_runner role on all containers
   hosts: docker_containers
+  become_method: ansible.builtin.su
   gather_facts: true
   tags: always
   vars:
