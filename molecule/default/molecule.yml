@@ -34,7 +34,7 @@ provisioner:
       remote_tmp: /tmp/.ansible-tmp-$${USER}
       result_format: yaml
       stdout_callback: ansible.builtin.default
-      verbosity: "$${ANSIBLE_VERBOSITY:-2}"
+      verbosity: "${ANSIBLE_VERBOSITY:-2}"
   env:
     ANSIBLE_FORCE_COLOR: "1"
     ANSIBLE_LOAD_CALLBACK_PLUGINS: "1"
