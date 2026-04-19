@@ -1,58 +1,64 @@
 ---
-- name: Start test
+- name: Print is_unix
   ansible.builtin.debug:
-    msg: Starting test...
+    msg: "{{ is_unix }}"
 
-- name: Check platform (non-Windows)
-  when: ansible_os_family != "Windows"
+- name: Print platform_name
+  ansible.builtin.debug:
+    msg: "{{ platform_name }}"
+
+- name: Populate paths
+  ansible.builtin.include_tasks: ../../roles/ea31337.metatrader/tasks/paths.yml
+  tags:
+    - metatrader_paths
+
+- name: Install winbind package (Unix)
+  ansible.builtin.apt:
+    allow_unauthenticated: true
+    install_recommends: "{{ 'yes' if wine_install_recommends else 'no' }}"
+    name: '{{ item }}'
+    state: present
+    update_cache: true
+  become: true
+  with_items:
+    - winbind
+  when: is_unix
+
+- name: Populate MT host paths (Windows, Cygwin)
+  when: platform_name == "Windows" or platform_name == "Cygwin"
   block:
-    - name: Install winbind package
-      ansible.builtin.apt:
-        allow_unauthenticated: true
-        install_recommends: "{{ 'yes' if wine_install_recommends else 'no' }}"
-        name: '{{ item }}'
-        state: present
-        update_cache: true
-      become: true
-      with_items:
-        - winbind
-    - name: Query MT platform path
-      changed_when: false
-      ansible.builtin.find:
-        paths: '{{ ansible_env.HOME }}/.wine'
-        patterns: >-
-          {{ mt_runner_mt_files[mt_runner_mt_version | int].terminal }}
-        recurse: true
-      register: mt_path_terminal
-    - name: Set platform's directory path
+    - name: Set MT platform path
       ansible.builtin.set_fact:
-        mt_runner_mt_path: "{{ mt_path_terminal.files[0].path | dirname }}"
-    - name: Set platform's terminal filepath
+        mt_runner_mt_path: "{{ mt_runner_mt_path_host }}"
+    - name: Set MT terminal path
       ansible.builtin.set_fact:
-        mt_runner_mt_terminal_path: "{{ mt_path_terminal.files[0].path }}"
+        mt_runner_mt_terminal_path: "{{ mt_runner_mt_terminal_path_host }}"
 
-- name: Convert paths (non-Windows)
-  when: ansible_os_family != "Windows"
+- name: Convert paths into wine paths (Unix)
+  when: is_unix
   block:
     - name: Converts platform's path to Unix
       changed_when: false
       # noqa command-instead-of-shell
       ansible.builtin.command: >-
-        winepath {{ mt_runner_mt_path | quote }}
+        winepath {{ mt_runner_mt_path_wine | quote }}
       environment:
         DISPLAY: "{{ xvfb_display }}"
       register: cmd_winepath_mt_path
+
     - name: Converts platform's terminal path to Unix
       changed_when: false
       # noqa command-instead-of-shell
       ansible.builtin.command: >-
-        winepath {{ mt_runner_mt_terminal_path | quote }}
+        winepath {{ mt_runner_mt_terminal_path_wine | quote }}
       environment:
         DISPLAY: "{{ xvfb_display }}"
       register: cmd_winepath_mt_terminal_path
+
     - name: Set MT platform path 1 for Unix
       ansible.builtin.set_fact:
         mt_runner_mt_path: "{{ cmd_winepath_mt_path.stdout }}"
+
     - name: Set MT platform path 2 for Unix
       ansible.builtin.set_fact:
         mt_runner_mt_terminal_path: "{{ cmd_winepath_mt_terminal_path.stdout }}"
@@ -63,14 +69,15 @@
     mode: "0644"
     src: '{{ mt_runner_mt_version }}/tester.ini.j2'
 
-- name: Clean-up before the test (non-Windows)
-  when: ansible_os_family != "Windows"
+- name: Clean-up before the test (Unix)
+  when: is_unix and false
   block:
     - name: Kills any existing terminal processes
       ansible.builtin.command: pkill terminal
       changed_when: false
       failed_when: cmd_pkill_res.rc > 1
       register: cmd_pkill_res
+
     - name: Finds old logs
       changed_when: false
       ansible.builtin.find:
@@ -78,6 +85,7 @@
         patterns: "*.log"
         recurse: true
       register: mt_old_logs
+
     - name: Removes old log files
       ansible.builtin.file:
         path: "{{ item.path }}"
@@ -94,14 +102,24 @@
         path: "{{ item.dest }}"
         state: directory
       loop: "{{ mt_runner_get_url_list }}"
-    - name: Ensures files are present
+
+    - name: Ensures files are present (Unix, Cygwin)
       ansible.builtin.get_url:
         dest: "{{ item.dest }}"
         mode: "{{ item.mode | default('u=rw,g=r') }}"
         url: "{{ item.url }}"
       loop: "{{ mt_runner_get_url_list }}"
+      when: is_unix or platform_name == "Cygwin"
 
-- name: Runs terminal
+    - name: Ensures files are present (Windows)
+      ansible.windows.win_get_url:
+        dest: "{{ item.dest }}"
+        url: "{{ item.url }}"
+      loop: "{{ mt_runner_get_url_list }}"
+      when: platform_name == "Windows"
+
+- name: Runs terminal (Unix)
+  when: is_unix
   async: 600
   poll: 0
   changed_when: false
@@ -109,13 +127,51 @@
     argv:
       - "{{ mt_runner_cmd_prefix }}"
       - "{{ mt_runner_mt_terminal_path }}"
+      - '/portable'
       - "{{ '/config:tester.ini' if (mt_runner_mt_version | int) == 5 else 'tester.ini' }}"
   args:
     chdir: '{{ mt_runner_mt_path }}'
   environment:
     DISPLAY: "{{ xvfb_display }}"
     WINEDEBUG: warn-all,fixme-all,-alsa,-ole,-toolbar
-  register: cmd_terminal_async
+  register: cmd_terminal_async_result
+
+- set_fact: cmd_terminal_async="{{cmd_terminal_async_result}}"
+  when: (cmd_terminal_async_result is defined) and (cmd_terminal_async_result.ansible_job_id is defined)
+
+- name: Runs terminal (Cygwin)
+  when: platform_name == "Cygwin"
+  async: 600
+  poll: 0
+  changed_when: false
+  ansible.builtin.command:
+    argv:
+      - "{{ mt_runner_mt_terminal_path }}"
+      - '/portable'
+      - "{{ '/config:tester.ini' if (mt_runner_mt_version | int) == 5 else 'tester.ini' }}"
+  args:
+    chdir: '{{ mt_runner_mt_path }}'
+  register: cmd_terminal_async_result
+
+- set_fact: cmd_terminal_async="{{cmd_terminal_async_result}}"
+  when: (cmd_terminal_async_result is defined) and (cmd_terminal_async_result.ansible_job_id is defined)
+
+- name: Runs terminal (Windows)
+  when: platform_name == "Windows"
+  async: 600
+  poll: 0
+  changed_when: false
+  ansible.windows.win_command:
+    argv:
+      - "{{ mt_runner_cmd_prefix }}"
+      - "{{ mt_runner_mt_terminal_path }}"
+      - "{{ '/config:tester.ini' if (mt_runner_mt_version | int) == 5 else 'tester.ini' }}"
+  args:
+    chdir: '{{ mt_runner_mt_path_host }}'
+  register: cmd_terminal_async_result
+
+- set_fact: cmd_terminal_async="{{cmd_terminal_async_result}}"
+  when: (cmd_terminal_async_result is defined) and (cmd_terminal_async_result.ansible_job_id is defined)
 
 - name: Check for terminal log
   block:
@@ -169,43 +225,52 @@
         or (cmd_iconv_res.stdout | join('') | regex_search(mt_runner_mt_error_messages) | select | list | length > 0)
       when: (mt_runner_mt_version | int) == 5
 
-- name: Process test results
-  when: cmd_terminal_async_status is finished
-  block:
+- name: Ensure bs4 Python package in installed
+  ansible.builtin.pip:
+    name: bs4
+    state: present
+  become: "{{ is_unix | bool }}"
+  become_user: root
 
-    - name: Converts report to CSV (Orders)
-      ansible.builtin.copy:
-        content: |
-          {{ lookup('parse_mt_report',
-            mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report, 'orders', True) }}
-        dest: >-
-          {{ mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report ~ '-Orders.csv' }}
-        mode: '0644'
-    - name: Converts report to CSV (Deals)
-      ansible.builtin.copy:
-        content: |
-          {{ lookup('parse_mt_report', mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report,
-            'deals', True) }}
-        dest: >-
-          {{ mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report }}-Deals.csv
-        mode: '0644'
+- name: Converts report to CSV (Orders)
+  ansible.builtin.copy:
+    content: |
+      {{ lookup('parse_mt_report', mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report, 'orders', True) }}
+    dest: >-
+      {{ mt_runner_mt_path }}/{{ mt_runner_bt_mt5_config.Tester.Report }}-Orders.csv
+    mode: '0644'
+  become: "{{ is_unix | bool }}"
+  become_user: root
 
-    - name: Converts report to CSV (Header)
-      ansible.builtin.copy:
-        content: |
-          {{ lookup('parse_mt_report', mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report,
-            'header', True) }}
-        dest: >-
-          {{ mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report }}-Header.csv
-        mode: '0644'
+- name: Converts report to CSV (Deals)
+  ansible.builtin.copy:
+    content: |
+      {{ lookup('parse_mt_report', mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report, 'deals', True) }}
+    dest: >-
+      {{ mt_runner_mt_path }}/{{ mt_runner_bt_mt5_config.Tester.Report }}-Deals.csv
+    mode: '0644'
+  become: "{{ is_unix | bool }}"
+  become_user: root
 
-    - name: Converts report to CSV (Optimization)
-      ansible.builtin.copy:
-        content: |
-          {{ lookup('parse_mt_report', mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report, 'opt', True) }}
-        dest: >-
-          {{ mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report }}-Optimization.csv
-        mode: '0644'
+- name: Converts report to CSV (Header)
+  ansible.builtin.copy:
+    content: |
+      {{ lookup('parse_mt_report', mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report, 'header', True) }}
+    dest: >-
+      {{ mt_runner_mt_path }}/{{ mt_runner_bt_mt5_config.Tester.Report }}-Header.json
+    mode: '0644'
+  become: "{{ is_unix | bool }}"
+  become_user: root
+
+- name: Converts report to CSV (Optimization)
+  ansible.builtin.copy:
+    content: |
+      {{ lookup('parse_mt_report', mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report, 'opt', True) }}
+    dest: >-
+      {{ mt_runner_mt_path }}/{{ mt_runner_bt_mt5_config.Tester.Report }}-Optimization.csv
+    mode: '0644'
+  become: "{{ is_unix | bool }}"
+  become_user: root
 
 - name: Make sure all handlers run
   ansible.builtin.meta: flush_handlers

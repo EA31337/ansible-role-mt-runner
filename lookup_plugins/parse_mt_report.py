@@ -6,6 +6,7 @@ import re
 from bs4 import BeautifulSoup
 import csv
 import json
+import argparse
 import xml.etree.ElementTree as ET
 
 def parse_period(value):
@@ -303,7 +304,13 @@ def write_to_json(html_content, output_file, type, return_string=False):
         jsonfile.close()
 
 def write_opt(input_file, output_file, include_titles, return_string=False):
-    tree = ET.parse(input_file)
+    with open(input_file, "r", encoding="utf-16le") as f:
+        content = f.read()
+    
+    soup = BeautifulSoup(content, "html.parser")
+    content = soup.prettify()
+
+    tree = ET.ElementTree(ET.fromstring(content))
     root = tree.getroot()
 
     # Define namespaces.
@@ -312,15 +319,18 @@ def write_opt(input_file, output_file, include_titles, return_string=False):
     # Find the Table element.
     table = root.find('.//ss:Table', ns)
 
-    # Extract column names
-    columns = [cell.find('./ss:Data', ns).text for cell in table.find('./ss:Row', ns)]
+    if table is None:
+        return write_to_csv([["Pass", "Result", "Profit", "Expected Payoff", "Profit Factor", "Recovery Factor", "Sharpe Ratio", "Custom", "Equity DD %"], []], output_file, include_titles, "opt", return_string=return_string)
+    else:
+        # Extract column names
+        columns = [cell.find('./ss:Data', ns).text for cell in table.find('./ss:Row', ns)]
 
-    data = []
-    for row in sorted(table.findall('./ss:Row', ns)[1:], key=lambda x: float(x.find('./ss:Cell/ss:Data', ns).text)):
-        row_data = [cell.find('./ss:Data', ns).text for cell in row]
-        data.append(row_data)
+        data = []
+        for row in sorted(table.findall('./ss:Row', ns)[1:], key=lambda x: float(x.find('./ss:Cell/ss:Data', ns).text)):
+            row_data = [cell.find('./ss:Data', ns).text for cell in row]
+            data.append(row_data)
 
-    return write_to_csv([columns, data], output_file, include_titles, "opt", return_string=return_string)
+        return write_to_csv([columns, data], output_file, include_titles, "opt", return_string=return_string)
 
 def main(input_file_path, output_file_path, include_titles = False, type = None, return_string=False):
     if type == None:
@@ -336,11 +346,11 @@ def main(input_file_path, output_file_path, include_titles = False, type = None,
             raise AnsibleError("An error occurred:" + str(e))
 
     if type in ["orders", "deals"]:
-        return write_to_csv(html_content, output_file_path, include_titles, type, return_string=return_string)
+        return [write_to_csv(html_content, output_file_path, include_titles, type, return_string=return_string)]
     elif type in ["header"]:
-        return write_to_json(html_content, output_file_path, type, return_string=return_string)
+        return [write_to_json(html_content, output_file_path, type, return_string=return_string)]
     elif type in ["opt"]:
-        return write_opt(input_file_path, output_file_path, include_titles, return_string=return_string)
+        return [write_opt(input_file_path, output_file_path, include_titles, return_string=return_string)]
 
     raise ValueError('Incorrect type passed. Allowed value: "orders" OR "deals" OR "header" OR "opt".')
 
@@ -351,6 +361,30 @@ class LookupModule(LookupBase):
             raise AnsibleError('parse_mt_report requires exactly 3 parameters to be passed:\n1) input file path\n2) type of file: "orders"|"deals"|"header"|"opt"\n3) include titles?')
         (input_file_path, type, include_titles) = terms
         return main(input_file_path, '', include_titles, type, True)
+
+if __name__ == "__main__":
+        parser = argparse.ArgumentParser(description="Parse MT report and extract data.")
+        parser.add_argument("input_file_path", help="Path to the input file.")
+        parser.add_argument("output_file_path", help="Path to the output file.")
+        parser.add_argument("--type", choices=["orders", "deals", "header", "opt"], required=True, help="Type of data to extract.")
+        parser.add_argument("--include_titles", action="store_true", help="Include titles in the output.")
+        parser.add_argument("--return_string", action="store_true", help="Return the output as a string instead of writing to a file.")
+
+        args = parser.parse_args()
+
+        try:
+            result = main(
+                input_file_path=args.input_file_path,
+                output_file_path=args.output_file_path,
+                include_titles=args.include_titles,
+                type=args.type,
+                return_string=args.return_string
+            )
+            if args.return_string:
+                print(result)
+        except Exception as e:
+            print(f"Error: {e}", file=sys.stderr)
+            sys.exit(1)
 
 # Testing:
 # lm = LookupModule()
