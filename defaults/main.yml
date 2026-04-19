@@ -144,4 +144,6 @@ mt_runner_bt_mt5_config:
 mt_runner_cmd_prefix: wine
 mt_runner_get_url_list: []
 mt_runner_mt_version: '{{ metatrader_version | default(5) | int }}'
+# Extended timeout (600s) is required to accommodate long-running MetaTrader backtests.
+# Override mt_runner_timeout via inventory or group/host vars if your environment supports a shorter timeout.
 mt_runner_timeout: 2400
