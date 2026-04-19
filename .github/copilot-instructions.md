@@ -12,7 +12,7 @@ You are expected to be an expert in:
 ## Code Standards
 
 - Avoid writing trailing whitespace
-- Follow PEP 8 for Python.
+- Follow PEP 8 for Python
 - Include docstrings and type hints where applicable
 - Maintain consistent YAML indentation
 - Optimize for readability first, performance second
@@ -43,9 +43,11 @@ Ensure enforcing the following rules:
 
 - fqcn[keyword]: Avoid `collections` keyword by using FQCN for all plugins, modules, roles and playbooks
 
-## YAML Guidelines
+## Formatting Guidelines
 
-Ensure the following rules are strictly followed:
+### YAML
+
+Follow the YAML rules defined in `.yamllint`:
 
 - yaml[empty-lines]: Avoid too many blank lines
 - yaml[indentation]: Avoid wrong indentation
@@ -53,7 +55,20 @@ Ensure the following rules are strictly followed:
 - yaml[new-line-at-end-of-file]: Enforce new line character at the end of file
 - yaml[truthy]: Truthy value should be one of [false, true]
 - Ensure items are in lexicographical order when possible.
-- When writing inline code, add a new line at the end to maintain proper indentation
+- When writing inline code, add a new line at the end to maintain proper
+  indentation
+
+To verify locally, run `yamllint .` or `pre-commit run yamllint -a`.
+
+### Markdown
+
+Follow the Markdown rules defined in `.markdownlint.yaml`:
+
+- MD013: Line length max 120 characters
+- MD033: Inline HTML allowed only for `<details>` elements
+- MD046: Consistent code block style
+
+To verify locally, run `pre-commit run markdownlint -a`.
 
 ## Project Specifics
 
@@ -63,23 +78,51 @@ This role installs and runs trading platform with distribution-specific approach
 - **Debian/Ubuntu**: Uses apt package manager
 - **Nix**: Uses nix-env in lightweight Nix environments
 
-Notes:
-
-- Project utilizes Codespaces with config file at .devcontainer/devcontainer.json
-  and requirements at .devcontainer/requirements.txt
-- GitHub Actions are used to validate the code by running
-  pre-commit checks (see .pre-commit-config.yaml file) and Molecule (molecule/).
-- Service management uses supervisord across platforms.
-- Formatting rules are defined in .yamllint (YAML) and .markdownlint.yaml (Markdown) files.
-
 ### Key Variables
 
-Variables are defined in defaults/main.yml and vars/main.yml files.
+Variables are defined in `defaults/main.yml` (user-facing) and
+`vars/main.yml` (internal).
 
 Notes:
 
-- On variable changes, update main.yml and README.md files accordingly.
+- On variable changes, update `defaults/main.yml` and `README.md` accordingly.
 
-### Testing Approach
+### Devcontainer Guidance
+
+Project utilizes Codespaces with config at `.devcontainer/devcontainer.json`
+and requirements at `.devcontainer/requirements.txt`.
+
+- Treat the repository devcontainer as the default controller environment.
+- Keep controller dependency installation in the devcontainer configuration
+  so Molecule scenarios can assume those tools are already available.
+- If dependencies are missing, update `.devcontainer/requirements.txt`
+  instead of adding per-run install steps.
+
+## Testing Approach
 
 - Use Molecule with Docker driver
+- GitHub Actions run pre-commit checks (`.pre-commit-config.yaml`) and
+  Molecule (`molecule/`)
+- Service management uses supervisord across platforms
+- Formatting rules: `.yamllint` (YAML) and `.markdownlint.yaml` (Markdown)
+
+### Running Tests
+
+```bash
+# Full molecule test (all scenarios)
+molecule test
+
+# Single scenario
+molecule test -s default
+
+# Individual steps
+molecule create -s default
+molecule converge -s default
+molecule verify -s default
+molecule destroy -s default
+
+# Linting
+yamllint .
+ansible-lint
+pre-commit run -a
+```

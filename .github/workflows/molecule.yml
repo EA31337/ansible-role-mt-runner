@@ -1,4 +1,5 @@
 ---
+# Note: Keep keys and envs in alphabetical order.
 name: Molecule
 
 # yamllint disable-line rule:truthy
@@ -19,6 +20,9 @@ on:
       - '.*'
       - LICENSE
       - Pipfile*
+
+permissions:
+  contents: read
 
 jobs:
   test:
@@ -55,7 +59,9 @@ jobs:
           molecule_working_dir: ${{ github.repository }}
       - if: always()
         name: Ensure report file permissions are correct
-        run: sudo chmod 644 molecule-${{ matrix.scenario }}-report.html
+        run: |
+          sudo touch molecule-${{ matrix.scenario }}-report.html
+          sudo chmod 644 molecule-${{ matrix.scenario }}-report.html
         working-directory: ${{ github.repository }}
       - if: always()
         name: Converts test report
@@ -63,6 +69,6 @@ jobs:
         with:
           input_file: ${{ github.repository }}/molecule-${{ matrix.scenario }}-report.html
       # Debug with tmate on failure when debug logging is enabled.
-      - if: ${{ failure() && runner.debug }}
+      - if: ${{ failure() && runner.debug == '1' }}
         uses: mxschmitt/action-tmate@v3
     timeout-minutes: 60
