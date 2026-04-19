@@ -55,7 +55,9 @@ jobs:
           molecule_working_dir: ${{ github.repository }}
       - if: always()
         name: Ensure report file permissions are correct
-        run: sudo chmod 644 molecule-${{ matrix.scenario }}-report.html
+        run: |
+          sudo touch molecule-${{ matrix.scenario }}-report.html
+          sudo chmod 644 molecule-${{ matrix.scenario }}-report.html
         working-directory: ${{ github.repository }}
       - if: always()
         name: Converts test report
