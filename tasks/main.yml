@@ -27,9 +27,11 @@
           {{ mt_runner_mt_files[mt_runner_mt_version | int].terminal }}
         recurse: true
       register: mt_path_terminal
+
     - name: Set platform's directory path
       ansible.builtin.set_fact:
         mt_runner_mt_path: "{{ mt_path_terminal.files[0].path | dirname }}"
+
     - name: Set platform's terminal filepath
       ansible.builtin.set_fact:
         mt_runner_mt_terminal_path: "{{ mt_path_terminal.files[0].path }}"
@@ -43,7 +45,8 @@
 - name: Convert paths (non-Windows)
   when: ansible_facts.os_family != "Windows"
   block:
-    - name: Converts platform's path to Unix
+
+    - name: Converts platform's path to a Unix
       changed_when: false
       # noqa command-instead-of-shell
       ansible.builtin.command: >-
@@ -56,8 +59,20 @@
         FONTCONFIG_PATH: >-
           {{ (ansible_facts.env.HOME ~ '/.config/fontconfig')
              if mt_runner_fontconfig_stat.stat.exists | default(false) else omit }}
+        WINEDEBUG: -all,fixme-all
       register: cmd_winepath_mt_path
-    - name: Converts platform's terminal path to Unix
+
+    - name: Converts platform's path to a Windows
+      changed_when: false
+      # noqa command-instead-of-shell
+      ansible.builtin.command: >-
+        winepath -w {{ mt_runner_mt_path | quote }}
+      environment:
+        DISPLAY: "{{ xvfb_display }}"
+        WINEDEBUG: -all,fixme-all
+      register: cmd_winepath_mt_path_win
+
+    - name: Converts platform's terminal path to a Unix
       changed_when: false
       # noqa command-instead-of-shell
       ansible.builtin.command: >-
@@ -70,11 +85,18 @@
         FONTCONFIG_PATH: >-
           {{ (ansible_facts.env.HOME ~ '/.config/fontconfig')
              if mt_runner_fontconfig_stat.stat.exists | default(false) else omit }}
+        WINEDEBUG: -all,fixme-all
       register: cmd_winepath_mt_terminal_path
-    - name: Set MT platform path 1 for Unix
+
+    - name: Set MT platform path for Unix
       ansible.builtin.set_fact:
         mt_runner_mt_path: "{{ cmd_winepath_mt_path.stdout }}"
-    - name: Set MT platform path 2 for Unix
+
+    - name: Set MT platform path for Windows
+      ansible.builtin.set_fact:
+        mt_runner_mt_path_win: "{{ cmd_winepath_mt_path_win.stdout }}"
+
+    - name: Set MT platform's terminal path for Unix
       ansible.builtin.set_fact:
         mt_runner_mt_terminal_path: "{{ cmd_winepath_mt_terminal_path.stdout }}"
 
@@ -162,6 +184,7 @@
       {{ (ansible_facts.env.HOME ~ '/.config/fontconfig')
          if mt_runner_fontconfig_stat.stat.exists | default(false) else omit }}
     WINEDEBUG: warn-all,fixme-all,-alsa,-ole,-toolbar
+    WINEDLLOVERRIDES: "mshtml="
   register: cmd_terminal_async
 
 - name: Check for terminal log
@@ -175,23 +198,30 @@
         state: present
         timeout: 240
       register: task_wait_for_terminal_logs
-    - name: Prints terminal log file (MT4)
+    - name: Prints terminal log file
       ansible.builtin.command:
-        cmd: cat "{{ task_wait_for_terminal_logs.path }}"
+        cmd: >-
+          {% if (mt_runner_mt_version | int) == 5 %}
+          iconv -f utf-16 -t utf-8
+          {% else %}
+          cat
+          {% endif %}
+          "{{ task_wait_for_terminal_logs.path }}"
       changed_when: false
-      when: (mt_runner_mt_version | int) == 4
-    - name: Prints terminal log file (MT5)
-      ansible.builtin.command:
-        cmd: iconv -f utf-16 -t utf-8 "{{ task_wait_for_terminal_logs.path }}"
-      changed_when: false
-      failed_when: |
-        cmd_iconv_res.stderr | length > 0
-        or ("exit with code -" in cmd_iconv_res.stdout)
-        or ("not found" in cmd_iconv_res.stdout)
-        or ("tester didn't start" in cmd_iconv_res.stdout)
-        or ("tester not started" in cmd_iconv_res.stdout)
-      register: cmd_iconv_res
-      when: (mt_runner_mt_version | int) == 5
+      failed_when:
+        res_terminal_logs.rc != 0 or res_terminal_logs.stderr | length > 0
+      register: res_terminal_logs
+    - name: Capture terminal errors
+      ansible.builtin.set_fact:
+        terminal_errors: >-
+          {{ (res_terminal_logs.stdout | join('')
+          | regex_search(mt_runner_terminal_errors_regex)) | default([]) }}
+    - name: Checks for errors in the terminal log
+      ansible.builtin.fail:
+        msg: |
+          Error found in terminal log file: {{ task_wait_for_terminal_logs.path }}
+          Error: {{ terminal_errors }}
+      when: terminal_errors | length > 0
 
 - name: Wait for test results
   block:
@@ -204,21 +234,88 @@
       until: cmd_terminal_async_status is finished
       retries: "{{ mt_runner_timeout // 10 }}"
   always:
-    - name: Prints final terminal log file (MT4)
+    - name: Prints final terminal log file
       ansible.builtin.command:
-        cmd: cat "{{ task_wait_for_terminal_logs.path }}"
+        cmd: >-
+          {% if (mt_runner_mt_version | int) == 5 %}
+          iconv -f utf-16 -t utf-8
+          {% else %}
+          cat
+          {% endif %}
+          "{{ task_wait_for_terminal_logs.path }}"
       changed_when: false
-      when: (mt_runner_mt_version | int) == 4
-    - name: Prints final terminal log file (MT5)
-      ansible.builtin.command:
-        cmd: iconv -f utf-16 -t utf-8 "{{ task_wait_for_terminal_logs.path }}"
+      failed_when:
+        res_terminal_logs.rc != 0 or res_terminal_logs.stderr | length > 0
+      register: res_terminal_logs
+    - name: Capture terminal errors
+      ansible.builtin.set_fact:
+        terminal_errors: >-
+          {{ (res_terminal_logs.stdout | join('')
+          | regex_search(mt_runner_terminal_errors_regex)) | default([]) }}
+    - name: Checks for errors in the terminal log
+      ansible.builtin.fail:
+        msg: |
+          Error found in terminal log file: {{ task_wait_for_terminal_logs.path }}
+          Error: {{ terminal_errors }}
+      when: terminal_errors | length > 0
+
+- name: Process test results
+  when: cmd_terminal_async_status is finished
+  block:
+    - name: Store temporary report path in the mt_report_temp_path variable
+      ansible.builtin.set_fact:
+        mt_report_temp_path: "{{ ansible_env.TMPDIR | default('/tmp') }}/mt5_report.html"
+
+    - name: Store temporary optimization report path in the mt_opt_report_temp_path variable
+      ansible.builtin.set_fact:
+        mt_opt_report_temp_path: "{{ ansible_env.TMPDIR | default('/tmp') }}/mt5_opt_report.html"
+
+    - name: Fetch the report file to control node
+      ansible.builtin.fetch:
+        src: "{{ mt_runner_mt_path }}/report.html"
+        dest: "{{ mt_report_temp_path }}"
+        flat: true
+
+    # TODO: Generate optimization report remove failed_when and changed_when.
+    - name: Fetch the optimization report file to control node
+      ansible.builtin.fetch:
+        src: "{{ mt_runner_mt_path }}/optimization.html"
+        dest: "{{ mt_opt_report_temp_path }}"
+        flat: true
+      failed_when: false
       changed_when: false
-      failed_when: |
-        cmd_iconv_res.stderr | length > 0
-        or ('tester not started' in cmd_iconv_res.stdout)
-        or ('not found' in cmd_iconv_res.stdout)
-      register: cmd_iconv_res
-      when: (mt_runner_mt_version | int) == 5
+
+    - name: Converts report to CSV (Orders)
+      ansible.builtin.copy:
+        content: |
+          {{ lookup('parse_mt_report', mt_report_temp_path, 'orders', True) }}
+        dest: >-
+          {{ mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report }}-Orders.csv
+        mode: '0644'
+
+    - name: Converts report to CSV (Deals)
+      ansible.builtin.copy:
+        content: |
+          {{ lookup('parse_mt_report', mt_report_temp_path, 'deals', True) }}
+        dest: >-
+          {{ mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report }}-Deals.csv
+        mode: '0644'
+
+    - name: Converts report to JSON (Header)
+      ansible.builtin.copy:
+        content: |
+          {{ lookup('parse_mt_report', mt_report_temp_path, 'header', True) }}
+        dest: >-
+          {{ mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report }}-Header.json
+        mode: '0644'
+
+    # - name: Converts report to CSV (Optimization)
+    #   ansible.builtin.copy:
+    #     content: |
+    #       {{ lookup('parse_mt_report', mt_opt_report_temp_path, 'opt', True) }}
+    #     dest: >-
+    #       {{ mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report }}-Optimization.csv
+    #     mode: '0644'
 
 - name: Make sure all handlers run
   ansible.builtin.meta: flush_handlers

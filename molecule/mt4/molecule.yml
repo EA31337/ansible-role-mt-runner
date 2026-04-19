@@ -17,6 +17,7 @@ lint: |
   yamllint .
   molecule syntax
   ansible-lint
+  # flake8
 platforms:
   - env:
       MT_RUNNER_MT4_LOGIN: "${MT_RUNNER_MT4_LOGIN:-12345}"
@@ -27,6 +28,9 @@ platforms:
       - mt4
     image: ubuntu:jammy
     name: ubuntu-jammy
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
 provisioner:
   config_options:
     defaults:

@@ -39,9 +39,16 @@ jobs:
       - uses: actions/checkout@v6
         with:
           path: ${{ github.repository }}
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache
+            /var/cache
+          key: ${{ runner.os }}-${{ matrix.scenario }}-${{ hashFiles('**/requirements.txt') }}
       - uses: gofrolist/molecule-action@v2
         env:
           ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
+          ANSIBLE_DISPLAY_FAILED_STDERR: '1'
           ANSIBLE_FORCE_COLOR: '1'
           ANSIBLE_STDOUT_CALLBACK: ${{ runner.debug == '1' && 'debug' || 'ansible.builtin.default' }}
           ANSIBLE_VERBOSITY: '3'

@@ -1,7 +1,10 @@
 # Python's requirements
 # Usage: pip install -r requirements.txt
+bs4
+chardet
 docker>=7.1
-pipenv
+flake8
 molecule
 molecule-docker
+pipenv
 requests==2.31.0
