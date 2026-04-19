@@ -1,7 +1,14 @@
+.ansible
+ansible-role-*
 *.bak
+.cache
+collections/
 *.html
+*.log
+*.org
 *.orig
 *.png
-.ansible
-.cache
 __pycache__
+requirements-local.yml
+*.swp
+*.verb

@@ -1,19 +1,29 @@
 ---
+# Molecule configuration file.
+# Dependency management (download roles/collections)
+# Note: Keep YAML keys sorted alphabetically.
+# _TESTING_
 dependency:
-  command: >-
-    pip install -r "${MOLECULE_SCENARIO_DIRECTORY}"/../requirements.txt
-  name: shell
+  name: galaxy
+  options:
+    ignore-certs: false
+    ignore-errors: false
+    role-file: requirements.yml
+    requirements-file: requirements.yml
 driver:
   name: docker
 lint: |
   set -e
-  ansible-lint
   yamllint .
+  molecule syntax
+  ansible-lint
   # flake8
 platforms:
   - env:
       MT_RUNNER_MT4_LOGIN: "${MT_RUNNER_MT4_LOGIN:-12345}"
       MT_RUNNER_MT4_PASSWORD: "${MT_RUNNER_MT4_PASSWORD:-SETME}"
+      MT_RUNNER_MT4_SERVER: "${MT_RUNNER_MT4_SERVER:-MetaQuotes-Demo}"
+      WINEDLLOVERRIDES: "mscoree,mshtml=,winebrowser.exe=,dbghelp=n"
     groups:
       - mt4
     image: ubuntu:jammy
@@ -24,15 +34,37 @@ platforms:
 provisioner:
   config_options:
     defaults:
-      # Use the built-in default callback with result_format instead of community.general.yaml
-      callback_result_format: yaml
+      host_key_checking: false
+      # Use the built-in 'ansible.builtin.default' callback with YAML result_format
       remote_tmp: /tmp/.ansible-tmp-$${USER}
+      result_format: yaml
       stdout_callback: ansible.builtin.default
-  name: ansible
+      verbosity: "${ANSIBLE_VERBOSITY:-2}"
+  env:
+    ANSIBLE_FORCE_COLOR: "1"
+    ANSIBLE_LOAD_CALLBACK_PLUGINS: "1"
   inventory:
     group_vars:
       all:
         wine_install_winetricks: true
         wine_release: stable
+    host_vars:
+      alpine-latest:
+        wine_version: '10.0'
+      nixos-latest:
+        ansible_python_interpreter: /root/.nix-profile/bin/python3
+        wine_version: '10.0'
+      ubuntu-jammy:
+        wine_version: '10.0'
+  ssh_connection:
+    pipelining: true
+  name: ansible
+  options:
+    diff: true
+    force-handlers: true
+  playbooks:
+    converge: converge.yml
+    prepare: ../default/prepare.yml
+    verify: ../default/verify.yml
 verifier:
   name: ansible

@@ -1,11 +1,8 @@
 #!/usr/bin/env python
 from ansible.errors import AnsibleError
-from ansible.module_utils.common.text.converters import to_text, to_native
+from ansible.module_utils.common.text.converters import to_native
 from ansible.plugins.lookup import LookupBase
 import base64
-import codecs
-import logging
-import string
 
 
 class LookupModule(LookupBase):

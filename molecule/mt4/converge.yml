@@ -1,6 +1,7 @@
 ---
 - name: Converge
   hosts: all
+  gather_facts: true
   tasks:
     - name: Include main role
       ansible.builtin.import_role:
@@ -10,7 +11,7 @@
           Login: "{{ ansible_facts.env.MT_RUNNER_MT4_LOGIN }}"
           Password: "{{ ansible_facts.env.MT_RUNNER_MT4_PASSWORD }}"
           Profile: default
-          Server:
+          Server: "{{ ansible_facts.env.MT_RUNNER_MT4_SERVER | default('MetaQuotes-Demo') }}"
           TestExpert: MACD Sample.ex4
           TestFromDate: 2020.01.01
           TestModel: 1
