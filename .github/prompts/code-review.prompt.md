@@ -23,7 +23,6 @@ to ensure it meets high-quality standards and follows best practices.
 - Follow standard role structure:
 
   - [tasks/](../../tasks/)
-  - [handlers/](../../handlers/)
   - [templates/](../../templates/)
   - [defaults/](../../defaults/)
   - [meta/](../../meta/)
@@ -63,7 +62,7 @@ to ensure it meets high-quality standards and follows best practices.
 
 - Ensure GitHub Actions workflows are correctly configured to run pre-commit checks and Molecule tests.
 - Verify that the workflows cover all necessary validation steps.
-- Check [.github/workflows/](../) directory for workflow configurations.
+- Check [.github/workflows/](../workflows/) directory for workflow configurations.
 
 ## Documentation
 
