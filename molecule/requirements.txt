@@ -1,6 +1,7 @@
 # Python's requirements
 # Usage: pip install -r requirements.txt
 bs4
+chardet
 docker>=7.1
 flake8
 molecule
