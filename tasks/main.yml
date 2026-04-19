@@ -225,7 +225,7 @@
         or (cmd_iconv_res.stdout | join('') | regex_search(mt_runner_mt_error_messages) | select | list | length > 0)
       when: (mt_runner_mt_version | int) == 5
 
-- name: Ensure bs4 Python package in installed
+- name: Ensure bs4 Python package is installed
   ansible.builtin.pip:
     name: bs4
     state: present
@@ -252,7 +252,7 @@
   become: "{{ is_unix | bool }}"
   become_user: root
 
-- name: Converts report to CSV (Header)
+- name: Converts report to JSON (Header)
   ansible.builtin.copy:
     content: |
       {{ lookup('parse_mt_report', mt_runner_mt_path ~ '/' ~ mt_runner_bt_mt5_config.Tester.Report, 'header', True) }}
