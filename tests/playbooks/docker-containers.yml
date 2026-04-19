@@ -18,6 +18,26 @@
         image: "{{ container_image }}"
         state: started
         command: sleep infinity
+        privileged: true
+        tmpfs:
+          - /tmp:exec
+          - /run:exec
+        env:
+          NIX_CONFIG: "sandbox = false"
+          TMPDIR: /tmp
+      when: container_image is search("nixos")
+      delegate_to: localhost
+      vars:
+        # Use system Python with requests installed for controller-side Docker modules.
+        ansible_python_interpreter: "{{ controller_python }}"
+
+    - name: Ensure container is started
+      community.docker.docker_container:
+        name: "{{ inventory_hostname }}"
+        image: "{{ container_image }}"
+        state: started
+        command: sleep infinity
+      when: not (container_image is search("nixos"))
       delegate_to: localhost
       vars:
         # Use system Python with requests installed for controller-side Docker modules.
@@ -50,6 +70,22 @@
       changed_when: false
       when: container_image is search("ubuntu") or container_image is search("debian")
 
+    - name: Install Python 3 on NixOS (from host)
+      ansible.builtin.shell:
+        cmd: |
+          docker exec {{ inventory_hostname }} /nix/var/nix/profiles/default/bin/sh -c '
+          if ! command -v python3 >/dev/null 2>&1; then
+            mkdir -p /etc/nix
+            echo "sandbox = false" > /etc/nix/nix.conf
+            export NIX_CONFIG="sandbox = false"
+            /nix/var/nix/profiles/default/bin/nix-env --option sandbox false -iA nixpkgs.python3
+          fi'
+      changed_when: false
+      delegate_to: localhost
+      when: container_image is search("nixos")
+      vars:
+        ansible_python_interpreter: "{{ controller_python }}"
+
     - name: Gather facts
       ansible.builtin.setup:
 
@@ -67,7 +103,7 @@
   vars:
     controller_python: "{{ ansible_playbook_python }}"
     container_image_map:
-      mt-runner-on-alpine-latest: alpine:latest
+      mt-runner-on-alpine-latest: alpine:3.20
       mt-runner-on-debian-latest: debian:latest
       mt-runner-on-nixos-latest: nixos/nix
       mt-runner-on-ubuntu-jammy: ubuntu:jammy
@@ -77,6 +113,7 @@
 
 - name: Install ea31337.mt_runner role on all containers
   hosts: docker_containers
+  become_method: ansible.builtin.su
   gather_facts: true
   tags: always
   vars:
@@ -85,6 +122,30 @@
     - name: Installs ea31337.mt_runner role
       ansible.builtin.import_role:
         name: ea31337.mt_runner
+      vars:
+        # noqa: var-naming[no-role-prefix]
+        metatrader_version: 5
+        mt_runner_bt_mt5_config:
+          Common:
+            Login: "{{ ansible_facts.env.MT_RUNNER_MT5_LOGIN | default('12345') }}"
+            Password: "{{ ansible_facts.env.MT_RUNNER_MT5_PASSWORD | default('SETME') }}"
+            Server: "{{ ansible_facts.env.MT_RUNNER_MT5_SERVER | default('MetaQuotes-Demo') }}"
+          Tester:
+            Deposit: 10000
+            ExecutionMode: 0
+            Expert: EA31337-Libre-v1.013.ex5
+            FromDate: 2024.01.01
+            Leverage: 1:500
+            Login: "{{ ansible_facts.env.MT_RUNNER_MT5_LOGIN | default('12345') }}"
+            Model: 1
+            Report: report.html
+            ReplaceReport: 1
+            ShutdownTerminal: 1
+            Symbol: EURUSD
+            ToDate: 2024.01.11
+        mt_runner_get_url_list:
+          - dest: "{{ mt_runner_mt_path }}/MQL5/Experts"
+            url: https://github.com/EA31337/EA31337-Libre/releases/download/v1.013/EA31337-Libre-v1.013.ex5
 
   post_tasks:
     - name: Stop Docker containers

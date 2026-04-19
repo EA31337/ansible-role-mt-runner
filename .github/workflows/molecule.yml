@@ -32,23 +32,26 @@ jobs:
           - mt4
           - mt5-ea
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           path: ${{ github.repository }}
       - uses: gofrolist/molecule-action@v2
         env:
+          ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
           ANSIBLE_FORCE_COLOR: '1'
           ANSIBLE_STDOUT_CALLBACK: ${{ runner.debug == '1' && 'debug' || 'ansible.builtin.default' }}
-          ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
+          ANSIBLE_VERBOSITY: '3'
+          DOCKER_API_VERSION: '1.44'
           MOLECULE_REPORT: molecule-${{ matrix.scenario }}-report.html
           MT_RUNNER_MT4_PASSWORD: ${{ secrets.MT_RUNNER_MT4_PASSWORD || 'SETME' }}
+          MT_RUNNER_MT4_SERVER: ${{ secrets.MT_RUNNER_MT4_SERVER || 'MetaQuotes-Demo' }}
           MT_RUNNER_MT5_LOGIN: ${{ secrets.MT_RUNNER_MT5_LOGIN || '12345' }}
-          MT_RUNNER_MT5_PASSWORD: ${{ secrets.MT_RUNNER_MT5_PASSWORD || 'SETME' }}
+          MT_RUNNER_MT5_SERVER: ${{ secrets.MT_RUNNER_MT5_SERVER || 'MetaQuotes-Demo' }}
         with:
           molecule_args: >-
             --scenario-name ${{ matrix.scenario }}
           molecule_command: test
-          molecule_options: ${{ runner.debug == '1' && '--verbose' || '' }}
+          molecule_options: --verbose
           molecule_working_dir: ${{ github.repository }}
       - if: always()
         name: Ensure report file permissions are correct
@@ -62,4 +65,4 @@ jobs:
       # Debug with tmate on failure when debug logging is enabled.
       - if: ${{ failure() && runner.debug == '1' }}
         uses: mxschmitt/action-tmate@v3
-    timeout-minutes: 20
+    timeout-minutes: 60

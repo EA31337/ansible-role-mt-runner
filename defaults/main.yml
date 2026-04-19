@@ -37,7 +37,7 @@ mt_runner_bt_mt4_config:
   ProxyType: HTTP
   Script:
   ScriptParameters:
-  Server:
+  Server: "{{ ansible_facts.env.MT_RUNNER_MT4_SERVER | default('MetaQuotes-Demo') }}"
   Symbol: EURUSD
   Template: popular.tpl
   TestDateEnable: true
@@ -86,7 +86,7 @@ mt_runner_bt_mt5_config:
     ProxyPassword:
     ProxyServer:
     ProxyType: SOCKS5
-    Server: MetaQuotes-Demo
+    Server: "{{ ansible_facts.env.MT_RUNNER_MT5_SERVER | default('MetaQuotes-Demo') }}"
   Charts:
     PrintColor: 1
     SaveDeleted: 1
@@ -144,4 +144,4 @@ mt_runner_bt_mt5_config:
 mt_runner_cmd_prefix: wine
 mt_runner_get_url_list: []
 mt_runner_mt_version: '{{ metatrader_version | default(5) | int }}'
-mt_runner_timeout: 600
+mt_runner_timeout: 2400

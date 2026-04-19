@@ -20,6 +20,8 @@ platforms:
   - env:
       MT_RUNNER_MT5_LOGIN: "${MT_RUNNER_MT5_LOGIN:-12345}"
       MT_RUNNER_MT5_PASSWORD: "${MT_RUNNER_MT5_PASSWORD:-SETME}"
+      MT_RUNNER_MT5_SERVER: "${MT_RUNNER_MT5_SERVER:-MetaQuotes-Demo}"
+      WINEDLLOVERRIDES: "mscoree,mshtml=,winebrowser.exe=,dbghelp=n"
     groups:
       - mt5
     image: ubuntu:jammy
@@ -32,7 +34,7 @@ provisioner:
       remote_tmp: /tmp/.ansible-tmp-$${USER}
       result_format: yaml
       stdout_callback: ansible.builtin.default
-      verbosity: 1
+      verbosity: "${ANSIBLE_VERBOSITY:-2}"
   env:
     ANSIBLE_FORCE_COLOR: "1"
     ANSIBLE_LOAD_CALLBACK_PLUGINS: "1"
@@ -42,8 +44,13 @@ provisioner:
         wine_install_winetricks: true
         wine_release: stable
     host_vars:
+      alpine-latest:
+        wine_version: '9'
       nixos-latest:
         ansible_python_interpreter: /root/.nix-profile/bin/python3
+        wine_version: '9'
+      ubuntu-jammy:
+        wine_version: '10.0'
   ssh_connection:
     pipelining: true
   name: ansible

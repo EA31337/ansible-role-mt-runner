@@ -4,8 +4,8 @@
 dependencies:
   - name: ea31337.metatrader
     scm: git
-    src: https://github.com/EA31337/ansible-role-metatrader.git
-    version: v1.0.3  # This should match version in requirements.yml
+    src: https://github.com/nseam/ansible-role-metatrader.git
+    version: test/testing-after-wine-role-changes
 galaxy_info:
   author: kenorb
   company: EA31337 Ltd
