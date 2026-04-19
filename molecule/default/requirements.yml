@@ -2,5 +2,5 @@
 ---
 - name: ea31337.metatrader
   scm: git
-  src: https://github.com/nseam/ansible-role-metatrader.git
-  version: test/testing-after-wine-role-changes
+  src: https://github.com/EA31337/ansible-role-metatrader.git
+  version: dev
