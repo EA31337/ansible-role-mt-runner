@@ -29,6 +29,7 @@ platforms:
 provisioner:
   config_options:
     defaults:
+      callbacks_enabled: ansible.posix.profile_tasks
       host_key_checking: false
       # Use the built-in ansible.builtin.default callback with YAML result_format for output
       remote_tmp: /tmp/.ansible-tmp-$${USER}
