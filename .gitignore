@@ -1,5 +1,7 @@
 .ansible
 ansible-role-*
+ca-certificates/
+collections
 *.bak
 .cache
 collections/
