@@ -63,5 +63,19 @@ provisioner:
     converge: converge.yml
     prepare: ../default/prepare.yml
     verify: ../default/verify.yml
+  ssh_connection:
+    pipelining: true
+scenario:
+  name: mt4
+  test_sequence:
+    - dependency
+    - destroy
+    - syntax
+    - create
+    - prepare
+    - converge
+    - verify
+    - destroy
 verifier:
   name: ansible
+
