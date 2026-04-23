@@ -8,8 +8,8 @@ dependency:
   options:
     ignore-certs: false
     ignore-errors: false
-    role-file: requirements.yml
-    requirements-file: requirements.yml
+    role-file: ../../requirements.yml
+    requirements-file: ../../requirements.yml
 driver:
   name: docker
 lint: |
@@ -58,7 +58,7 @@ provisioner:
       callbacks_enabled: ansible.posix.profile_tasks
       # Ensure collections installed to ./collections are found by ansible-playbook.
       collections_path: >-
-        ${MOLECULE_PROJECT_DIRECTORY}/collections:~/.ansible/collections:/usr/share/ansible/collections
+        ../../collections:${MOLECULE_PROJECT_DIRECTORY}/collections:~/.ansible/collections:/usr/share/ansible/collections
       host_key_checking: false
       # Use the built-in 'ansible.builtin.default' callback with YAML result_format
       remote_tmp: /tmp/.ansible-tmp-$${USER}
