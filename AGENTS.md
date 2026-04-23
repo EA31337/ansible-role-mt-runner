@@ -1,7 +1,5 @@
 # AGENTS.md
 
-This repository uses [Cogni AI](https://github.com/Cogni-AI-OU) agents to help maintain and develop the project.
-
 ## Project Invariants
 
 - **Role Name:** `ea31337.mt_runner`
