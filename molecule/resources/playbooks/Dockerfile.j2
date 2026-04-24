@@ -30,11 +30,16 @@ RUN \
 # Prepare Alpine environment: trust proxy CA certs and install Ansible dependencies.
 COPY ca-certificates/ /tmp/host-ca/
 RUN \
-    # Trust proxy CA certificates if present (appended to live bundle for immediate use by apk).
+    # Trust proxy CA certificates if present (appended to live bundles for immediate use by apk).
     if ls /tmp/host-ca/*.crt >/dev/null 2>&1; then \
       mkdir -p /usr/local/share/ca-certificates && \
       cp /tmp/host-ca/*.crt /usr/local/share/ca-certificates/ && \
-      for c in /tmp/host-ca/*.crt; do cat "$c" >> /etc/ssl/certs/ca-certificates.crt; done; \
+      # apk uses /etc/ssl/cert.pem directly in minimal Alpine images.
+      for c in /tmp/host-ca/*.crt; do cat "$c" >> /etc/ssl/cert.pem; done && \
+      # Keep the common OpenSSL bundle in sync when present.
+      if [ -f /etc/ssl/certs/ca-certificates.crt ]; then \
+        for c in /tmp/host-ca/*.crt; do cat "$c" >> /etc/ssl/certs/ca-certificates.crt; done; \
+      fi; \
     fi && \
     rm -rf /tmp/host-ca && \
     # Install required packages for Ansible.
