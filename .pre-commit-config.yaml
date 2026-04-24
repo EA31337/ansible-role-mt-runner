@@ -60,6 +60,7 @@ repos:
       - id: end-of-file-fixer
       - id: fix-byte-order-marker
       - id: trailing-whitespace
+        exclude: \.ya?ml$  # yamllint handles YAML files with warning level
 
   - repo: https://github.com/jumanjihouse/pre-commit-hooks
     rev: 3.0.0
@@ -67,6 +68,13 @@ repos:
       - id: forbid-binary
       - id: git-check     # Configure in .gitattributes
       - id: require-ascii
+        exclude: |
+          (?x)^(
+            .github/copilot-instructions.md |
+            .github/prompts/.* |
+            .github/workflows/molecule.yml |
+            AGENTS.md
+          )$
       - id: script-must-have-extension
 
   - repo: https://github.com/rhysd/actionlint
