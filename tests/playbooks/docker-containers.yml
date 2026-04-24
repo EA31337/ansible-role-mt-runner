@@ -120,10 +120,8 @@
   tags: always
   vars:
     controller_python: "{{ ansible_playbook_python }}"
-  tasks:
-    - name: Installs ea31337.mt_runner role
-      ansible.builtin.import_role:
-        name: ea31337.mt_runner
+  roles:
+    - role: ea31337.mt_runner
       vars:
         # noqa: var-naming[no-role-prefix]
         metatrader_version: 5

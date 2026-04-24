@@ -58,6 +58,7 @@ molecule test
 - MUST end files with a newline character.
 - MUST use `true`/`false` for truthy values (not `yes`/`no`).
 - MUST run `yamllint .` and `ansible-lint` before committing YAML changes.
+- NEVER mock roles or modules, or use `exclude_paths` for `molecule/` and `tests/` as a workaround for issues.
 - NEVER hardcode sensitive information; use variables.
 - NEVER remove or modify unrelated tests.
 - NEVER use `git add .` without verifying staged files.

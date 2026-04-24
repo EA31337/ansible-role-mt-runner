@@ -2,10 +2,8 @@
 - name: Converge
   hosts: all
   gather_facts: true
-  tasks:
-    - name: Include main role
-      ansible.builtin.import_role:
-        name: ea31337.mt_runner
+  roles:
+    - role: ea31337.mt_runner
       vars:
         mt_runner_bt_mt4_config:
           Login: "{{ ansible_facts.env.MT_RUNNER_MT4_LOGIN }}"

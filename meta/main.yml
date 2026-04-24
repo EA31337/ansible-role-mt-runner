@@ -1,8 +1,10 @@
+---
+# noqa: schema[meta]
 # Documentation: https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html
 # Note: Ensure the list is sorted alphabetically.
----
 dependencies:
   - name: ea31337.metatrader
+    role: ea31337.metatrader
     scm: git
     src: https://github.com/EA31337/ansible-role-metatrader.git
     version: dev
