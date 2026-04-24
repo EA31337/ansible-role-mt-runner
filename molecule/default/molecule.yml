@@ -7,13 +7,14 @@ dependency:
   options:
     ignore-certs: false
     ignore-errors: false
-    role-file: requirements.yml
-    requirements-file: requirements.yml
+    role-file: ${MOLECULE_PROJECT_DIRECTORY}/requirements.yml
+    requirements-file: ${MOLECULE_PROJECT_DIRECTORY}/requirements.yml
 driver:
   name: docker
 lint: |
   set -e
   yamllint .
+  molecule syntax
   ansible-lint
 platforms:
   - name: alpine-latest
@@ -25,7 +26,7 @@ platforms:
     image: debian:latest
     init: true
   - name: nixos-latest
-    dockerfile: ../resources/playbooks/Dockerfile.j2
+    dockerfile: ${MOLECULE_PROJECT_DIRECTORY}/molecule/resources/playbooks/Dockerfile.j2
     image: nixos/nix:latest
     init: true
     pre_build_image: false

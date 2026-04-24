@@ -78,7 +78,7 @@ jobs:
         run: echo "$HOME/.local/bin" >> "$GITHUB_PATH"
       # See: <https://github.com/Cogni-AI-OU/cogni-ai-agent-action>
       - name: Run Cogni AI Agent
-        uses: Cogni-AI-OU/cogni-ai-agent-action@705a8d5d9eeb6a6eaeb7c070bd55c8d3bfce5d0a
+        uses: Cogni-AI-OU/cogni-ai-agent-action@main
         with:
           model: ${{ inputs.model || 'opencode/gemini-3-flash' }}
           opencode-api-key: ${{ secrets.OPENCODE_API_KEY }}  # <https://opencode.ai/auth>

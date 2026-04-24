@@ -14,3 +14,7 @@ __pycache__
 requirements-local.yml
 *.swp
 *.verb
+/.github/agents/
+/.github/instructions/
+/.github/skills/
+roles/
