@@ -1,4 +1,3 @@
-# Molecule's requirements file.
 ---
 - name: ea31337.metatrader
   scm: git

@@ -3,7 +3,6 @@
   hosts: all
   gather_facts: false
   tasks:
-
     - name: Bootstrap Python and Sudo
       ansible.builtin.raw: |
         if (command -v python3 >/dev/null 2>&1 || command -v python >/dev/null 2>&1) && \
@@ -52,7 +51,6 @@
           fi
         fi
       changed_when: false
-
     - name: Trust proxy CA certificates (if mounted)
       ansible.builtin.raw: |
         if ! ls /usr/local/share/ca-certificates/*.crt >/dev/null 2>&1; then

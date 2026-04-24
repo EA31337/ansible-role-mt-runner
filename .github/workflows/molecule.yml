@@ -1,7 +1,6 @@
 ---
 # Note: Keep keys and envs in alphabetical order.
 name: Molecule
-
 # yamllint disable-line rule:truthy
 on:
   pull_request:
@@ -9,7 +8,7 @@ on:
       - '!.github/workflows/**'
       - '**.cfg'
       - '**.md'
-      - '.*'
+      - .*
       - LICENSE
       - Pipfile*
   push:
@@ -17,17 +16,14 @@ on:
       - '!.github/workflows/**'
       - '**.cfg'
       - '**.md'
-      - '.*'
+      - .*
       - LICENSE
       - Pipfile*
-
 concurrency:
   cancel-in-progress: true
   group: ${{ github.workflow }}-${{ github.ref }}
-
 permissions:
   contents: read
-
 jobs:
   test:
     name: Test
@@ -35,10 +31,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        scenario:
-          - default
-          - mt4
-          - mt5-ea
+        scenario: [default, mt4, mt5-ea]
     steps:
       - uses: actions/checkout@v6
         with:

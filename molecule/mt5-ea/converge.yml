@@ -9,8 +9,8 @@
         metatrader_version: 5
         mt_runner_bt_mt5_config:
           Common:
-            Login: "{{ ansible_facts.env.MT_RUNNER_MT5_LOGIN }}"
-            Password: "{{ ansible_facts.env.MT_RUNNER_MT5_PASSWORD }}"
+            Login: '{{ ansible_facts.env.MT_RUNNER_MT5_LOGIN }}'
+            Password: '{{ ansible_facts.env.MT_RUNNER_MT5_PASSWORD }}'
             Server: "{{ ansible_facts.env.MT_RUNNER_MT5_SERVER | default('MetaQuotes-Demo') }}"
           Tester:
             Deposit: 10000
@@ -18,7 +18,7 @@
             Expert: EA31337-Libre-v1.013.ex5
             FromDate: 2024.01.01
             Leverage: 1:500
-            Login: "{{ ansible_facts.env.MT_RUNNER_MT5_LOGIN }}"
+            Login: '{{ ansible_facts.env.MT_RUNNER_MT5_LOGIN }}'
             Model: 1
             Period: M15
             Report: report.html
@@ -27,5 +27,5 @@
             Symbol: EURUSD
             ToDate: 2024.01.11
         mt_runner_get_url_list:
-          - dest: "{{ mt_runner_mt_path }}/MQL5/Experts"
+          - dest: '{{ mt_runner_mt_path }}/MQL5/Experts'
             url: https://github.com/EA31337/EA31337-Libre/releases/download/v1.013/EA31337-Libre-v1.013.ex5
