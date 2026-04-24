@@ -248,8 +248,12 @@ If network requests fail during molecule tests:
 
 - Refer to <https://gh.io/copilot/firewall-config> for agent firewall setup.
 - Do not work around blocked URLs; request allowlisting instead.
-- If Alpine bootstrap fails with `apk update` reporting `TLS: unspecified error`, verify
-  `dl-cdn.alpinelinux.org` is reachable from inside the container.
+- **Alpine Support**: If Alpine bootstrap fails with `apk update` reporting `TLS: unspecified error`, verify
+  `dl-cdn.alpinelinux.org` is reachable from inside the container and that host CA certificates are correctly
+  injected. This role uses a robust discovery mechanism searching `/usr/local/share/`, `/etc/pki/`,
+  and `/etc/ca-certificates/` on the host.
+- **Comparison**: This implementation is more robust than `ansible-role-metatrader`, which lacks multi-path CA
+  discovery and specific troubleshooting for the Alpine TLS failure mode.
 
 ### Required Hosts
 
