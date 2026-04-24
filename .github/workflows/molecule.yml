@@ -68,10 +68,12 @@ jobs:
           sudo touch molecule-${{ matrix.scenario }}-report.html
           sudo chmod 644 molecule-${{ matrix.scenario }}-report.html
       - if: always()
-        name: Converts test report
-        uses: patrick-werner/fhir-html-validation-to-markdown@1.0.0
+        name: Upload Molecule report artifact
+        uses: actions/upload-artifact@v4
         with:
-          input_file: molecule-${{ matrix.scenario }}-report.html
+          if-no-files-found: warn
+          name: molecule-${{ matrix.scenario }}-report
+          path: molecule-${{ matrix.scenario }}-report.html
       # Debug with tmate on failure when debug logging is enabled.
       - if: ${{ failure() && runner.debug == '1' }}
         uses: mxschmitt/action-tmate@v3

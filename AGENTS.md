@@ -166,6 +166,12 @@ molecule destroy -s default
   in newer `ansible-core`.
 - **Workaround**: Scenario configs set `allow_broken_conditionals: true` in `provisioner.config_options.defaults`.
 
+### GitHub Actions Molecule report step fails with summary size limit
+
+- **Root cause**: GitHub job summaries are capped at 1 MiB, but full Molecule HTML-to-Markdown conversions can exceed it.
+- **Fix**: Upload Molecule HTML reports as workflow artifacts instead of appending the full converted report to
+  `$GITHUB_STEP_SUMMARY`.
+
 ### MetaTrader setup download fails
 
 - **Root cause**: `download.mql5.com` blocked by network policy or DNS failure inside Docker.
@@ -242,6 +248,8 @@ If network requests fail during molecule tests:
 
 - Refer to <https://gh.io/copilot/firewall-config> for agent firewall setup.
 - Do not work around blocked URLs; request allowlisting instead.
+- If Alpine bootstrap fails with `apk update` reporting `TLS: unspecified error`, verify
+  `dl-cdn.alpinelinux.org` is reachable from inside the container.
 
 ### Required Hosts
 
