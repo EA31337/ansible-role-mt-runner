@@ -32,5 +32,5 @@ jobs:
         with:
           path: ~/.cache/pre-commit
           key: pre-commit|${{ hashFiles('.pre-commit-config.yaml') }}
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v6.1.0
       - uses: pre-commit/action@v3.0.1
