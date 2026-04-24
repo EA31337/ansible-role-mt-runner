@@ -3,25 +3,7 @@ name: Check
 # yamllint disable-line rule:truthy
 on:
   pull_request:
-    paths-ignore:
-      - '!.github/workflows/**'
-      - '.github/workflows/cogni-ai-agent.yml'
-      - '.github/workflows/copilot-setup-steps.yml'
-      - '**.cfg'
-      - '**.md'
-      - .*
-      - LICENSE
-      - Pipfile*
   push:
-    paths-ignore:
-      - '!.github/workflows/**'
-      - '.github/workflows/cogni-ai-agent.yml'
-      - '.github/workflows/copilot-setup-steps.yml'
-      - '**.cfg'
-      - '**.md'
-      - .*
-      - LICENSE
-      - Pipfile*
   schedule:
     - cron: 0 0 * * 1  # Run every Monday at 00:00 UTC
   workflow_dispatch:
