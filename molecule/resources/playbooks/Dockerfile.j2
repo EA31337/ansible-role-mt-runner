@@ -1,7 +1,6 @@
-{% set base_image = item.base_image | default(item.image) %}
-FROM {{ base_image }}
+FROM {{ item.image }}
 
-{% if 'nixos' in base_image %}
+{% if 'nixos' in item.image %}
 
 # Prepare NixOS environment: containerd workarounds, proxy CA certs, and Ansible dependencies.
 COPY ca-certificates/ /tmp/host-ca/
@@ -26,7 +25,7 @@ RUN \
     nix-channel --update && \
     nix-env -iA nixpkgs.procps nixpkgs.python3 nixpkgs.python3Packages.pip
 
-{% elif 'alpine' in base_image %}
+{% elif 'alpine' in item.image %}
 
 # Prepare Alpine environment: trust proxy CA certs and install Ansible dependencies.
 COPY ca-certificates/ /tmp/host-ca/

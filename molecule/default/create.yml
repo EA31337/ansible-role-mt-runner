@@ -7,7 +7,6 @@
   vars:
     # Use controller Python (Ansible's interpreter)
     ansible_python_interpreter: "{{ ansible_playbook_python }}"
-    host_ca_certs: []
 
   tasks:
     - name: Ensure Python dependencies are installed on controller
@@ -80,6 +79,7 @@
              if host_ca_certs | length > 0 else omit }}
       loop: "{{ molecule_yml.platforms }}"
       register: container_results
+      # Allow enough time for image pulls/builds in constrained CI environments.
       async: 7200
       poll: 0
 
