@@ -19,8 +19,10 @@ lint: |
   ansible-lint
 platforms:
   - name: alpine-latest
+    dockerfile: ../resources/playbooks/Dockerfile.j2
     image: i386/alpine:latest
     init: true
+    pre_build_image: false
   - name: debian-latest
     image: debian:latest
     init: true

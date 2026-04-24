@@ -42,16 +42,17 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          path: ${{ github.repository }}
+          persist-credentials: false  # Prevents Duplicate header: "Authorization" error.
       - name: Cache Ansible Galaxy collections
         uses: actions/cache@v4
         with:
-          key: galaxy-${{ hashFiles(format('{0}/requirements.yml', github.repository)) }}
+          key: galaxy-${{ hashFiles('requirements.yml') }}
           path: |
-            ${{ github.repository }}/roles
-            ${{ github.repository }}/collections
+            roles
+            collections
       - uses: gofrolist/molecule-action@v2
         env:
+          ANSIBLE_COLLECTIONS_PATH: collections
           ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
           ANSIBLE_FORCE_COLOR: '1'
           ANSIBLE_STDOUT_CALLBACK: ${{ runner.debug == '1' && 'debug' || 'ansible.builtin.default' }}
@@ -67,18 +68,17 @@ jobs:
             --scenario-name ${{ matrix.scenario }}
           molecule_command: test
           molecule_options: --verbose
-          molecule_working_dir: ${{ github.repository }}
+          molecule_working_dir: .
       - if: always()
         name: Ensure report file permissions are correct
         run: |
           sudo touch molecule-${{ matrix.scenario }}-report.html
           sudo chmod 644 molecule-${{ matrix.scenario }}-report.html
-        working-directory: ${{ github.repository }}
       - if: always()
         name: Converts test report
         uses: patrick-werner/fhir-html-validation-to-markdown@1.0.0
         with:
-          input_file: ${{ github.repository }}/molecule-${{ matrix.scenario }}-report.html
+          input_file: molecule-${{ matrix.scenario }}-report.html
       # Debug with tmate on failure when debug logging is enabled.
       - if: ${{ failure() && runner.debug == '1' }}
         uses: mxschmitt/action-tmate@v3
