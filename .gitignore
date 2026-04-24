@@ -17,3 +17,4 @@ requirements-local.yml
 /.github/agents/
 /.github/instructions/
 /.github/skills/
+roles/

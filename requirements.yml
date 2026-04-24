@@ -1,15 +1,11 @@
-# A file containing a list of collections to be installed.
-# Usage:
-# ansible-galaxy install -r requirements.yml
 ---
 collections:
   - name: ansible.posix  # Required for profile_tasks callback plugin.
   - name: community.docker
   - name: community.general  # Required for apk, from_ini and supervisorctl modules.
-    version: ">=10.6.0"  # Required by community.general.from_ini filter.
+    version: '>=10.6.0'  # Required by community.general.from_ini filter.
   - name: community.windows
   - name: ansible.windows
-
 roles:
   - name: ea31337.metatrader
     scm: git

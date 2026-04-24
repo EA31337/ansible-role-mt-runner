@@ -1,5 +1,5 @@
-# Collections requirements for molecule default scenario.
 ---
+# Collections requirements for molecule default scenario.
 collections:
   - name: community.general
   - name: community.docker

@@ -5,29 +5,24 @@ chat:
 early_access: true
 reviews:
   auto_review:
-    base_branches:
-      - "dev*"
-      - "main"
-      - "master"
+    base_branches: [dev*, main, master]
     drafts: false
     enabled: true
-    ignore_title_keywords:
-      - "WIP"
-      - "DO NOT MERGE"
+    ignore_title_keywords: [WIP, DO NOT MERGE]
   high_level_summary: true
   path_filters:
-    - "**/*.j2"
-    - "**/*.md"
-    - "**/*.py"
-    - "**/*.yaml"
-    - "**/*.yml"
-    - "defaults/**"
-    - "meta/**"
-    - "molecule/**"
-    - "tasks/**"
-    - "vars/**"
+    - '**/*.j2'
+    - '**/*.md'
+    - '**/*.py'
+    - '**/*.yaml'
+    - '**/*.yml'
+    - defaults/**
+    - meta/**
+    - molecule/**
+    - tasks/**
+    - vars/**
   path_instructions:
-    - path: "**/*.{yml,yaml}"
+    - path: '**/*.{yml,yaml}'
       instructions: |
         - For Ansible files, review the YAML code against the Ansible best practices and point out any mismatches.
         - For non-task YAML files (like defaults, vars, or workflow files), ensure keys are in lexicographical

@@ -6,16 +6,14 @@
       ansible.builtin.apt:
         allow_unauthenticated: true
         install_recommends: "{{ 'yes' if wine_install_recommends else 'no' }}"
-        name:
-          - winbind
+        name: [winbind]
         state: present
         update_cache: true
       become: true
       when: ansible_facts.os_family == "Debian"
     - name: Install winbind package (Alpine)
       ansible.builtin.package:
-        name:
-          - samba-winbind
+        name: [samba-winbind]
         state: present
       become: true
       when: ansible_facts.os_family == "Alpine"
@@ -29,17 +27,15 @@
       register: mt_path_terminal
     - name: Set platform's directory path
       ansible.builtin.set_fact:
-        mt_runner_mt_path: "{{ mt_path_terminal.files[0].path | dirname }}"
+        mt_runner_mt_path: '{{ mt_path_terminal.files[0].path | dirname }}'
     - name: Set platform's terminal filepath
       ansible.builtin.set_fact:
-        mt_runner_mt_terminal_path: "{{ mt_path_terminal.files[0].path }}"
-
+        mt_runner_mt_terminal_path: '{{ mt_path_terminal.files[0].path }}'
 - name: Check fontconfig config availability (non-Windows)
   when: ansible_facts.os_family != "Windows"
   ansible.builtin.stat:
-    path: "{{ ansible_facts.env.HOME }}/.config/fontconfig/fonts.conf"
+    path: '{{ ansible_facts.env.HOME }}/.config/fontconfig/fonts.conf'
   register: mt_runner_fontconfig_stat
-
 - name: Convert paths (non-Windows)
   when: ansible_facts.os_family != "Windows"
   block:
@@ -49,13 +45,15 @@
       ansible.builtin.command: >-
         winepath {{ mt_runner_mt_path | quote }}
       environment:
-        DISPLAY: "{{ xvfb_display }}"
+        DISPLAY: '{{ xvfb_display }}'
         FONTCONFIG_FILE: >-
           {{ (ansible_facts.env.HOME ~ '/.config/fontconfig/fonts.conf')
-             if mt_runner_fontconfig_stat.stat.exists | default(false) else omit }}
+             if mt_runner_fontconfig_stat.stat.exists | default(false) else omit
+          }}
         FONTCONFIG_PATH: >-
           {{ (ansible_facts.env.HOME ~ '/.config/fontconfig')
-             if mt_runner_fontconfig_stat.stat.exists | default(false) else omit }}
+             if mt_runner_fontconfig_stat.stat.exists | default(false) else omit
+          }}
       register: cmd_winepath_mt_path
     - name: Converts platform's terminal path to Unix
       changed_when: false
@@ -63,33 +61,32 @@
       ansible.builtin.command: >-
         winepath {{ mt_runner_mt_terminal_path | quote }}
       environment:
-        DISPLAY: "{{ xvfb_display }}"
+        DISPLAY: '{{ xvfb_display }}'
         FONTCONFIG_FILE: >-
           {{ (ansible_facts.env.HOME ~ '/.config/fontconfig/fonts.conf')
-             if mt_runner_fontconfig_stat.stat.exists | default(false) else omit }}
+             if mt_runner_fontconfig_stat.stat.exists | default(false) else omit
+          }}
         FONTCONFIG_PATH: >-
           {{ (ansible_facts.env.HOME ~ '/.config/fontconfig')
-             if mt_runner_fontconfig_stat.stat.exists | default(false) else omit }}
+             if mt_runner_fontconfig_stat.stat.exists | default(false) else omit
+          }}
       register: cmd_winepath_mt_terminal_path
     - name: Set MT platform path 1 for Unix
       ansible.builtin.set_fact:
-        mt_runner_mt_path: "{{ cmd_winepath_mt_path.stdout }}"
+        mt_runner_mt_path: '{{ cmd_winepath_mt_path.stdout }}'
     - name: Set MT platform path 2 for Unix
       ansible.builtin.set_fact:
-        mt_runner_mt_terminal_path: "{{ cmd_winepath_mt_terminal_path.stdout }}"
-
+        mt_runner_mt_terminal_path: '{{ cmd_winepath_mt_terminal_path.stdout }}'
 - name: Creates tester.ini
   ansible.builtin.template:
     dest: '{{ mt_runner_mt_path }}/tester.ini'
-    mode: "0644"
+    mode: '0644'
     src: '{{ mt_runner_mt_version }}/tester.ini.j2'
-
 - name: Check if running in a Nix environment
   ansible.builtin.stat:
     path: /nix/store
   register: _mt_nix_store
   when: ansible_facts.os_family != "Windows"
-
 - name: Clean-up before the test (non-Windows)
   when: ansible_facts.os_family != "Windows"
   block:
@@ -99,7 +96,6 @@
       failed_when: cmd_pkill_res.rc > 1
       register: cmd_pkill_res
       when: not (_mt_nix_store.stat.exists | default(false))
-
     - name: Kills any existing terminal processes (Nix)
       ansible.builtin.shell: |
         set -o pipefail
@@ -109,52 +105,47 @@
         fi
       changed_when: false
       when: _mt_nix_store.stat.exists | default(false)
-
     - name: Finds old logs
       changed_when: false
       ansible.builtin.find:
-        paths: "{{ mt_runner_mt_path }}"
-        patterns: "*.log"
+        paths: '{{ mt_runner_mt_path }}'
+        patterns: '*.log'
         recurse: true
       register: mt_old_logs
-
     - name: Removes old log files
       ansible.builtin.file:
-        path: "{{ item.path }}"
+        path: '{{ item.path }}'
         state: absent
-      loop: "{{ mt_old_logs.files }}"
-      tags:
-        - molecule-idempotence-notest
-
+      loop: '{{ mt_old_logs.files }}'
+      tags: [molecule-idempotence-notest]
 - name: Ensures specified files are present
   block:
     - name: Ensures destination directories are present
       ansible.builtin.file:
         mode: '0755'
-        path: "{{ item.dest }}"
+        path: '{{ item.dest }}'
         state: directory
-      loop: "{{ mt_runner_get_url_list }}"
+      loop: '{{ mt_runner_get_url_list }}'
     - name: Ensures files are present
       ansible.builtin.get_url:
-        dest: "{{ item.dest }}"
+        dest: '{{ item.dest }}'
         mode: "{{ item.mode | default('u=rw,g=r') }}"
-        url: "{{ item.url }}"
-      loop: "{{ mt_runner_get_url_list }}"
-
+        url: '{{ item.url }}'
+      loop: '{{ mt_runner_get_url_list }}'
 - name: Runs terminal
-  async: "{{ mt_runner_timeout }}"
+  async: '{{ mt_runner_timeout }}'
   poll: 0
   changed_when: false
   ansible.builtin.command:
     argv:
-      - "{{ mt_runner_cmd_prefix }}"
-      - "{{ mt_runner_mt_terminal_path }}"
-      - "/portable"
+      - '{{ mt_runner_cmd_prefix }}'
+      - '{{ mt_runner_mt_terminal_path }}'
+      - /portable
       - "{{ '/config:tester.ini' if (mt_runner_mt_version | int) == 5 else 'tester.ini' }}"
   args:
     chdir: '{{ mt_runner_mt_path }}'
   environment:
-    DISPLAY: "{{ xvfb_display }}"
+    DISPLAY: '{{ xvfb_display }}'
     FONTCONFIG_FILE: >-
       {{ (ansible_facts.env.HOME ~ '/.config/fontconfig/fonts.conf')
          if mt_runner_fontconfig_stat.stat.exists | default(false) else omit }}
@@ -163,7 +154,6 @@
          if mt_runner_fontconfig_stat.stat.exists | default(false) else omit }}
     WINEDEBUG: warn-all,fixme-all,-alsa,-ole,-toolbar
   register: cmd_terminal_async
-
 - name: Check for terminal log
   block:
     - name: Wait for the terminal log file to be created
@@ -192,7 +182,6 @@
         or ("tester not started" in cmd_iconv_res.stdout)
       register: cmd_iconv_res
       when: (mt_runner_mt_version | int) == 5
-
 - name: Wait for test results
   block:
     - name: Wait until terminal exits
@@ -202,7 +191,7 @@
       delay: 10  # How much time to wait between retries.
       register: cmd_terminal_async_status
       until: cmd_terminal_async_status is finished
-      retries: "{{ mt_runner_timeout // 10 }}"
+      retries: '{{ mt_runner_timeout // 10 }}'
   always:
     - name: Prints final terminal log file (MT4)
       ansible.builtin.command:
@@ -219,6 +208,5 @@
         or ('not found' in cmd_iconv_res.stdout)
       register: cmd_iconv_res
       when: (mt_runner_mt_version | int) == 5
-
 - name: Make sure all handlers run
   ansible.builtin.meta: flush_handlers

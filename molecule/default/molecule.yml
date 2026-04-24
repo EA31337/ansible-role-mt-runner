@@ -18,8 +18,10 @@ lint: |
   ansible-lint
 platforms:
   - name: alpine-latest
+    dockerfile: ../resources/playbooks/Dockerfile.j2
     image: i386/alpine:latest
     init: true
+    pre_build_image: false
   - name: debian-latest
     image: debian:latest
     init: true
@@ -30,12 +32,11 @@ platforms:
     pre_build_image: false
     privileged: true
   - env:
-      MT_RUNNER_MT5_LOGIN: "${MT_RUNNER_MT5_LOGIN:-12345}"
-      MT_RUNNER_MT5_PASSWORD: "${MT_RUNNER_MT5_PASSWORD:-SETME}"
-      MT_RUNNER_MT5_SERVER: "${MT_RUNNER_MT5_SERVER:-MetaQuotes-Demo}"
-      WINEDLLOVERRIDES: "mscoree,mshtml=,winebrowser.exe=,dbghelp=n"
-    groups:
-      - mt5
+      MT_RUNNER_MT5_LOGIN: ${MT_RUNNER_MT5_LOGIN:-12345}
+      MT_RUNNER_MT5_PASSWORD: ${MT_RUNNER_MT5_PASSWORD:-SETME}
+      MT_RUNNER_MT5_SERVER: ${MT_RUNNER_MT5_SERVER:-MetaQuotes-Demo}
+      WINEDLLOVERRIDES: mscoree,mshtml=,winebrowser.exe=,dbghelp=n
+    groups: [mt5]
     image: ubuntu:jammy
     name: ubuntu-jammy
     init: true
@@ -63,10 +64,10 @@ provisioner:
       remote_tmp: /tmp/.ansible-tmp-$${USER}
       result_format: yaml
       stdout_callback: ansible.builtin.default
-      verbosity: "${ANSIBLE_VERBOSITY:-2}"
+      verbosity: ${ANSIBLE_VERBOSITY:-2}
   env:
-    ANSIBLE_FORCE_COLOR: "1"
-    ANSIBLE_LOAD_CALLBACK_PLUGINS: "1"
+    ANSIBLE_FORCE_COLOR: '1'
+    ANSIBLE_LOAD_CALLBACK_PLUGINS: '1'
   inventory:
     group_vars:
       all:
@@ -92,7 +93,6 @@ provisioner:
     destroy: destroy.yml
     prepare: prepare.yml
     verify: verify.yml
-
 scenario:
   name: default
   test_sequence:
