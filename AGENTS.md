@@ -169,8 +169,8 @@ molecule destroy -s default
 ### GitHub Actions Molecule report step fails with summary size limit
 
 - **Root cause**: GitHub job summaries are capped at 1 MiB, but full Molecule HTML-to-Markdown conversions can exceed it.
-- **Fix**: Upload Molecule HTML reports as workflow artifacts instead of appending the full converted report to
-  `$GITHUB_STEP_SUMMARY`.
+- **Fix**: Upload full Molecule HTML reports as workflow artifacts and append only a concise filtered summary
+  (e.g., Play Recap, errors, and warnings) to `$GITHUB_STEP_SUMMARY`.
 
 ### MetaTrader setup download fails
 
