@@ -8,7 +8,6 @@ exclude_paths:
   - molecule/*/destroy.yml
 # Ansible-lint does not automatically load rules that have the 'opt-in' tag.
 # You must enable opt-in rules by listing each rule 'id' below.
-offline: true
 enable_list:
   - args
   - empty-string-compare  # opt-in
