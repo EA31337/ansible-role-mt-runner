@@ -1,18 +1,22 @@
 # Notes:
 # - Keep the order of the hooks in lexicographical order.
 ---
+default_language_version:
+  python: python3.12
+
 repos:
 
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.37.1
+    rev: v1.38.0
     hooks:
       - id: yamllint
         args: ["-c", ".yamllint", "-s"]
 
   - repo: https://github.com/ansible-community/ansible-lint
-    rev: v25.12.2
+    rev: v26.4.0
     hooks:
       - id: ansible-lint
+        language_version: python3.12
 
   - repo: https://github.com/aristanetworks/j2lint.git
     rev: v1.2.0
@@ -20,22 +24,22 @@ repos:
       - id: j2lint
 
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.4.1
+    rev: v2.4.2
     hooks:
       - id: codespell
 
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.24.2
+    rev: v8.30.0
     hooks:
       - id: gitleaks
 
   - repo: https://github.com/igorshubovych/markdownlint-cli.git
-    rev: v0.46.0
+    rev: v0.48.0
     hooks:
       - id: markdownlint
 
   - repo: https://github.com/psf/black
-    rev: 25.1.0
+    rev: 26.3.1
     hooks:
       - id: black
 
@@ -49,12 +53,12 @@ repos:
     rev: v6.0.0
     hooks:
       - id: check-added-large-files
-      - id: check-byte-order-marker
       - id: check-case-conflict
       - id: check-executables-have-shebangs
       - id: check-merge-conflict
       - id: check-yaml
       - id: end-of-file-fixer
+      - id: fix-byte-order-marker
       - id: trailing-whitespace
 
   - repo: https://github.com/jumanjihouse/pre-commit-hooks
@@ -66,7 +70,7 @@ repos:
       - id: script-must-have-extension
 
   - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.8
+    rev: v1.7.12
     hooks:
       - id: actionlint
 

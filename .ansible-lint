@@ -19,4 +19,6 @@ mock_roles: []
 mock_modules:
   - community.docker.docker_container
   - community.docker.docker_container_info
+  - community.docker.docker_image
+  - community.docker.docker_network
 verbosity: 0

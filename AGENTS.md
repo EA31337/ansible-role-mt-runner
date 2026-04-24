@@ -35,14 +35,17 @@ molecule test
 ### Troubleshooting Molecule
 
 > Alpine container fails with TLS/SSL errors
+
 - Root cause: Missing or outdated CA certificates in the environment.
 - Fix: Ensure `ca-certificates` are updated or use the `create.yml` proxy CA discovery.
 
 > NixOS container fails with `path escapes from parent`
+
 - Root cause: Symlinks for `/etc/passwd` or `/etc/group` pointing outside build context.
 - Fix: Use `realpath --relative-to` in `Dockerfile.j2` to make them relative.
 
 > Molecule Docker driver fails with broken conditionals
+
 - Root cause: Use of `lookup('env', 'HOME')` or similar in playbooks.
 - Fix: Enable `allow_broken_conditionals: true` in `molecule.yml`.
 
