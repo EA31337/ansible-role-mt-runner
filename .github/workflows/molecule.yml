@@ -54,7 +54,7 @@ jobs:
         with:
           persist-credentials: false  # Prevents duplicate header: "Authorization" error.
       - name: Cache Ansible Galaxy collections
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           key: galaxy-${{ hashFiles('requirements.yml') }}
           path: |
@@ -108,7 +108,7 @@ jobs:
           fi
       - if: always()
         name: Upload Molecule report artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           if-no-files-found: warn
           name: molecule-${{ matrix.scenario }}-${{ matrix.platform }}-report
