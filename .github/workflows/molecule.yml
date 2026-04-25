@@ -5,34 +5,36 @@ name: Molecule
 on:
   pull_request:
     paths-ignore:
-      - '.github/*.json'
-      - '.github/dependabot.yml'
-      - '.github/workflows/check.yml'
-      - '.github/workflows/cogni-ai-agent.yml'
-      - '.github/workflows/copilot-setup-steps.yml'
-      - '.github/workflows/test.yml'
+      - '!.github/workflows/**'
+      - .github/*.json
+      - .github/dependabot.yml
+      - .github/workflows/check.yml
+      - .github/workflows/cogni-ai-agent.yml
+      - .github/workflows/copilot-setup-steps.yml
+      - .github/workflows/test.yml
       - '**.cfg'
       - '**.md'
       - .*
       - LICENSE
       - Pipfile*
       - requirements-local.yml.j2
-      - 'tests/**'
+      - tests/**
   push:
     paths-ignore:
-      - '.github/*.json'
-      - '.github/dependabot.yml'
-      - '.github/workflows/check.yml'
-      - '.github/workflows/cogni-ai-agent.yml'
-      - '.github/workflows/copilot-setup-steps.yml'
-      - '.github/workflows/test.yml'
+      - '!.github/workflows/**'
+      - .github/*.json
+      - .github/dependabot.yml
+      - .github/workflows/check.yml
+      - .github/workflows/cogni-ai-agent.yml
+      - .github/workflows/copilot-setup-steps.yml
+      - .github/workflows/test.yml
       - '**.cfg'
       - '**.md'
       - .*
       - LICENSE
       - Pipfile*
       - requirements-local.yml.j2
-      - 'tests/**'
+      - tests/**
 concurrency:
   cancel-in-progress: true
   group: ${{ github.workflow }}-${{ github.ref }}
