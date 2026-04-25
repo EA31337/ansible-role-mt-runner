@@ -6,19 +6,35 @@ on:
   pull_request:
     paths-ignore:
       - '!.github/workflows/**'
+      - .github/*.json
+      - .github/dependabot.yml
+      - .github/workflows/check.yml
+      - .github/workflows/cogni-ai-agent.yml
+      - .github/workflows/copilot-setup-steps.yml
+      - .github/workflows/test.yml
       - '**.cfg'
       - '**.md'
       - .*
       - LICENSE
       - Pipfile*
+      - requirements-local.yml.j2
+      - tests/**
   push:
     paths-ignore:
       - '!.github/workflows/**'
+      - .github/*.json
+      - .github/dependabot.yml
+      - .github/workflows/check.yml
+      - .github/workflows/cogni-ai-agent.yml
+      - .github/workflows/copilot-setup-steps.yml
+      - .github/workflows/test.yml
       - '**.cfg'
       - '**.md'
       - .*
       - LICENSE
       - Pipfile*
+      - requirements-local.yml.j2
+      - tests/**
 concurrency:
   cancel-in-progress: true
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -27,11 +43,16 @@ permissions:
 jobs:
   test:
     name: Test
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.platform }}
     strategy:
       fail-fast: false
       matrix:
-        scenario: [default, mt4, mt5-ea]
+        platform:
+          - ubuntu-latest
+        scenario:
+          - default
+          - mt4
+          - mt5-ea
     steps:
       - uses: actions/checkout@v6
         with:
@@ -60,43 +81,43 @@ jobs:
           molecule_args: >-
             --scenario-name ${{ matrix.scenario }}
           molecule_command: test
-          molecule_options: --verbose
+          molecule_options: ${{ runner.debug == '1' && '--verbose' || '' }}
           molecule_working_dir: .
-      - if: always()
-        name: Ensure report file permissions are correct
-        run: |
-          sudo touch molecule-${{ matrix.scenario }}-report.html
-          sudo chmod 644 molecule-${{ matrix.scenario }}-report.html
       - if: always()
         name: Summarize Molecule report
         run: |
           REPORT="molecule-${{ matrix.scenario }}-report.html"
           if [ -f "$REPORT" ]; then
-            echo "## Molecule Summary - ${{ matrix.scenario }}" >> $GITHUB_STEP_SUMMARY
+            # Fix permissions (the file might be owned by root if created in a container).
+            sudo chown "$USER":"$USER" "$REPORT" || true
 
-            # Extract Play Recap
-            echo "### Play Recap" >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            sed 's/<[^>]*>//g; s/&nbsp;/ /g; s/&lt;/</g; s/&gt;/>/g; s/&amp;/\&/g' "$REPORT" | \
-              awk '/PLAY RECAP/ {p=1} p; /^[[:space:]]*$/ && p {p=0}' | \
-              grep -v "^$" | head -n 20 >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
+            {
+              echo "## Molecule Summary - ${{ matrix.scenario }}"
+              echo ""
+              # Extract Play Recap
+              echo "### Play Recap"
+              echo '```'
+              sed 's/<[^>]*>//g; s/&nbsp;/ /g; s/&lt;/</g; s/&gt;/>/g; s/&amp;/\&/g' "$REPORT" | \
+                awk '/PLAY RECAP/ {p=1} p; /^[[:space:]]*$/ && p {p=0}' | \
+                grep -v "^$" | head -n 20
+              echo '```'
 
-            # Extract Errors and Warnings
-            echo "<details><summary>Errors and Warnings (click to expand)</summary>" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            sed 's/<[^>]*>//g; s/&nbsp;/ /g; s/&lt;/</g; s/&gt;/>/g; s/&amp;/\&/g' "$REPORT" | \
-              grep -iE "error|warning|fail" | grep -vE "ok=|changed=" | head -n 50 >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            echo "</details>" >> $GITHUB_STEP_SUMMARY
+              # Extract Errors and Warnings
+              echo "<details><summary>Errors and Warnings (click to expand)</summary>"
+              echo ""
+              echo '```'
+              sed 's/<[^>]*>//g; s/&nbsp;/ /g; s/&lt;/</g; s/&gt;/>/g; s/&amp;/\&/g' "$REPORT" | \
+                grep -iE "error|warning|fail" | grep -vE "ok=|changed=" | head -n 50
+              echo '```'
+              echo "</details>"
+            } >> "$GITHUB_STEP_SUMMARY"
           fi
       - if: always()
         name: Upload Molecule report artifact
         uses: actions/upload-artifact@v4
         with:
           if-no-files-found: warn
-          name: molecule-${{ matrix.scenario }}-report
+          name: molecule-${{ matrix.scenario }}-${{ matrix.platform }}-report
           path: molecule-${{ matrix.scenario }}-report.html
       # Debug with tmate on failure when debug logging is enabled.
       - if: ${{ failure() && runner.debug == '1' }}
