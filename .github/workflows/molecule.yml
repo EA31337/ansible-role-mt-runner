@@ -50,7 +50,7 @@ jobs:
         platform: [ubuntu-latest]
         scenario: [default, mt4, mt5-ea]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false  # Prevents duplicate header: "Authorization" error.
       - name: Cache Ansible Galaxy collections

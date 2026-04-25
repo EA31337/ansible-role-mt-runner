@@ -58,10 +58,10 @@ jobs:
       issues: write
       pull-requests: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false  # Prevents Duplicate header: "Authorization" error.
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6.1.0
         with:
           python-version: '3.12'
       - name: Restore Python user site
