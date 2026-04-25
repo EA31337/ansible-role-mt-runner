@@ -5,23 +5,33 @@ on:
   pull_request:
     paths-ignore:
       - '!.github/workflows/**'
-      - '.github/workflows/cogni-ai-agent.yml'
-      - '.github/workflows/copilot-setup-steps.yml'
+      - .github/*.json
+      - .github/dependabot.yml
+      - .github/workflows/check.yml
+      - .github/workflows/cogni-ai-agent.yml
+      - .github/workflows/copilot-setup-steps.yml
+      - .github/workflows/molecule.yml
       - '**.cfg'
       - '**.md'
       - .*
       - LICENSE
       - Pipfile*
+      - molecule/**
   push:
     paths-ignore:
       - '!.github/workflows/**'
-      - '.github/workflows/cogni-ai-agent.yml'
-      - '.github/workflows/copilot-setup-steps.yml'
+      - .github/*.json
+      - .github/dependabot.yml
+      - .github/workflows/check.yml
+      - .github/workflows/cogni-ai-agent.yml
+      - .github/workflows/copilot-setup-steps.yml
+      - .github/workflows/molecule.yml
       - '**.cfg'
       - '**.md'
       - .*
       - LICENSE
       - Pipfile*
+      - molecule/**
 concurrency:
   cancel-in-progress: true
   group: ${{ github.workflow }}-${{ github.ref }}
