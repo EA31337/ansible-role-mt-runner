@@ -33,10 +33,7 @@ on:
       submodules:
         default: 'false'
         description: 'Whether to checkout submodules: true, false, or recursive'
-        options:
-          - 'false'
-          - 'true'
-          - recursive
+        options: ['false', 'true', recursive]
         required: false
         type: choice
 permissions:
