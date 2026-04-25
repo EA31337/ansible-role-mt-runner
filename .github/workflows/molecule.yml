@@ -108,7 +108,7 @@ jobs:
           fi
       - if: always()
         name: Upload Molecule report artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v6
         with:
           if-no-files-found: warn
           name: molecule-${{ matrix.scenario }}-${{ matrix.platform }}-report
