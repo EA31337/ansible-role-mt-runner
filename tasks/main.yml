@@ -20,7 +20,7 @@
     - name: Query MT platform path
       changed_when: false
       ansible.builtin.find:
-        paths: '{{ ansible_facts.env.HOME }}/.wine'
+        paths: "{{ ansible_env.HOME | default('/root') }}/.wine"
         patterns: >-
           {{ mt_runner_mt_files[mt_runner_mt_version | int].terminal }}
         recurse: true
@@ -34,7 +34,7 @@
 - name: Check fontconfig config availability (non-Windows)
   when: ansible_facts.os_family != "Windows"
   ansible.builtin.stat:
-    path: '{{ ansible_facts.env.HOME }}/.config/fontconfig/fonts.conf'
+    path: "{{ ansible_env.HOME | default('/root') }}/.config/fontconfig/fonts.conf"
   register: mt_runner_fontconfig_stat
 - name: Convert paths (non-Windows)
   when: ansible_facts.os_family != "Windows"
@@ -47,11 +47,11 @@
       environment:
         DISPLAY: '{{ xvfb_display }}'
         FONTCONFIG_FILE: >-
-          {{ (ansible_facts.env.HOME ~ '/.config/fontconfig/fonts.conf')
+          {{ (ansible_env.HOME | default('/root') ~ '/.config/fontconfig/fonts.conf')
              if mt_runner_fontconfig_stat.stat.exists | default(false) else omit
           }}
         FONTCONFIG_PATH: >-
-          {{ (ansible_facts.env.HOME ~ '/.config/fontconfig')
+          {{ (ansible_env.HOME | default('/root') ~ '/.config/fontconfig')
              if mt_runner_fontconfig_stat.stat.exists | default(false) else omit
           }}
       register: cmd_winepath_mt_path
@@ -63,11 +63,11 @@
       environment:
         DISPLAY: '{{ xvfb_display }}'
         FONTCONFIG_FILE: >-
-          {{ (ansible_facts.env.HOME ~ '/.config/fontconfig/fonts.conf')
+          {{ (ansible_env.HOME | default('/root') ~ '/.config/fontconfig/fonts.conf')
              if mt_runner_fontconfig_stat.stat.exists | default(false) else omit
           }}
         FONTCONFIG_PATH: >-
-          {{ (ansible_facts.env.HOME ~ '/.config/fontconfig')
+          {{ (ansible_env.HOME | default('/root') ~ '/.config/fontconfig')
              if mt_runner_fontconfig_stat.stat.exists | default(false) else omit
           }}
       register: cmd_winepath_mt_terminal_path
@@ -147,10 +147,10 @@
   environment:
     DISPLAY: '{{ xvfb_display }}'
     FONTCONFIG_FILE: >-
-      {{ (ansible_facts.env.HOME ~ '/.config/fontconfig/fonts.conf')
+      {{ (ansible_env.HOME | default('/root') ~ '/.config/fontconfig/fonts.conf')
          if mt_runner_fontconfig_stat.stat.exists | default(false) else omit }}
     FONTCONFIG_PATH: >-
-      {{ (ansible_facts.env.HOME ~ '/.config/fontconfig')
+      {{ (ansible_env.HOME | default('/root') ~ '/.config/fontconfig')
          if mt_runner_fontconfig_stat.stat.exists | default(false) else omit }}
     WINEDEBUG: warn-all,fixme-all,-alsa,-ole,-toolbar
   register: cmd_terminal_async
