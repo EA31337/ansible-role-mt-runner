@@ -31,17 +31,12 @@ galaxy_info:
   min_ansible_version: '2.7'
   namespace: ea31337
   platforms:
-    - name: Alpine
-      versions: [all]
     - name: Debian
       versions:
         - all
         - bullseye
         - buster
         - stretch
-    # - name: NixOS
-    #   versions:
-    #     - all
     - name: Ubuntu
       versions: [all, bionic, focal, xenial]
   role_name: mt_runner

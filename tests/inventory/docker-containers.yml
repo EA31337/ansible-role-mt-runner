@@ -19,13 +19,3 @@ all:
           ansible_connection: docker
           ansible_host: mt-runner-on-debian-latest
           ansible_python_interpreter: /usr/bin/python3
-        mt-runner-on-alpine-latest:
-          ansible_connection: docker
-          ansible_host: mt-runner-on-alpine-latest
-          ansible_python_interpreter: /usr/bin/python3
-        mt-runner-on-nixos-latest:
-          ansible_connection: docker
-          ansible_distribution: NixOS
-          ansible_host: mt-runner-on-nixos-latest
-          ansible_python_interpreter: /root/.nix-profile/bin/python3
-          ansible_remote_tmp: /tmp/.ansible/tmp
