@@ -72,9 +72,10 @@ To verify locally, run `pre-commit run markdownlint -a`.
 
 ## Project Specifics
 
-This role installs and runs the trading platform on Debian/Ubuntu systems:
+This role installs and runs trading platform with distribution-specific approaches:
 
 - **Debian/Ubuntu**: Uses apt package manager
+- **Nix**: Uses nix-env in lightweight Nix environments
 
 ### Key Variables
 

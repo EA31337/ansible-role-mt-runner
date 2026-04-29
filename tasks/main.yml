@@ -134,10 +134,12 @@
   environment:
     DISPLAY: '{{ xvfb_display }}'
     FONTCONFIG_FILE: >-
-      {{ (ansible_facts.env.HOME | default(lookup('env', 'HOME')) | default('/root') ~ '/.config/fontconfig/fonts.conf')
+      {{ (ansible_facts.env.HOME | default(lookup('env', 'HOME')) | default('/root')
+      ~ '/.config/fontconfig/fonts.conf')
          if mt_runner_fontconfig_stat.stat.exists | default(false) else omit }}
     FONTCONFIG_PATH: >-
-      {{ (ansible_facts.env.HOME | default(lookup('env', 'HOME')) | default('/root') ~ '/.config/fontconfig')
+      {{ (ansible_facts.env.HOME | default(lookup('env', 'HOME')) | default('/root')
+      ~ '/.config/fontconfig')
          if mt_runner_fontconfig_stat.stat.exists | default(false) else omit }}
     WINEDEBUG: warn-all,fixme-all,-alsa,-ole,-toolbar
   register: cmd_terminal_async

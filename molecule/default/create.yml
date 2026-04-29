@@ -64,13 +64,10 @@
         image: "{{ (item.name ~ ':molecule') if item.dockerfile is defined else item.image }}"
         command: sleep infinity
         init: '{{ item.init | default(omit) }}'
-        privileged: "{{ item.privileged | default(false) }}"
-        # Relaxed seccomp/apparmor for compatibility.
-        security_opts: >-
-          {{ ['seccomp=unconfined', 'apparmor=unconfined']
-             if item.privileged | default(false) else omit }}
+        privileged: '{{ item.privileged | default(omit) }}'
+        security_opts: '{{ item.security_opts | default(omit) }}'
         recreate: true
-        pull: "{{ false if item.dockerfile is defined else true }}"
+        pull: '{{ false if item.dockerfile is defined else true }}'
         # Mount host CA certificates for proxy/firewall SSL interception environments.
         volumes: >-
           {{ [molecule_ephemeral_directory ~ '/ca-certificates:/usr/local/share/ca-certificates:ro']

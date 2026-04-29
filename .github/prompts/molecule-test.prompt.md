@@ -11,9 +11,9 @@ Run all Molecule scenarios and report results as a table.
    ```
 
 2. For each platform, run each Molecule step individually
-    to isolate failures. Since Molecule runs all platforms together,
-    if a single platform fails, comment it out in `molecule.yml` temporarily and
-    re-run the step for the remaining platforms:
+   to isolate failures. Since Molecule runs all platforms together,
+   if a single platform fails, comment it out in `molecule.yml` temporarily and
+   re-run the step for the remaining platforms:
 
    ```bash
    molecule destroy

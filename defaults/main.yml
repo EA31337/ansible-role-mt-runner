@@ -26,8 +26,8 @@ mt_runner_bt_mt4_config:
   FTPPath: /inetpub
   FTPPeriod: 10
   FTPServer: ftp.example.com
-  Login: "{{ ansible_facts.env.MT_RUNNER_MT4_LOGIN | default('12345') }}"  # pragma: allowlist secret
-  Password: "{{ ansible_facts.env.MT_RUNNER_MT4_PASSWORD | default('12345') }}"  # pragma: allowlist secret
+  Login: "{{ lookup('env', 'MT_RUNNER_MT4_LOGIN') | default('12345', true) }}"  # pragma: allowlist secret
+  Password: "{{ lookup('env', 'MT_RUNNER_MT4_PASSWORD') | default('12345', true) }}"  # pragma: allowlist secret
   Period: M15
   Profile: default
   ProxyEnable: false
@@ -37,7 +37,7 @@ mt_runner_bt_mt4_config:
   ProxyType: HTTP
   Script:
   ScriptParameters:
-  Server: "{{ ansible_facts.env.MT_RUNNER_MT4_SERVER | default('MetaQuotes-Demo') }}"
+  Server: "{{ lookup('env', 'MT_RUNNER_MT4_SERVER') | default('MetaQuotes-Demo', true) }}"
   Symbol: EURUSD
   Template: popular.tpl
   TestDateEnable: true
@@ -78,15 +78,15 @@ mt_runner_bt_mt5_config:
     CertInstall: 0
     CertPassword:
     KeepPrivate: 1
-    Login: "{{ ansible_facts.env.MT_RUNNER_MT5_LOGIN | default('12345') }}"
+    Login: "{{ lookup('env', 'MT_RUNNER_MT5_LOGIN') | default('12345', true) }}"
     NewsEnable: 0
-    Password: "{{ ansible_facts.env.MT_RUNNER_MT5_PASSWORD | default('12345') }}"
+    Password: "{{ lookup('env', 'MT_RUNNER_MT5_PASSWORD') | default('12345', true) }}"
     ProxyEnable: 0
     ProxyLogin:
     ProxyPassword:
     ProxyServer:
     ProxyType: SOCKS5
-    Server: "{{ ansible_facts.env.MT_RUNNER_MT5_SERVER | default('MetaQuotes-Demo') }}"
+    Server: "{{ lookup('env', 'MT_RUNNER_MT5_SERVER') | default('MetaQuotes-Demo', true) }}"
   Charts:
     PrintColor: 1
     SaveDeleted: 1
@@ -126,7 +126,7 @@ mt_runner_bt_mt5_config:
     ForwardMode:
     FromDate: 2024.01.01
     Leverage: 1:100
-    Login: "{{ ansible_facts.env.MT_RUNNER_MT5_LOGIN | default('12345') }}"
+    Login: "{{ lookup('env', 'MT_RUNNER_MT5_LOGIN') | default('12345', true) }}"
     Model: 1
     Optimization:
     OptimizationCriterion:
@@ -147,5 +147,3 @@ mt_runner_mt_version: '{{ metatrader_version | default(5) | int }}'
 # Extended timeout (600s) is required to accommodate long-running MetaTrader backtests.
 # Override mt_runner_timeout via inventory or group/host vars if your environment supports a shorter timeout.
 mt_runner_timeout: 2400
-wine_install_recommends: false
-xvfb_display: ':0'

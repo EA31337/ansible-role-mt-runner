@@ -28,8 +28,12 @@
             fi
             apt-get update -qq && \
               DEBIAN_FRONTEND=noninteractive apt-get install -y -q python3-minimal sudo ca-certificates
+          elif command -v dnf >/dev/null 2>&1; then
+            dnf install -y python3 sudo ca-certificates
+          elif command -v zypper >/dev/null 2>&1; then
+            zypper --non-interactive install python3 sudo ca-certificates
           else
-            echo "Unsupported system: only Debian/Ubuntu are supported (apt-get not found)" >&2
+            echo "Unsupported system: no supported package manager found for bootstrapping Python and sudo" >&2
             exit 1
           fi
         fi

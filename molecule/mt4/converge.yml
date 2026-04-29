@@ -6,10 +6,10 @@
     - role: ea31337.mt_runner
       vars:
         mt_runner_bt_mt4_config:
-          Login: "{{ ansible_facts.env.MT_RUNNER_MT4_LOGIN | default('12345') }}"
-          Password: "{{ ansible_facts.env.MT_RUNNER_MT4_PASSWORD | default('12345') }}"
+          Login: "{{ lookup('env', 'MT_RUNNER_MT4_LOGIN') | default('12345', true) }}"
+          Password: "{{ lookup('env', 'MT_RUNNER_MT4_PASSWORD') | default('SETME', true) }}"
           Profile: default
-          Server: "{{ ansible_facts.env.MT_RUNNER_MT4_SERVER | default('MetaQuotes-Demo') }}"
+          Server: "{{ lookup('env', 'MT_RUNNER_MT4_SERVER') | default('MetaQuotes-Demo', true) }}"
           TestExpert: MACD Sample.ex4
           TestFromDate: 2020.01.01
           TestModel: 1
