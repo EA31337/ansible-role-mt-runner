@@ -6,7 +6,7 @@ You are expected to be an expert in:
 - Python
 - Jinja2
 - Molecule
-- Linux (Alpine, Debian/Ubuntu, Nix)
+- Linux (Debian/Ubuntu)
 - YAML
 
 ## Code Standards
@@ -74,7 +74,6 @@ To verify locally, run `pre-commit run markdownlint -a`.
 
 This role installs and runs trading platform with distribution-specific approaches:
 
-- **Alpine Linux**: Uses apk package manager
 - **Debian/Ubuntu**: Uses apt package manager
 - **Nix**: Uses nix-env in lightweight Nix environments
 
