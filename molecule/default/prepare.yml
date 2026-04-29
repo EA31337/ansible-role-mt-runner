@@ -82,3 +82,14 @@
           [ -d /etc/ssl/certs ] && chmod 755 /etc/ssl/certs || true
         fi
       changed_when: false
+    - name: Show disk usage
+      ansible.builtin.command: df -h
+      changed_when: false
+    - name: Clean package manager cache
+      ansible.builtin.shell: |
+        if command -v apt-get >/dev/null 2>&1; then
+          apt-get clean
+        elif command -v apk >/dev/null 2>&1; then
+          rm -rf /var/cache/apk/*
+        fi
+      changed_when: false
