@@ -5,7 +5,7 @@
     - name: Install winbind package (Debian/Ubuntu)
       ansible.builtin.apt:
         allow_unauthenticated: true
-        install_recommends: "{{ 'yes' if wine_install_recommends else 'no' }}"
+        install_recommends: "{{ wine_install_recommends | bool }}"
         name: [winbind]
         state: present
         update_cache: true
