@@ -5,6 +5,7 @@ on:
   pull_request:
     paths-ignore:
       - '!.github/workflows/**'
+      - .devcontainer/**
       - .github/*.json
       - .github/dependabot.yml
       - .github/workflows/check.yml
@@ -20,6 +21,7 @@ on:
   push:
     paths-ignore:
       - '!.github/workflows/**'
+      - .devcontainer/**
       - .github/*.json
       - .github/dependabot.yml
       - .github/workflows/check.yml

@@ -5,6 +5,7 @@ name: Molecule
 on:
   pull_request:
     paths-ignore:
+      - .devcontainer/**
       - .github/*.json
       - .github/dependabot.yml
       - .github/workflows/check.yml
@@ -20,6 +21,7 @@ on:
       - tests/**
   push:
     paths-ignore:
+      - .devcontainer/**
       - .github/*.json
       - .github/dependabot.yml
       - .github/workflows/check.yml
