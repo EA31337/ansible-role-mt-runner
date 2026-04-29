@@ -30,10 +30,10 @@ platforms:
     name: ubuntu-jammy
     init: true
   - name: ubuntu-noble
-    image: ubuntu:noble
+    image: ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-noble
     init: true
   - name: ubuntu-latest
-    image: ubuntu:latest
+    image: ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-latest
     init: true
 provisioner:
   config_options:
