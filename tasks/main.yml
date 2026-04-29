@@ -11,12 +11,6 @@
         update_cache: true
       become: true
       when: ansible_facts.os_family == "Debian"
-    - name: Install winbind package (Alpine)
-      ansible.builtin.package:
-        name: [samba-winbind]
-        state: present
-      become: true
-      when: ansible_facts.os_family == "Alpine"
     - name: Query MT platform path
       changed_when: false
       ansible.builtin.find:
@@ -90,29 +84,14 @@
     dest: '{{ mt_runner_mt_path }}/tester.ini'
     mode: '0644'
     src: '{{ mt_runner_mt_version }}/tester.ini.j2'
-- name: Check if running in a Nix environment
-  ansible.builtin.stat:
-    path: /nix/store
-  register: _mt_nix_store
-  when: ansible_facts.os_family != "Windows"
 - name: Clean-up before the test (non-Windows)
   when: ansible_facts.os_family != "Windows"
   block:
-    - name: Kills any existing terminal processes (Non-Nix)
+    - name: Kills any existing terminal processes
       ansible.builtin.command: pkill terminal
       changed_when: false
       failed_when: cmd_pkill_res.rc > 1
       register: cmd_pkill_res
-      when: not (_mt_nix_store.stat.exists | default(false))
-    - name: Kills any existing terminal processes (Nix)
-      ansible.builtin.shell: |
-        set -o pipefail
-        pids=$(ps aux 2>/dev/null | grep '[t]erminal' | awk '{print $2}')
-        if [ -n "$pids" ]; then
-          echo "$pids" | xargs kill -TERM 2>/dev/null || true
-        fi
-      changed_when: false
-      when: _mt_nix_store.stat.exists | default(false)
     - name: Finds old logs
       changed_when: false
       ansible.builtin.find:
