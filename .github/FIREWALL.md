@@ -8,13 +8,10 @@ aka.ms
 ansible.com
 api.github.com
 archive.ubuntu.com
-cache.nixos.org
 cdn.mql5.com
-channels.nixos.org
 code.visualstudio.com
 codeload.github.com
 contributor-covenant.org
-dl-cdn.alpinelinux.org
 dl.winehq.org
 download.mql5.com
 files.pythonhosted.org
@@ -34,7 +31,6 @@ pkg-containers.githubusercontent.com
 pypi.org
 raw.githubusercontent.com
 registry.npmjs.org
-releases.nixos.org
 support.github.com
 tldrlegal.com
 trade.mql5.com

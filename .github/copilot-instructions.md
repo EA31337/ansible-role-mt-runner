@@ -6,7 +6,7 @@ You are expected to be an expert in:
 - Python
 - Jinja2
 - Molecule
-- Linux (Alpine, Debian/Ubuntu, Nix)
+- Linux (Debian/Ubuntu)
 - YAML
 
 ## Code Standards
@@ -72,11 +72,9 @@ To verify locally, run `pre-commit run markdownlint -a`.
 
 ## Project Specifics
 
-This role installs and runs trading platform with distribution-specific approaches:
+This role installs and runs trading platform on Debian/Ubuntu:
 
-- **Alpine Linux**: Uses apk package manager
 - **Debian/Ubuntu**: Uses apt package manager
-- **Nix**: Uses nix-env in lightweight Nix environments
 
 ### Key Variables
 
@@ -103,7 +101,7 @@ and requirements at `.devcontainer/requirements.txt`.
 - Use Molecule with Docker driver
 - GitHub Actions run pre-commit checks (`.pre-commit-config.yaml`) and
   Molecule (`molecule/`)
-- Service management uses supervisord across platforms
+- Service management uses supervisord
 - Formatting rules: `.yamllint` (YAML) and `.markdownlint.yaml` (Markdown)
 
 ### Running Tests
