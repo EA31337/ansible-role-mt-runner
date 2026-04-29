@@ -78,16 +78,16 @@
         metatrader_version: 5
         mt_runner_bt_mt5_config:
           Common:
-            Login: "{{ ansible_facts.env.MT_RUNNER_MT5_LOGIN | default('12345') }}"
-            Password: "{{ ansible_facts.env.MT_RUNNER_MT5_PASSWORD | default('SETME') }}"
-            Server: "{{ ansible_facts.env.MT_RUNNER_MT5_SERVER | default('MetaQuotes-Demo') }}"
+            Login: "{{ lookup('env', 'MT_RUNNER_MT5_LOGIN') | default('12345', true) }}"
+            Password: "{{ lookup('env', 'MT_RUNNER_MT5_PASSWORD') | default('SETME', true) }}"
+            Server: "{{ lookup('env', 'MT_RUNNER_MT5_SERVER') | default('MetaQuotes-Demo', true) }}"
           Tester:
             Deposit: 10000
             ExecutionMode: 0
             Expert: EA31337-Libre-v1.013.ex5
             FromDate: 2024.01.01
             Leverage: 1:500
-            Login: "{{ ansible_facts.env.MT_RUNNER_MT5_LOGIN | default('12345') }}"
+            Login: "{{ lookup('env', 'MT_RUNNER_MT5_LOGIN') | default('12345', true) }}"
             Model: 1
             Report: report.html
             ReplaceReport: 1

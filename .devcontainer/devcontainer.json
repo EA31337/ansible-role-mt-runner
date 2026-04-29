@@ -48,6 +48,7 @@
     // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
     "image": "mcr.microsoft.com/devcontainers/base:jammy",
     "name": "ansible-role-mt-runner",
+
     // Install dependencies and pre-commit hooks.
     "postCreateCommand": "pip install -r .devcontainer/requirements.txt && pre-commit install",
 

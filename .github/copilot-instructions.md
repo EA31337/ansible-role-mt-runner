@@ -78,7 +78,7 @@ This role installs and runs trading platform on Debian/Ubuntu:
 
 ### Key Variables
 
-Variables are defined in `defaults/main.yml` (user-facing) and
+Key variables are defined in `defaults/main.yml` (user-facing) and
 `vars/main.yml` (internal).
 
 Notes:

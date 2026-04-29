@@ -140,7 +140,7 @@ molecule destroy -s default
 - **Root cause**: `community.docker` collection not installed.
 - **Fix**: Run `ansible-galaxy collection install -r requirements.yml`.
 
-### Platform installer shows "Sorry, something went wrong"
+### GitHub Actions Molecule report step fails with summary size limit
 
 - **Root cause**: GitHub job summaries are capped at 1 MiB, but full Molecule HTML-to-Markdown conversions can exceed it.
 - **Fix**: Upload full Molecule HTML reports as workflow artifacts and append only a concise filtered summary
