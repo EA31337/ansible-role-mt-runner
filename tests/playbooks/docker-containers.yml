@@ -19,23 +19,6 @@
         image: '{{ container_image }}'
         state: started
         command: sleep infinity
-        privileged: true
-        tmpfs: [/tmp:exec, /run:exec]
-        env:
-          NIX_CONFIG: sandbox = false
-          TMPDIR: /tmp
-      when: container_image is search("nixos")
-      delegate_to: localhost
-      vars:
-        # Use system Python with requests installed for controller-side Docker modules.
-        ansible_python_interpreter: '{{ controller_python }}'
-    - name: Ensure container is started
-      community.docker.docker_container:
-        name: '{{ inventory_hostname }}'
-        image: '{{ container_image }}'
-        state: started
-        command: sleep infinity
-      when: not (container_image is search("nixos"))
       delegate_to: localhost
       vars:
         # Use system Python with requests installed for controller-side Docker modules.
@@ -54,31 +37,11 @@
       vars:
         # Use system Python with requests installed for controller-side Docker modules.
         ansible_python_interpreter: '{{ controller_python }}'
-    - name: Install Python 3 on Alpine
-      ansible.builtin.raw: |
-        test -e "{{ ansible_python_interpreter }}" || (apk update && apk add --no-cache python3 py3-pip)
-      changed_when: false
-      when: container_image is search("alpine")
     - name: Install Python 3 on Ubuntu/Debian
       ansible.builtin.raw: |
         test -e "{{ ansible_python_interpreter }}" || (apt-get update && apt-get install -y python3 python3-pip)
       changed_when: false
       when: container_image is search("ubuntu") or container_image is search("debian")
-    - name: Install Python 3 on NixOS (from host)
-      ansible.builtin.shell:
-        cmd: |
-          docker exec {{ inventory_hostname }} /nix/var/nix/profiles/default/bin/sh -c '
-          if ! command -v python3 >/dev/null 2>&1; then
-            mkdir -p /etc/nix
-            echo "sandbox = false" > /etc/nix/nix.conf
-            export NIX_CONFIG="sandbox = false"
-            /nix/var/nix/profiles/default/bin/nix-env --option sandbox false -iA nixpkgs.python3
-          fi'
-      changed_when: false
-      delegate_to: localhost
-      when: container_image is search("nixos")
-      vars:
-        ansible_python_interpreter: '{{ controller_python }}'
     - name: Gather facts
       ansible.builtin.setup:
     - name: Install Python packages for Ubuntu/Debian
@@ -91,9 +54,7 @@
   vars:
     controller_python: '{{ ansible_playbook_python }}'
     container_image_map:
-      mt-runner-on-alpine-latest: alpine:3.20
       mt-runner-on-debian-latest: debian:latest
-      mt-runner-on-nixos-latest: nixos/nix
       mt-runner-on-ubuntu-jammy: ubuntu:jammy
       mt-runner-on-ubuntu-latest: ubuntu:latest
       mt-runner-on-ubuntu-noble: ubuntu:noble

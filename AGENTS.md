@@ -7,7 +7,7 @@ For project overview and install instructions, see [README.md](README.md).
 ## Setup & Environment Invariants
 
 - Ansible role: `ea31337.mt_runner`
-- Supported OS: Alpine, Debian/Ubuntu, NixOS (Nix)
+- Supported OS: Debian/Ubuntu
 - Driver: Docker (Molecule)
 - Python 3.10+ required; install via `pip install -r .devcontainer/requirements.txt`
 - Collections: `community.docker`, `community.general`, `ansible.posix`
@@ -27,7 +27,6 @@ For project overview and install instructions, see [README.md](README.md).
 | `molecule/default/destroy.yml` | Custom Docker destroy playbook |
 | `molecule/default/prepare.yml` | Container preparation (sudo, Python, certs) |
 | `molecule/default/verify.yml` | Verification playbook |
-| `molecule/resources/playbooks/Dockerfile.j2` | NixOS/Alpine container Dockerfile template |
 | `requirements.yml` | Ansible Galaxy collection + role dependencies |
 | `ansible.cfg` | Ansible configuration (collections_path, callbacks) |
 | `.github/workflows/molecule.yml` | CI: Molecule test matrix |
@@ -74,9 +73,7 @@ For project overview and install instructions, see [README.md](README.md).
 
 | Container | Image | Notes |
 | --------- | ----- | ----- |
-| `alpine-latest` | `i386/alpine:latest` | Custom Dockerfile build |
 | `debian-latest` | `debian:latest` | Standard image |
-| `nixos-latest` | `nixos/nix:latest` | Custom Dockerfile build |
 | `ubuntu-jammy` | `ubuntu:jammy` | Standard image |
 | `ubuntu-noble` | `ubuntu:noble` | Standard image |
 | `ubuntu-latest` | `ubuntu:latest` | Standard image |
@@ -142,23 +139,6 @@ molecule destroy -s default
 
 - **Root cause**: `community.docker` collection not installed.
 - **Fix**: Run `ansible-galaxy collection install -r requirements.yml`.
-
-### NixOS Docker build SSL failures
-
-- **Root cause**: Missing CA bundles break `nix-channel --update`.
-- **Fix**: Custom `create.yml` injects host CA certificates.
-
-### NixOS: files in `/etc/ssl/certs/` vanish across Docker build layers
-
-- **Root cause**: containerd/overlayfs bug causes files written to `/etc/ssl/certs/` in one Docker `RUN` layer
-  to disappear in subsequent layers (NixOS image only).
-- **Fix**: Store combined CA bundle in `/etc/nix/ca-bundle.crt` instead; `/etc/nix/` persists correctly.
-- **Prevention**: NEVER store persistent files under `/etc/ssl/certs/` in NixOS containers.
-
-### NixOS containerd symlink error
-
-- **Root cause**: `path escapes from parent` due to absolute symlinks.
-- **Fix**: Use `realpath --relative-to` in `Dockerfile.j2`.
 
 ### GitHub Actions Molecule report step fails with summary size limit
 
@@ -254,36 +234,18 @@ If network requests fail during molecule tests:
 
 - Refer to <https://gh.io/copilot/firewall-config> for agent firewall setup.
 - Do not work around blocked URLs; request allowlisting instead.
-- **Alpine Support**: If Alpine bootstrap fails with `apk update` reporting `TLS: unspecified error`, verify
-  `dl-cdn.alpinelinux.org` is reachable from inside the container and that host CA certificates are correctly
-  injected. This role uses a robust discovery mechanism searching `/usr/local/share/`, `/etc/pki/`,
-  and `/etc/ca-certificates/` on the host.
-- **Comparison**: This implementation is more robust than `ansible-role-metatrader`, which lacks multi-path CA
-  discovery and specific troubleshooting for the Alpine TLS failure mode.
-
-### Alpine bootstrap fails with TLS error
-
-- **Root cause**: Alpine `apk update` fails with `TLS: unspecified error` when behind an SSL-intercepting proxy
-  if the proxy CA is not in the build-time trust store.
-- **Fix**: The custom `Dockerfile.j2` injects host CA certificates directly into `/etc/ssl/cert.pem`
-  during the build phase so `apk` can fetch dependencies safely.
-- **Prevention**: Verify `dl-cdn.alpinelinux.org` is reachable from inside the container.
 
 ### Required Hosts
 
 | Host | Purpose |
 | ---- | ------- |
-| `cache.nixos.org` | Nix binary cache (pre-built packages) |
 | `cdn.mql5.com` | CDN (MT5 platform files) |
-| `channels.nixos.org` | Nix channel metadata |
-| `dl-cdn.alpinelinux.org` | Alpine Linux package repository |
 | `dl.winehq.org` | WineHQ APT repository |
 | `download.mql5.com` | MetaTrader setup executable download |
 | `galaxy.ansible.com` | Ansible Galaxy collections |
 | `github.com` | Dependency downloads |
 | `mt5-trade.metaquotes.net` | Trade server (installer backend) |
 | `raw.githubusercontent.com` | Static asset downloads |
-| `releases.nixos.org` | Nix channel tarballs |
 | `trade.mql5.com` | Trade server (registration) |
 | `web.archive.org` | Fallback download mirror |
 | `www.mql5.com` | Main website (installer backend) |
