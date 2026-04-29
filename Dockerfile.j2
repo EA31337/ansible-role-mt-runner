@@ -7,13 +7,27 @@ LABEL org.opencontainers.image.description="MetaTrader runner container based on
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install Ansible and dependencies
+{% if 'alpine' in (docker_image | default('ubuntu:noble')) %}
+RUN grep -E '^[^#].*/main$' /etc/apk/repositories | sed 's/main$/community/' >> /etc/apk/repositories && \
+    apk update && \
+    apk add --no-cache ansible bash ca-certificates cabextract curl fontconfig gawk p7zip python3 sudo ttf-freefont unzip xauth xvfb-run && \
+    update-ca-certificates
+{% elif 'nixos' in (docker_image | default('ubuntu:noble')) %}
+RUN nix-channel --update && \
+    nix-env -iA nixpkgs.ansible nixpkgs.procps nixpkgs.python3 nixpkgs.python3Packages.pip nixpkgs.sudo
+{% else %}
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     ansible \
     python3-apt \
     python3-pip \
+    python3-setuptools \
+    python3-wheel \
     sudo && \
+    pip3 install --no-cache-dir "ansible-core>=2.14" --break-system-packages || \
+    pip3 install --no-cache-dir "ansible-core>=2.14" && \
     rm -rf /var/lib/apt/lists/*
+{% endif %}
 
 # Copy the role into the container
 WORKDIR /etc/ansible/roles/ea31337.mt_runner
@@ -28,17 +42,20 @@ COPY README.md .
 # Create a local playbook to apply the role
 RUN ansible-galaxy role install -r requirements.yml && \
     ansible-galaxy collection install -r requirements.yml && \
-    printf -- "---\n- hosts: localhost\n  connection: local\n  roles:\n    - ea31337.mt_runner\n" > /tmp/playbook.yml && \
+    printf -- "---\n- hosts: localhost\n  connection: local\n  roles:\n    - role: ea31337.mt_runner\n" > /tmp/playbook.yml && \
     ansible-playbook /tmp/playbook.yml && \
     rm /tmp/playbook.yml && \
+    { [ ! -f /usr/bin/apt-get ] || { \
     apt-get update && \
     apt-get purge -y --auto-remove \
         ansible \
         python3-apt \
         python3-pip \
+        python3-setuptools \
+        python3-wheel \
         sudo && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*; }; }
 
 # Default CMD
 CMD ["wine", "--version"]
