@@ -20,21 +20,25 @@
     - name: Query MT platform path
       changed_when: false
       ansible.builtin.find:
-        paths: '{{ ansible_facts.env.HOME }}/.wine'
+        paths: "{{ ansible_facts.env.HOME | default(lookup('env', 'HOME')) | default('/root') }}/.wine"
         patterns: >-
-          {{ mt_runner_mt_files[mt_runner_mt_version | int].terminal }}
+          {{ (mt_runner_mt_files[mt_runner_mt_version | int] | default(mt_runner_mt_files[5])).terminal }}
         recurse: true
       register: mt_path_terminal
     - name: Set platform's directory path
       ansible.builtin.set_fact:
-        mt_runner_mt_path: '{{ mt_path_terminal.files[0].path | dirname }}'
+        mt_runner_mt_path: |-
+          {{ (mt_path_terminal.files | first | default({'path': '/tmp/terminal.exe'})).path | dirname }}
     - name: Set platform's terminal filepath
       ansible.builtin.set_fact:
-        mt_runner_mt_terminal_path: '{{ mt_path_terminal.files[0].path }}'
+        mt_runner_mt_terminal_path: |-
+          {{ (mt_path_terminal.files | first | default({'path': '/tmp/terminal.exe'})).path }}
 - name: Check fontconfig config availability (non-Windows)
   when: ansible_facts.os_family != "Windows"
   ansible.builtin.stat:
-    path: '{{ ansible_facts.env.HOME }}/.config/fontconfig/fonts.conf'
+    path: |-
+      {{ ansible_facts.env.HOME | default(lookup('env', 'HOME')) | default('/root') ~
+         '/.config/fontconfig/fonts.conf' }}
   register: mt_runner_fontconfig_stat
 - name: Convert paths (non-Windows)
   when: ansible_facts.os_family != "Windows"
@@ -46,12 +50,14 @@
         winepath {{ mt_runner_mt_path | quote }}
       environment:
         DISPLAY: '{{ xvfb_display }}'
-        FONTCONFIG_FILE: >-
-          {{ (ansible_facts.env.HOME ~ '/.config/fontconfig/fonts.conf')
+        FONTCONFIG_FILE: |-
+          {{ (ansible_facts.env.HOME | default(lookup('env', 'HOME')) | default('/root') ~
+             '/.config/fontconfig/fonts.conf')
              if mt_runner_fontconfig_stat.stat.exists | default(false) else omit
           }}
-        FONTCONFIG_PATH: >-
-          {{ (ansible_facts.env.HOME ~ '/.config/fontconfig')
+        FONTCONFIG_PATH: |-
+          {{ (ansible_facts.env.HOME | default(lookup('env', 'HOME')) | default('/root') ~
+             '/.config/fontconfig')
              if mt_runner_fontconfig_stat.stat.exists | default(false) else omit
           }}
       register: cmd_winepath_mt_path
@@ -62,12 +68,14 @@
         winepath {{ mt_runner_mt_terminal_path | quote }}
       environment:
         DISPLAY: '{{ xvfb_display }}'
-        FONTCONFIG_FILE: >-
-          {{ (ansible_facts.env.HOME ~ '/.config/fontconfig/fonts.conf')
+        FONTCONFIG_FILE: |-
+          {{ (ansible_facts.env.HOME | default(lookup('env', 'HOME')) | default('/root') ~
+             '/.config/fontconfig/fonts.conf')
              if mt_runner_fontconfig_stat.stat.exists | default(false) else omit
           }}
-        FONTCONFIG_PATH: >-
-          {{ (ansible_facts.env.HOME ~ '/.config/fontconfig')
+        FONTCONFIG_PATH: |-
+          {{ (ansible_facts.env.HOME | default(lookup('env', 'HOME')) | default('/root') ~
+             '/.config/fontconfig')
              if mt_runner_fontconfig_stat.stat.exists | default(false) else omit
           }}
       register: cmd_winepath_mt_terminal_path
@@ -147,10 +155,10 @@
   environment:
     DISPLAY: '{{ xvfb_display }}'
     FONTCONFIG_FILE: >-
-      {{ (ansible_facts.env.HOME ~ '/.config/fontconfig/fonts.conf')
+      {{ (ansible_facts.env.HOME | default(lookup('env', 'HOME')) | default('/root') ~ '/.config/fontconfig/fonts.conf')
          if mt_runner_fontconfig_stat.stat.exists | default(false) else omit }}
     FONTCONFIG_PATH: >-
-      {{ (ansible_facts.env.HOME ~ '/.config/fontconfig')
+      {{ (ansible_facts.env.HOME | default(lookup('env', 'HOME')) | default('/root') ~ '/.config/fontconfig')
          if mt_runner_fontconfig_stat.stat.exists | default(false) else omit }}
     WINEDEBUG: warn-all,fixme-all,-alsa,-ole,-toolbar
   register: cmd_terminal_async
@@ -160,7 +168,8 @@
       ansible.builtin.wait_for:
         delay: 30
         path: |-
-          {{ mt_runner_mt_path ~ '/logs/' ~ ('%Y%m%d' | strftime(ansible_facts.date_time.epoch | int)) }}.log
+          {{ mt_runner_mt_path ~ '/logs/' ~ ('%Y%m%d' |
+             strftime(ansible_facts.date_time.epoch | default(lookup('pipe', 'date +%s')) | int)) }}.log
         sleep: 10
         state: present
         timeout: 240
