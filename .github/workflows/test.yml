@@ -4,7 +4,6 @@ name: Test
 on:
   pull_request:
     paths-ignore:
-      - '!.github/workflows/**'
       - .github/*.json
       - .github/dependabot.yml
       - .github/workflows/check.yml
@@ -19,7 +18,6 @@ on:
       - molecule/**
   push:
     paths-ignore:
-      - '!.github/workflows/**'
       - .github/*.json
       - .github/dependabot.yml
       - .github/workflows/check.yml
