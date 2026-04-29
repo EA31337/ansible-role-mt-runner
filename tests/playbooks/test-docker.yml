@@ -47,13 +47,13 @@
           delay: 2
           retries: 10
 
-- name: Install ea31337.wine role on the container
+- name: Install ea31337.mt_runner role on the container
   hosts: docker_containers
   gather_facts: true
   tasks:
-    - name: Installs ea31337.wine role
+    - name: Installs ea31337.mt_runner role
       ansible.builtin.import_role:
-        name: ea31337.wine
+        name: ea31337.mt_runner
 
   post_tasks:
     - name: Stop Docker containers

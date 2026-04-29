@@ -1,8 +1,8 @@
-# Dockerfile for ea31337.wine Ansible role
+# Dockerfile for ea31337.mt_runner Ansible role
 FROM {{ docker_image | default('ubuntu:noble') }}
 
-LABEL org.opencontainers.image.source=https://github.com/EA31337/ansible-role-wine
-LABEL org.opencontainers.image.description="Wine container based on ea31337.wine Ansible role"
+LABEL org.opencontainers.image.source=https://github.com/EA31337/ansible-role-mt-runner
+LABEL org.opencontainers.image.description="MetaTrader runner container based on ea31337.mt_runner Ansible role"
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -16,14 +16,29 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy the role into the container
-WORKDIR /etc/ansible/roles/ea31337.wine
-COPY . .
+WORKDIR /etc/ansible/roles/ea31337.mt_runner
+COPY defaults/ defaults/
+COPY meta/ meta/
+COPY tasks/ tasks/
+COPY templates/ templates/
+COPY vars/ vars/
+COPY requirements.yml .
+COPY README.md .
 
 # Create a local playbook to apply the role
-RUN ansible-galaxy collection install -r requirements.yml && \
-    printf -- "---\n- hosts: localhost\n  connection: local\n  roles:\n    - ea31337.wine\n" > /tmp/playbook.yml && \
+RUN ansible-galaxy role install -r requirements.yml && \
+    ansible-galaxy collection install -r requirements.yml && \
+    printf -- "---\n- hosts: localhost\n  connection: local\n  roles:\n    - ea31337.mt_runner\n" > /tmp/playbook.yml && \
     ansible-playbook /tmp/playbook.yml && \
-    rm /tmp/playbook.yml
+    rm /tmp/playbook.yml && \
+    apt-get update && \
+    apt-get purge -y --auto-remove \
+        ansible \
+        python3-apt \
+        python3-pip \
+        sudo && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Default CMD
 CMD ["wine", "--version"]
