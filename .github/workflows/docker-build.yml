@@ -73,18 +73,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - arch: linux/386
-            image: i386/alpine:latest
-            is_default: false
-            platform: alpine-latest
           - arch: linux/amd64
             image: debian:latest
             is_default: false
             platform: debian-latest
-          - arch: linux/amd64
-            image: nixos/nix:latest
-            is_default: false
-            platform: nixos-latest
           - arch: linux/amd64
             image: ubuntu:jammy
             is_default: false
