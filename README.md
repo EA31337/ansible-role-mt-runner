@@ -17,9 +17,7 @@ This role requires:
 - Python
 - Administrative/root access on target hosts
 - One of the following operating systems:
-  - Alpine Linux
   - Debian/Ubuntu
-  - NixOS or systems with Nix package manager
 
 ## Install
 

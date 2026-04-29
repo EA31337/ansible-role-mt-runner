@@ -6,8 +6,8 @@
     - role: ea31337.mt_runner
       vars:
         mt_runner_bt_mt4_config:
-          Login: '{{ ansible_facts.env.MT_RUNNER_MT4_LOGIN }}'
-          Password: '{{ ansible_facts.env.MT_RUNNER_MT4_PASSWORD }}'
+          Login: "{{ ansible_facts.env.MT_RUNNER_MT4_LOGIN | default('12345') }}"
+          Password: "{{ ansible_facts.env.MT_RUNNER_MT4_PASSWORD | default('12345') }}"
           Profile: default
           Server: "{{ ansible_facts.env.MT_RUNNER_MT4_SERVER | default('MetaQuotes-Demo') }}"
           TestExpert: MACD Sample.ex4
