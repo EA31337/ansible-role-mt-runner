@@ -19,11 +19,16 @@ RUN nix-channel --update && \
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     ansible \
+    ca-certificates \
+    curl \
+    fontconfig \
     python3-apt \
     python3-pip \
     python3-setuptools \
     python3-wheel \
-    sudo && \
+    sudo \
+    xvfb \
+    && \
     pip3 install --no-cache-dir "ansible-core>=2.14" --break-system-packages || \
     pip3 install --no-cache-dir "ansible-core>=2.14" && \
     rm -rf /var/lib/apt/lists/*

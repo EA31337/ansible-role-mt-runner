@@ -7,7 +7,7 @@ tests
 Pipfile
 Pipfile.lock
 requirements-local.yml.j2
-README.md
+# README.md (removed from ignore as it is used in Dockerfile)
 LICENSE
 AGENTS.md
 .ansible-lint

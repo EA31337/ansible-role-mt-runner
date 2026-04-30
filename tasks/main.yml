@@ -148,7 +148,7 @@
         delay: 30
         path: |-
           {{ mt_runner_mt_path ~ '/logs/' ~ ('%Y%m%d' |
-             strftime(ansible_facts.date_time.epoch | default(lookup('pipe', 'date +%s')) | int)) }}.log
+             strftime(lookup('pipe', 'date +%s') | int)) }}.log
         sleep: 10
         state: present
         timeout: 240
