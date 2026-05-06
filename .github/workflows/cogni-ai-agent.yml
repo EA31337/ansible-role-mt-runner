@@ -121,8 +121,17 @@ jobs:
             || github.event.issue.body
             || github.event.pull_request.body
             || inputs.prompt }}
+  cogni-ai-summary:
+    name: Generate Session Summary
+    runs-on: ubuntu-latest
+    needs: cogni-ai-agent
+    if: always()
+    permissions:
+      actions: read
+      issues: write
+      pull-requests: write
+    steps:
       - name: Generate Session Summary
-        if: always()
         uses: Cogni-AI-OU/cogni-ai-agent-action/ai-inference/summary@main
         with:
           agent_job_id: cogni-ai-agent
