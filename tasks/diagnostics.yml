@@ -1,0 +1,11 @@
+---
+- name: Show disk usage
+  ansible.builtin.command: df -h
+  changed_when: false
+
+- name: Clean package manager cache
+  ansible.builtin.shell: |
+    if command -v apt-get >/dev/null 2>&1; then
+      apt-get clean
+    fi
+  changed_when: false
