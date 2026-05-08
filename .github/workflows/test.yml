@@ -48,6 +48,10 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
+          cache: pip
+          cache-dependency-path: |
+            ${{ github.repository }}/.devcontainer/requirements.txt
+            ${{ github.repository }}/Pipfile*
           python-version: '3.11'
       - name: Install Python's requirements
         run: pip install -r .devcontainer/requirements.txt
