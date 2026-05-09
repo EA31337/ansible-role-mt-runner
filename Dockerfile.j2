@@ -10,23 +10,28 @@ ENV DEBIAN_FRONTEND=noninteractive
 {% if 'alpine' in (docker_image | default('ubuntu:noble')) %}
 RUN grep -E '^[^#].*/main$' /etc/apk/repositories | sed 's/main$/community/' >> /etc/apk/repositories && \
     apk update && \
-    apk add --no-cache ansible bash ca-certificates cabextract curl fontconfig gawk p7zip python3 sudo ttf-freefont unzip xauth xvfb-run && \
+    apk add --no-cache ansible bash ca-certificates cabextract curl fontconfig gawk git p7zip python3 sudo ttf-freefont unzip xauth xvfb-run && \
     update-ca-certificates
 {% elif 'nixos' in (docker_image | default('ubuntu:noble')) %}
 RUN nix-channel --update && \
-    nix-env -iA nixpkgs.ansible nixpkgs.procps nixpkgs.python3 nixpkgs.python3Packages.pip nixpkgs.sudo
+    nix-env -iA nixpkgs.ansible nixpkgs.git nixpkgs.p7zip nixpkgs.procps nixpkgs.python3 nixpkgs.python3Packages.pip nixpkgs.sudo
 {% else %}
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     ansible \
     ca-certificates \
+    cabextract \
     curl \
     fontconfig \
+    git \
+    p7zip-full \
     python3-apt \
+    python3-distutils \
     python3-pip \
     python3-setuptools \
     python3-wheel \
     sudo \
+    unzip \
     xvfb \
     && \
     pip3 install --no-cache-dir "ansible-core>=2.14" --break-system-packages || \
@@ -54,7 +59,10 @@ RUN ansible-galaxy role install -r requirements.yml && \
     apt-get update && \
     apt-get purge -y --auto-remove \
         ansible \
+        git \
+        p7zip-full \
         python3-apt \
+        python3-distutils \
         python3-pip \
         python3-setuptools \
         python3-wheel \
