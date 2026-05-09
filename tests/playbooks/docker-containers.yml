@@ -19,7 +19,11 @@
         image: '{{ container_image }}'
         state: started
         command: sleep infinity
+        volumes:
+          - /tmp/ansible-tmp-{{ inventory_hostname }}:/root/.ansible/tmp
+          - /tmp/cache-{{ inventory_hostname }}:/root/.cache
       delegate_to: localhost
+      no_log: "{{ mt_runner_no_log | default(ansible_verbosity | default(0) < 1) }}"
       vars:
         # Use system Python with requests installed for controller-side Docker modules.
         ansible_python_interpreter: '{{ controller_python }}'
@@ -33,32 +37,37 @@
       changed_when: false
       delay: 2
       delegate_to: localhost
+      no_log: "{{ mt_runner_no_log | default(ansible_verbosity | default(0) < 1) }}"
       retries: 10
       vars:
         # Use system Python with requests installed for controller-side Docker modules.
         ansible_python_interpreter: '{{ controller_python }}'
     - name: Install Python 3 on Ubuntu/Debian
       ansible.builtin.raw: |
-        test -e "{{ ansible_python_interpreter }}" || (apt-get update && apt-get install -y python3 python3-pip)
+        test -e "{{ ansible_python_interpreter }}" || \
+        (apt-get update -y -qq && apt-get install -y -qq python3 python3-pip)
       changed_when: false
       when: container_image is search("ubuntu") or container_image is search("debian")
     - name: Gather facts
       ansible.builtin.setup:
+    - name: Run diagnostics
+      ansible.builtin.include_tasks: ../../tasks/diagnostics.yml
     - name: Install Python packages for Ubuntu/Debian
       ansible.builtin.apt:
         name: [python3, python3-pip, python3-setuptools]
         state: present
         update_cache: true
+      no_log: "{{ mt_runner_no_log | default(ansible_verbosity | default(0) < 1) }}"
       when: container_image is search("ubuntu") or container_image is search("debian")
   tags: always
   vars:
+    mt_runner_no_log: "{{ ansible_verbosity | default(0) < 1 }}"
     controller_python: '{{ ansible_playbook_python }}'
     container_image_map:
       mt-runner-on-debian-latest: debian:latest
       mt-runner-on-ubuntu-jammy: ubuntu:jammy
-      mt-runner-on-ubuntu-latest: ubuntu:noble
       mt-runner-on-ubuntu-noble: ubuntu:noble
-    container_image: "{{ container_image_map[inventory_hostname] | default('ubuntu:latest') }}"
+    container_image: "{{ container_image_map[inventory_hostname] | default('ubuntu:noble') }}"
 - name: Install ea31337.mt_runner role on all containers
   hosts: docker_containers
   become_method: ansible.builtin.su
@@ -73,16 +82,16 @@
         metatrader_version: 5
         mt_runner_bt_mt5_config:
           Common:
-            Login: "{{ ansible_facts.env.MT_RUNNER_MT5_LOGIN | default('12345') }}"
-            Password: "{{ ansible_facts.env.MT_RUNNER_MT5_PASSWORD | default('SETME') }}"
-            Server: "{{ ansible_facts.env.MT_RUNNER_MT5_SERVER | default('MetaQuotes-Demo') }}"
+            Login: "{{ lookup('env', 'MT_RUNNER_MT5_LOGIN') | default('12345', true) }}"
+            Password: "{{ lookup('env', 'MT_RUNNER_MT5_PASSWORD') | default('SETME', true) }}"
+            Server: "{{ lookup('env', 'MT_RUNNER_MT5_SERVER') | default('MetaQuotes-Demo', true) }}"
           Tester:
             Deposit: 10000
             ExecutionMode: 0
             Expert: EA31337-Libre-v1.013.ex5
             FromDate: 2024.01.01
             Leverage: 1:500
-            Login: "{{ ansible_facts.env.MT_RUNNER_MT5_LOGIN | default('12345') }}"
+            Login: "{{ lookup('env', 'MT_RUNNER_MT5_LOGIN') | default('12345', true) }}"
             Model: 1
             Report: report.html
             ReplaceReport: 1
@@ -99,3 +108,4 @@
         state: stopped
       delegate_to: localhost
       failed_when: false
+      no_log: "{{ mt_runner_no_log | default(ansible_verbosity | default(0) < 1) }}"

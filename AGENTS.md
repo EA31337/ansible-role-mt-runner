@@ -76,7 +76,6 @@ For project overview and install instructions, see [README.md](README.md).
 | `debian-latest` | `debian:latest` | Standard image |
 | `ubuntu-jammy` | `ubuntu:jammy` | Standard image |
 | `ubuntu-noble` | `ubuntu:noble` | Standard image |
-| `ubuntu-latest` | `ubuntu:latest` | Standard image |
 
 ### Running Tests
 
@@ -93,7 +92,7 @@ molecule test
 molecule test -s default
 
 # Single platform in a scenario
-molecule test -s default --platform-name ubuntu-latest
+molecule test -s default --platform-name ubuntu-noble
 
 # Step-by-step debugging (useful for troubleshooting)
 molecule destroy -s default              # clean up any leftover state
@@ -114,11 +113,11 @@ For CI or automated environments, use timeouts:
 
 ```bash
 # Test a single platform with timeout (15 minutes)
-timeout 900 molecule test -s default --platform-name ubuntu-latest
+timeout 900 molecule test -s default --platform-name ubuntu-noble
 
 # If converge fails, debug interactively:
-molecule create -s default --platform-name ubuntu-latest
-molecule converge -s default --platform-name ubuntu-latest
+molecule create -s default --platform-name ubuntu-noble
+molecule converge -s default --platform-name ubuntu-noble
 # (inspect container state, then clean up)
 molecule destroy -s default
 ```
@@ -140,7 +139,7 @@ molecule destroy -s default
 - **Root cause**: `community.docker` collection not installed.
 - **Fix**: Run `ansible-galaxy collection install -r requirements.yml`.
 
-### Platform installer shows "Sorry, something went wrong"
+### GitHub Actions Molecule report step fails with summary size limit
 
 - **Root cause**: GitHub job summaries are capped at 1 MiB, but full Molecule HTML-to-Markdown conversions can exceed it.
 - **Fix**: Upload full Molecule HTML reports as workflow artifacts and append only a concise filtered summary

@@ -37,6 +37,7 @@ on:
       - Pipfile*
       - requirements-local.yml.j2
       - tests/**
+  workflow_dispatch:
 concurrency:
   cancel-in-progress: true
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -49,16 +50,20 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform:
-          - ubuntu-latest
-        scenario:
-          - default
-          - mt4
-          - mt5-ea
+        platform: [ubuntu-latest]
+        scenario: [default, mt4, mt5-ea]
     steps:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false  # Prevents duplicate header: "Authorization" error.
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          cache: pip
+          cache-dependency-path: |
+            .devcontainer/requirements.txt
+            Pipfile*
+          python-version: '3.12'
       - name: Cache Ansible Galaxy collections
         uses: actions/cache@v5
         with:
@@ -68,11 +73,11 @@ jobs:
             collections
       - uses: gofrolist/molecule-action@v2
         env:
-          ANSIBLE_COLLECTIONS_PATH: collections
           ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
+          ANSIBLE_COLLECTIONS_PATH: collections
           ANSIBLE_FORCE_COLOR: '1'
-          ANSIBLE_STDOUT_CALLBACK: ${{ runner.debug == '1' && 'debug' || 'ansible.builtin.default' }}
-          ANSIBLE_VERBOSITY: '3'
+          ANSIBLE_STDOUT_CALLBACK: ${{ runner.debug == '1' && 'debug' || 'community.general.unixy' }}
+          ANSIBLE_VERBOSITY: '0'
           DOCKER_API_VERSION: '1.44'
           MOLECULE_REPORT: molecule-${{ matrix.scenario }}-report.html
           MT_RUNNER_MT4_PASSWORD: ${{ secrets.MT_RUNNER_MT4_PASSWORD || 'SETME' }}
@@ -87,36 +92,34 @@ jobs:
           molecule_working_dir: .
       - if: always()
         name: Summarize Molecule report
+        env:
+          REPORT: molecule-${{ matrix.scenario }}-report.html
+          SCENARIO: ${{ matrix.scenario }}
         run: |
-          REPORT="molecule-${{ matrix.scenario }}-report.html"
           if [ -f "$REPORT" ]; then
             # Fix permissions (the file might be owned by root if created in a container).
-            sudo chown "$USER":"$USER" "$REPORT" || true
-
+            sudo chown "$USER:$USER" "$REPORT" || true
             {
-              echo "## Molecule Summary - ${{ matrix.scenario }}"
-              echo ""
-              # Extract Play Recap
-              echo "### Play Recap"
-              echo '```'
+              printf "## Molecule Summary - %s\n\n" "$SCENARIO"
+              printf "### Play Recap\n"
+              printf '```\n'
               sed 's/<[^>]*>//g; s/&nbsp;/ /g; s/&lt;/</g; s/&gt;/>/g; s/&amp;/\&/g' "$REPORT" | \
                 awk '/PLAY RECAP/ {p=1} p; /^[[:space:]]*$/ && p {p=0}' | \
                 grep -v "^$" | head -n 20
-              echo '```'
+              printf '```\n\n'
 
               # Extract Errors and Warnings
-              echo "<details><summary>Errors and Warnings (click to expand)</summary>"
-              echo ""
-              echo '```'
+              printf "<details><summary>Errors and Warnings (click to expand)</summary>\n\n"
+              printf '```\n'
               sed 's/<[^>]*>//g; s/&nbsp;/ /g; s/&lt;/</g; s/&gt;/>/g; s/&amp;/\&/g' "$REPORT" | \
                 grep -iE "error|warning|fail" | grep -vE "ok=|changed=" | head -n 50
-              echo '```'
-              echo "</details>"
+              printf '```\n'
+              printf "</details>\n"
             } >> "$GITHUB_STEP_SUMMARY"
           fi
       - if: always()
         name: Upload Molecule report artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           if-no-files-found: warn
           name: molecule-${{ matrix.scenario }}-${{ matrix.platform }}-report

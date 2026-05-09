@@ -4,8 +4,8 @@
   hosts: localhost
   connection: local
   gather_facts: false
-  collections: [community.docker]
   vars:
+    mt_runner_no_log: "{{ ansible_verbosity | default(0) < 1 }}"
     # Use controller Python (Ansible's interpreter)
     ansible_python_interpreter: '{{ ansible_playbook_python }}'
   tasks:
@@ -14,6 +14,7 @@
         cmd: '{{ ansible_playbook_python }} -m pip install docker>=7.1 requests'
       register: pip_install_result
       changed_when: pip_install_result.rc == 0 and 'Successfully installed' in pip_install_result.stdout
+      no_log: "{{ mt_runner_no_log | default(ansible_verbosity | default(0) < 1) }}"
     - name: Discover proxy CA certificates on the host
       ansible.builtin.set_fact:
         host_ca_certs: >-
@@ -58,28 +59,38 @@
             source: build
             force_source: true
           loop: "{{ molecule_yml.platforms | selectattr('dockerfile', 'defined') | list }}"
+          loop_control:
+            label: '{{ item.name }}'
+          no_log: "{{ mt_runner_no_log | default(ansible_verbosity | default(0) < 1) }}"
     - name: Ensure test containers are running
       community.docker.docker_container:
         name: '{{ item.name }}'
         image: "{{ (item.name ~ ':molecule') if item.dockerfile is defined else item.image }}"
         command: sleep infinity
         init: '{{ item.init | default(omit) }}'
-        privileged: "{{ item.privileged | default(false) }}"
+        privileged: '{{ item.privileged | default(false) }}'
         # Relaxed seccomp/apparmor for compatibility.
         security_opts: >-
           {{ ['seccomp=unconfined', 'apparmor=unconfined']
              if item.privileged | default(false) else omit }}
         recreate: true
-        pull: "{{ false if item.dockerfile is defined else true }}"
-        # Mount host CA certificates for proxy/firewall SSL interception environments.
+        pull: '{{ false if item.dockerfile is defined else true }}'
+        # Mount host CA certificates and temp/cache dirs to prevent "No space left on device" errors.
         volumes: >-
-          {{ [molecule_ephemeral_directory ~ '/ca-certificates:/usr/local/share/ca-certificates:ro']
-             if host_ca_certs | length > 0 else omit }}
+          {{
+            ([molecule_ephemeral_directory ~ '/ca-certificates:/usr/local/share/ca-certificates:ro']
+              if host_ca_certs | length > 0 else []) +
+            ['/tmp/ansible-tmp-' ~ item.name ~ ':/root/.ansible/tmp',
+             '/tmp/cache-' ~ item.name ~ ':/root/.cache']
+          }}
       loop: '{{ molecule_yml.platforms }}'
+      loop_control:
+        label: '{{ item.name }}'
       register: container_results
       # Allow enough time for image pulls/builds in constrained CI environments.
       async: 7200
       poll: 0
+      no_log: "{{ mt_runner_no_log | default(ansible_verbosity | default(0) < 1) }}"
     - name: Wait for container(s) creation to complete
       ansible.builtin.async_status:
         jid: '{{ item.ansible_job_id }}'

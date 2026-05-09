@@ -10,6 +10,7 @@
         state: present
         update_cache: true
       become: true
+      no_log: "{{ mt_runner_no_log | default(ansible_verbosity | default(0) < 1) }}"
       when: ansible_facts.os_family == "Debian"
     - name: Query MT platform path
       changed_when: false
@@ -84,6 +85,7 @@
     dest: '{{ mt_runner_mt_path }}/tester.ini'
     mode: '0644'
     src: '{{ mt_runner_mt_version }}/tester.ini.j2'
+  no_log: "{{ mt_runner_no_log }}"
 - name: Clean-up before the test (non-Windows)
   when: ansible_facts.os_family != "Windows"
   block:
@@ -135,10 +137,12 @@
   environment:
     DISPLAY: '{{ xvfb_display }}'
     FONTCONFIG_FILE: >-
-      {{ (ansible_facts.env.HOME | default(lookup('env', 'HOME')) | default('/root') ~ '/.config/fontconfig/fonts.conf')
+      {{ (ansible_facts.env.HOME | default(lookup('env', 'HOME')) | default('/root')
+      ~ '/.config/fontconfig/fonts.conf')
          if mt_runner_fontconfig_stat.stat.exists | default(false) else omit }}
     FONTCONFIG_PATH: >-
-      {{ (ansible_facts.env.HOME | default(lookup('env', 'HOME')) | default('/root') ~ '/.config/fontconfig')
+      {{ (ansible_facts.env.HOME | default(lookup('env', 'HOME')) | default('/root')
+      ~ '/.config/fontconfig')
          if mt_runner_fontconfig_stat.stat.exists | default(false) else omit }}
     WINEDEBUG: warn-all,fixme-all,-alsa,-ole,-toolbar
   register: cmd_terminal_async

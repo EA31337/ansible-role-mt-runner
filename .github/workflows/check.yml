@@ -4,13 +4,9 @@ name: Check
 # yamllint disable-line rule:truthy
 on:
   pull_request:
-    paths-ignore:
-      - .devcontainer/**
-      - .github/*.json
+    paths-ignore: [.devcontainer/**, .github/*.json]
   push:
-    paths-ignore:
-      - .devcontainer/**
-      - .github/*.json
+    paths-ignore: [.devcontainer/**, .github/*.json]
   schedule:
     - cron: 0 0 * * 1  # Run every Monday at 00:00 UTC
   workflow_call:
@@ -39,10 +35,7 @@ on:
       submodules:
         default: 'false'
         description: 'Whether to checkout submodules: true, false, or recursive'
-        options:
-          - 'false'
-          - 'true'
-          - recursive
+        options: ['false', 'true', recursive]
         required: false
         type: choice
 permissions:
