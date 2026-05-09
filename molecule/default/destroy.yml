@@ -18,7 +18,7 @@
       changed_when: >-
         pip_install_result.rc == 0
         and 'Successfully installed' in pip_install_result.stdout
-      no_log: "{{ mt_runner_no_log }}"
+      no_log: "{{ mt_runner_no_log | default(ansible_verbosity | default(0) < 1) }}"
   tasks:
     - name: Stop and remove test containers
       community.docker.docker_container:
@@ -30,7 +30,7 @@
       register: container_results
       async: 7200
       poll: 0
-      no_log: "{{ mt_runner_no_log }}"
+      no_log: "{{ mt_runner_no_log | default(ansible_verbosity | default(0) < 1) }}"
     - name: Wait for instance(s) deletion to complete
       ansible.builtin.async_status:
         jid: '{{ item.ansible_job_id }}'
