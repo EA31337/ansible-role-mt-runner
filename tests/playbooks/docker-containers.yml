@@ -76,6 +76,7 @@
   become_method: ansible.builtin.su
   gather_facts: true
   pre_tasks:
+    # TODO: Remove this workaround once legacy roles are updated to use ansible_facts (see #50).
     - name: Set compatibility facts for legacy roles
       ansible.builtin.set_fact:
         ansible_distribution: "{{ ansible_facts.distribution }}"
