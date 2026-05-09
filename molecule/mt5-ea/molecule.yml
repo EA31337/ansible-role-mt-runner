@@ -17,21 +17,15 @@ lint: |
   molecule syntax
   ansible-lint
 platforms:
-  - name: debian-latest
-    image: debian:latest
-    init: true
   - env:
       MT_RUNNER_MT5_LOGIN: ${MT_RUNNER_MT5_LOGIN:-12345}
       MT_RUNNER_MT5_PASSWORD: ${MT_RUNNER_MT5_PASSWORD:-SETME}
       MT_RUNNER_MT5_SERVER: ${MT_RUNNER_MT5_SERVER:-MetaQuotes-Demo}
       WINEDLLOVERRIDES: mscoree,mshtml=,winebrowser.exe=,dbghelp=n
     groups: [mt5]
-    image: ubuntu:jammy
-    name: ubuntu-jammy
-    init: true
-  - name: ubuntu-noble
     image: ubuntu:noble
     init: true
+    name: ubuntu-noble
 provisioner:
   config_options:
     defaults:

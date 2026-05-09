@@ -64,8 +64,6 @@
     mt_runner_no_log: "{{ ansible_verbosity | default(0) < 1 }}"
     controller_python: '{{ ansible_playbook_python }}'
     container_image_map:
-      mt-runner-on-debian-latest: debian:latest
-      mt-runner-on-ubuntu-jammy: ubuntu:jammy
       mt-runner-on-ubuntu-noble: ubuntu:noble
     container_image: "{{ container_image_map[inventory_hostname] | default('ubuntu:noble') }}"
 - name: Install ea31337.mt_runner role on all containers
