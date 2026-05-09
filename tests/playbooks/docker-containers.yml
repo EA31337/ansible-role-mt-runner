@@ -1,6 +1,7 @@
 ---
 - name: Configure Docker container
-  # Note: Since facts are not gathered initially, we rely on connection_user, UID or env facts if available.
+  # Note: Since facts are not gathered initially, we rely on connection_user or env/fact fallbacks if available.
+  # We use safe access to ansible_facts to prevent "undefined variable" errors.
   become: >-
     {{
       (connection_user | default('root')) != 'root'
@@ -74,6 +75,14 @@
   hosts: docker_containers
   become_method: ansible.builtin.su
   gather_facts: true
+  pre_tasks:
+    - name: Set compatibility facts for legacy roles
+      ansible.builtin.set_fact:
+        ansible_distribution: "{{ ansible_facts.distribution }}"
+        ansible_env: "{{ ansible_facts.env }}"
+        ansible_os_family: "{{ ansible_facts.os_family }}"
+        ansible_user_id: "{{ ansible_facts.user_id }}"
+        ansible_user_uid: "{{ ansible_facts.user_uid }}"
   tags: always
   vars:
     controller_python: '{{ ansible_playbook_python }}'

@@ -2,6 +2,14 @@
 - name: Converge
   hosts: all
   gather_facts: true
+  pre_tasks:
+    - name: Set compatibility facts for legacy roles
+      ansible.builtin.set_fact:
+        ansible_distribution: "{{ ansible_facts.distribution }}"
+        ansible_env: "{{ ansible_facts.env }}"
+        ansible_os_family: "{{ ansible_facts.os_family }}"
+        ansible_user_id: "{{ ansible_facts.user_id }}"
+        ansible_user_uid: "{{ ansible_facts.user_uid }}"
   roles:
     - role: ea31337.mt_runner
       vars:
