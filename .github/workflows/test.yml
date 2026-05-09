@@ -80,7 +80,7 @@ jobs:
           MT_RUNNER_MT5_PASSWORD: ${{ secrets.MT_RUNNER_MT5_PASSWORD || 'SETME' }}
           MT_RUNNER_MT5_SERVER: ${{ secrets.MT_RUNNER_MT5_SERVER || 'MetaQuotes-Demo' }}
         run: |
-          ansible-playbook -i tests/inventory/docker-containers.yml tests/playbooks/docker-containers.yml -vvv
+          ansible-playbook -i tests/inventory/docker-containers.yml tests/playbooks/docker-containers.yml
 
       # Debug with tmate on failure when debug logging is enabled.
       - if: ${{ failure() && runner.debug == '1' }}

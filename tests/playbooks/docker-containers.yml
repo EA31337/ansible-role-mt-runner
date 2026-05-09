@@ -23,6 +23,7 @@
           - /tmp/ansible-tmp-{{ inventory_hostname }}:/root/.ansible/tmp
           - /tmp/cache-{{ inventory_hostname }}:/root/.cache
       delegate_to: localhost
+      no_log: "{{ mt_runner_no_log | default(ansible_verbosity | default(0) < 1) }}"
       vars:
         # Use system Python with requests installed for controller-side Docker modules.
         ansible_python_interpreter: '{{ controller_python }}'
@@ -36,13 +37,15 @@
       changed_when: false
       delay: 2
       delegate_to: localhost
+      no_log: "{{ mt_runner_no_log | default(ansible_verbosity | default(0) < 1) }}"
       retries: 10
       vars:
         # Use system Python with requests installed for controller-side Docker modules.
         ansible_python_interpreter: '{{ controller_python }}'
     - name: Install Python 3 on Ubuntu/Debian
       ansible.builtin.raw: |
-        test -e "{{ ansible_python_interpreter }}" || (apt-get update && apt-get install -y python3 python3-pip)
+        test -e "{{ ansible_python_interpreter }}" || \
+        (apt-get update -y -qq && apt-get install -y -qq python3 python3-pip)
       changed_when: false
       when: container_image is search("ubuntu") or container_image is search("debian")
     - name: Gather facts
@@ -54,16 +57,17 @@
         name: [python3, python3-pip, python3-setuptools]
         state: present
         update_cache: true
+      no_log: "{{ mt_runner_no_log | default(ansible_verbosity | default(0) < 1) }}"
       when: container_image is search("ubuntu") or container_image is search("debian")
   tags: always
   vars:
+    mt_runner_no_log: "{{ ansible_verbosity | default(0) < 1 }}"
     controller_python: '{{ ansible_playbook_python }}'
     container_image_map:
       mt-runner-on-debian-latest: debian:latest
       mt-runner-on-ubuntu-jammy: ubuntu:jammy
-      mt-runner-on-ubuntu-latest: ubuntu:latest
       mt-runner-on-ubuntu-noble: ubuntu:noble
-    container_image: "{{ container_image_map[inventory_hostname] | default('ubuntu:latest') }}"
+    container_image: "{{ container_image_map[inventory_hostname] | default('ubuntu:noble') }}"
 - name: Install ea31337.mt_runner role on all containers
   hosts: docker_containers
   become_method: ansible.builtin.su
@@ -104,3 +108,4 @@
         state: stopped
       delegate_to: localhost
       failed_when: false
+      no_log: "{{ mt_runner_no_log | default(ansible_verbosity | default(0) < 1) }}"
