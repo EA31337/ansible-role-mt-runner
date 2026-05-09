@@ -34,6 +34,7 @@ on:
       - LICENSE
       - Pipfile*
       - molecule/**
+  workflow_dispatch:
 concurrency:
   cancel-in-progress: true
   group: ${{ github.workflow }}-${{ github.ref }}
