@@ -79,9 +79,13 @@
     # TODO: Remove this workaround once legacy roles are updated to use ansible_facts (see #50).
     - name: Set compatibility facts for legacy roles
       ansible.builtin.set_fact:
+        ansible_architecture: "{{ ansible_facts.architecture }}"
         ansible_distribution: "{{ ansible_facts.distribution }}"
+        ansible_distribution_release: "{{ ansible_facts.distribution_release }}"
         ansible_env: "{{ ansible_facts.env }}"
         ansible_os_family: "{{ ansible_facts.os_family }}"
+        ansible_system: "{{ ansible_facts.system }}"
+        ansible_user_dir: "{{ ansible_facts.user_dir }}"
         ansible_user_id: "{{ ansible_facts.user_id }}"
         ansible_user_uid: "{{ ansible_facts.user_uid }}"
   tags: always
