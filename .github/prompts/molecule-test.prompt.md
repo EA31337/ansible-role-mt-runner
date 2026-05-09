@@ -41,7 +41,6 @@ Run all Molecule scenarios and report results as a table.
 | `debian-latest` | `debian:latest` | Uses `apt` |
 | `ubuntu-jammy` | `ubuntu:jammy` | Uses `apt` |
 | `ubuntu-noble` | `ubuntu:noble` | Uses `apt` |
-| `ubuntu-latest` | `ubuntu:latest` | Uses `apt` |
 
 ## Results Template
 
@@ -55,7 +54,6 @@ Use PASS for pass, FAIL for fail, SKIP for skipped.
 | `debian-latest` | | | | | |
 | `ubuntu-jammy` | | | | | |
 | `ubuntu-noble` | | | | | |
-| `ubuntu-latest` | | | | | |
 
 ## Troubleshooting
 
