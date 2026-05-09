@@ -2,11 +2,11 @@
 - name: Show disk usage
   ansible.builtin.command: df -h
   changed_when: false
-  no_log: '{{ ansible_verbosity | default(0) < 1 }}'
+  no_log: "{{ mt_runner_no_log }}"
 - name: Clean package manager cache
   ansible.builtin.shell: |
     if command -v apt-get >/dev/null 2>&1; then
       apt-get clean
     fi
   changed_when: false
-  no_log: '{{ ansible_verbosity | default(0) < 1 }}'
+  no_log: "{{ mt_runner_no_log }}"

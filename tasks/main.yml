@@ -10,7 +10,7 @@
         state: present
         update_cache: true
       become: true
-      no_log: '{{ ansible_verbosity | default(0) < 1 }}'
+      no_log: "{{ mt_runner_no_log }}"
       when: ansible_facts.os_family == "Debian"
     - name: Query MT platform path
       changed_when: false
