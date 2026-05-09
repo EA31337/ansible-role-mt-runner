@@ -2,6 +2,8 @@
 - name: Prepare hosts
   hosts: all
   gather_facts: false
+  vars:
+    mt_runner_no_log: "{{ ansible_verbosity | default(0) < 1 }}"
   tasks:
     - name: Bootstrap Python and Sudo
       ansible.builtin.raw: |
@@ -26,14 +28,10 @@
                   /etc/apt/sources.list.d/ubuntu.sources
               fi
             fi
-            apt-get update -qq && \
-              DEBIAN_FRONTEND=noninteractive apt-get install -y -q python3-minimal sudo ca-certificates
-          elif command -v dnf >/dev/null 2>&1; then
-            dnf install -y python3 sudo ca-certificates
-          elif command -v zypper >/dev/null 2>&1; then
-            zypper --non-interactive install python3 sudo ca-certificates
+            apt-get update -y -qq && \
+              DEBIAN_FRONTEND=noninteractive apt-get install -y -qq python3-minimal sudo ca-certificates
           else
-            echo "Unsupported system: no supported package manager found for bootstrapping Python and sudo" >&2
+            echo "Unsupported system: only Debian/Ubuntu are supported (apt-get not found)" >&2
             exit 1
           fi
         fi
@@ -57,3 +55,5 @@
           [ -d /etc/ssl/certs ] && chmod 755 /etc/ssl/certs || true
         fi
       changed_when: false
+    - name: Run diagnostics
+      ansible.builtin.include_tasks: ../../tasks/diagnostics.yml
