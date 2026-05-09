@@ -82,7 +82,7 @@ jobs:
             is_default: false
             platform: ubuntu-jammy
           - arch: linux/amd64
-            image: ubuntu:latest
+            image: ubuntu:noble
             is_default: true
             platform: ubuntu-latest
           - arch: linux/amd64

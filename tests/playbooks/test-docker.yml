@@ -54,6 +54,8 @@
     - name: Installs ea31337.mt_runner role
       ansible.builtin.import_role:
         name: ea31337.mt_runner
+      vars:
+        mt_runner_run_terminal: false
 
   post_tasks:
     - name: Stop Docker containers
