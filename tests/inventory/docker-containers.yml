@@ -7,3 +7,11 @@ all:
           ansible_connection: docker
           ansible_host: mt-runner-on-ubuntu-noble
           ansible_python_interpreter: /usr/bin/python3
+        mt-runner-on-ubuntu-jammy:
+          ansible_connection: docker
+          ansible_host: mt-runner-on-ubuntu-jammy
+          ansible_python_interpreter: /usr/bin/python3
+        mt-runner-on-debian-latest:
+          ansible_connection: docker
+          ansible_host: mt-runner-on-debian-latest
+          ansible_python_interpreter: /usr/bin/python3

@@ -73,6 +73,8 @@ For project overview and install instructions, see [README.md](README.md).
 
 | Container | Image | Notes |
 | --------- | ----- | ----- |
+| `debian-latest` | `debian:latest` | Standard image |
+| `ubuntu-jammy` | `ubuntu:jammy` | Standard image |
 | `ubuntu-noble` | `ubuntu:noble` | Standard image |
 
 ### Running Tests

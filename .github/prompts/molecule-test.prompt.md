@@ -38,6 +38,8 @@ Run all Molecule scenarios and report results as a table.
 
 | Container | Image | Notes |
 | --- | --- | --- |
+| `debian-latest` | `debian:latest` | Uses `apt` |
+| `ubuntu-jammy` | `ubuntu:jammy` | Uses `apt` |
 | `ubuntu-noble` | `ubuntu:noble` | Uses `apt` |
 
 ## Results Template
@@ -49,6 +51,8 @@ Use PASS for pass, FAIL for fail, SKIP for skipped.
 
 | Platform | create | prepare | converge | idempotence | verify |
 | --- | :---: | :---: | :---: | :---: | :---: |
+| `debian-latest` | | | | | |
+| `ubuntu-jammy` | | | | | |
 | `ubuntu-noble` | | | | | |
 
 ## Troubleshooting
