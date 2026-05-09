@@ -26,17 +26,16 @@ RUN apt-get update && \
     git \
     p7zip-full \
     python3-apt \
-    python3-distutils \
+    lsb-release \
     python3-pip \
     python3-setuptools \
     python3-wheel \
     sudo \
     unzip \
     xvfb \
-    && \
-    pip3 install --no-cache-dir "ansible-core>=2.14" --break-system-packages || \
-    pip3 install --no-cache-dir "ansible-core>=2.14" && \
-    rm -rf /var/lib/apt/lists/*
+    && (pip3 install --no-cache-dir "ansible-core>=2.14" --break-system-packages || \
+        pip3 install --no-cache-dir "ansible-core>=2.14") \
+    && rm -rf /var/lib/apt/lists/*
 {% endif %}
 
 # Copy the role into the container
@@ -61,8 +60,8 @@ RUN ansible-galaxy role install -r requirements.yml && \
         ansible \
         git \
         p7zip-full \
+        lsb-release \
         python3-apt \
-        python3-distutils \
         python3-pip \
         python3-setuptools \
         python3-wheel \
