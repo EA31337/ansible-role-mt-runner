@@ -76,8 +76,6 @@ jobs:
         run: ansible-lint tests/playbooks/docker-containers.yml
       - name: Run Ansible playbook
         env:
-          ANSIBLE_DISPLAY_OK_HOSTS: 'no'
-          ANSIBLE_DISPLAY_SKIPPED_HOSTS: 'no'
           MT_RUNNER_MT5_LOGIN: ${{ secrets.MT_RUNNER_MT5_LOGIN || '12345' }}
           MT_RUNNER_MT5_PASSWORD: ${{ secrets.MT_RUNNER_MT5_PASSWORD || 'SETME' }}
           MT_RUNNER_MT5_SERVER: ${{ secrets.MT_RUNNER_MT5_SERVER || 'MetaQuotes-Demo' }}

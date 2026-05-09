@@ -73,8 +73,6 @@ jobs:
         env:
           ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
           ANSIBLE_COLLECTIONS_PATH: collections
-          ANSIBLE_DISPLAY_OK_HOSTS: 'no'
-          ANSIBLE_DISPLAY_SKIPPED_HOSTS: 'no'
           ANSIBLE_FORCE_COLOR: '1'
           ANSIBLE_STDOUT_CALLBACK: ${{ runner.debug == '1' && 'debug' || 'community.general.unixy' }}
           ANSIBLE_VERBOSITY: '0'

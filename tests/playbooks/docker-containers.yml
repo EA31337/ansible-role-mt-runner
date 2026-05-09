@@ -23,6 +23,7 @@
           - /tmp/ansible-tmp-{{ inventory_hostname }}:/root/.ansible/tmp
           - /tmp/cache-{{ inventory_hostname }}:/root/.cache
       delegate_to: localhost
+      no_log: "{{ mt_runner_no_log }}"
       vars:
         # Use system Python with requests installed for controller-side Docker modules.
         ansible_python_interpreter: '{{ controller_python }}'
@@ -108,3 +109,4 @@
         state: stopped
       delegate_to: localhost
       failed_when: false
+      no_log: "{{ mt_runner_no_log }}"

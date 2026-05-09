@@ -6,6 +6,7 @@
   gather_facts: false
   collections: [community.docker]
   vars:
+    mt_runner_no_log: "{{ ansible_verbosity | default(0) < 1 }}"
     # Use controller Python (Ansible's interpreter)
     ansible_python_interpreter: '{{ ansible_playbook_python }}'
   pre_tasks:
@@ -17,6 +18,7 @@
       changed_when: >-
         pip_install_result.rc == 0
         and 'Successfully installed' in pip_install_result.stdout
+      no_log: "{{ mt_runner_no_log }}"
   tasks:
     - name: Stop and remove test containers
       community.docker.docker_container:
@@ -28,6 +30,7 @@
       register: container_results
       async: 7200
       poll: 0
+      no_log: "{{ mt_runner_no_log }}"
     - name: Wait for instance(s) deletion to complete
       ansible.builtin.async_status:
         jid: '{{ item.ansible_job_id }}'
