@@ -55,17 +55,14 @@ RUN ansible-galaxy role install -r requirements.yml && \
     ansible-playbook /tmp/playbook.yml -e mt_runner_run_terminal=false && \
     rm /tmp/playbook.yml && \
     { [ ! -f /usr/bin/apt-get ] || { \
+    export SUDO_FORCE_REMOVE=yes && \
     apt-get update && \
     apt-get purge -y --auto-remove \
         ansible \
         git \
-        p7zip-full \
-        lsb-release \
-        python3-apt \
         python3-pip \
         python3-setuptools \
-        python3-wheel \
-        sudo && \
+        python3-wheel && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*; }; }
 
