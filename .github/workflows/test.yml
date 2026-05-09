@@ -78,11 +78,13 @@ jobs:
         working-directory: ${{ github.repository }}
       - name: Run Ansible playbook
         env:
+          ANSIBLE_DISPLAY_OK_HOSTS: 'no'
+          ANSIBLE_DISPLAY_SKIPPED_HOSTS: 'no'
           MT_RUNNER_MT5_LOGIN: ${{ secrets.MT_RUNNER_MT5_LOGIN || '12345' }}
           MT_RUNNER_MT5_PASSWORD: ${{ secrets.MT_RUNNER_MT5_PASSWORD || 'SETME' }}
           MT_RUNNER_MT5_SERVER: ${{ secrets.MT_RUNNER_MT5_SERVER || 'MetaQuotes-Demo' }}
         run: |
-          ansible-playbook -i tests/inventory/docker-containers.yml tests/playbooks/docker-containers.yml -vvv
+          ansible-playbook -i tests/inventory/docker-containers.yml tests/playbooks/docker-containers.yml
         working-directory: ${{ github.repository }}
 
       # Debug with tmate on failure when debug logging is enabled.

@@ -57,19 +57,22 @@
             source: build
             force_source: true
           loop: "{{ molecule_yml.platforms | selectattr('dockerfile', 'defined') | list }}"
+          loop_control:
+            label: '{{ item.name }}'
+          no_log: '{{ ansible_verbosity | default(0) < 1 }}'
     - name: Ensure test containers are running
       community.docker.docker_container:
         name: '{{ item.name }}'
         image: "{{ (item.name ~ ':molecule') if item.dockerfile is defined else item.image }}"
         command: sleep infinity
         init: '{{ item.init | default(omit) }}'
-        privileged: "{{ item.privileged | default(false) }}"
+        privileged: '{{ item.privileged | default(false) }}'
         # Relaxed seccomp/apparmor for compatibility.
         security_opts: >-
           {{ ['seccomp=unconfined', 'apparmor=unconfined']
              if item.privileged | default(false) else omit }}
         recreate: true
-        pull: "{{ false if item.dockerfile is defined else true }}"
+        pull: '{{ false if item.dockerfile is defined else true }}'
         # Mount host CA certificates and temp/cache dirs to prevent "No space left on device" errors.
         volumes: >-
           {{
@@ -79,6 +82,9 @@
              '/tmp/cache-' ~ item.name ~ ':/root/.cache']
           }}
       loop: '{{ molecule_yml.platforms }}'
+      loop_control:
+        label: '{{ item.name }}'
+      no_log: '{{ ansible_verbosity | default(0) < 1 }}'
       register: container_results
       # Allow enough time for image pulls/builds in constrained CI environments.
       async: 7200

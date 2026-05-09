@@ -4,6 +4,7 @@
   gather_facts: true
   roles:
     - role: ea31337.mt_runner
+      no_log: '{{ ansible_verbosity | default(0) < 1 }}'
       vars:
         # noqa: var-naming[no-role-prefix]
         metatrader_version: 5

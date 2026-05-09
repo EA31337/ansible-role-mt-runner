@@ -32,11 +32,7 @@ galaxy_info:
   namespace: ea31337
   platforms:
     - name: Debian
-      versions:
-        - all
-        - bullseye
-        - buster
-        - stretch
+      versions: [all, bullseye, buster, stretch]
     - name: Ubuntu
       versions: [all, bionic, focal, xenial]
   role_name: mt_runner
