@@ -76,6 +76,7 @@ For project overview and install instructions, see [README.md](README.md).
 | `debian-latest` | `ghcr.io/ea31337/ansible-role-xvfb:1.0.4-debian-latest` | Wine/Xvfb-enabled image |
 | `ubuntu-jammy` | `ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-jammy` | Wine/Xvfb-enabled image |
 | `ubuntu-noble` | `ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-noble` | Wine/Xvfb-enabled image |
+
 ### Running Tests
 
 ```bash
@@ -251,5 +252,7 @@ If network requests fail during molecule tests:
 ## References
 
 - Project documentation: [README.md](README.md)
+- Project canonical facts: [FACTS.mmd](FACTS.mmd)
+- Project flow logic: [FLOWS.mmd](FLOWS.mmd)
 - Org baseline: <https://github.com/Cogni-AI-OU/.github/blob/main/AGENTS.md>
 - Agents.md standard: <https://agents.md/>

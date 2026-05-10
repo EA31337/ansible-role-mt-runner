@@ -147,7 +147,7 @@ mt_runner_mt_version: '{{ metatrader_version | default(5) | int }}'
 # Extended timeout (600s) is required to accommodate long-running MetaTrader backtests.
 # Override mt_runner_timeout via inventory or group/host vars if your environment supports a shorter timeout.
 # Conditional no_log to reduce noise unless verbosity is increased.
-mt_runner_no_log: "{{ ansible_verbosity | default(0) < 1 }}"
+mt_runner_no_log: '{{ ansible_verbosity | default(0) < 1 }}'
 mt_runner_timeout: 2400
 wine_install_recommends: false
-xvfb_display: ':0'
+xvfb_display: :0

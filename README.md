@@ -9,6 +9,11 @@
 
 Ansible role to run tests using MT platform.
 
+## Documentation
+
+- [FACTS.mmd](FACTS.mmd): Project facts and canonical state (Mindmap).
+- [FLOWS.mmd](FLOWS.mmd): Flow logic of the role (Flowchart).
+
 ## Requirements
 
 This role requires:
