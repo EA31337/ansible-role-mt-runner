@@ -1,13 +1,20 @@
 ---
 - name: Configure Docker container
-  # Note: Since facts are not gathered, we're checking for ansible_user_id, connection_user or UID instead.
+  # Note: Since facts are not gathered initially, we rely on connection_user or env/fact fallbacks if available.
+  # We use safe access to ansible_facts to prevent "undefined variable" errors.
   become: >-
     {{
       (connection_user | default('root')) != 'root'
-      or (ansible_user_id | default('root')) != 'root'
-      or (ansible_user_uid | default(0) | int) != 0
-      or (((ansible_env | default({}))['UID'] | default(0) | int) != 0)
+      or (ansible_facts | default({})).user_id | default('root') != 'root'
+      or (ansible_facts | default({})).user_uid | default(0) | int != 0
+      or ((ansible_facts | default({})).env | default({})).UID | default(0) | int != 0
+      or (
+        ((ansible_facts | default({})).env | default({})).USER
+        | default(((ansible_facts | default({})).env | default({})).LOGNAME | default('root'))
+        != 'root'
+      )
     }}
+
   # Use su as become_method as sudo is not available in all containers.
   become_method: ansible.builtin.su
   gather_facts: false
@@ -76,6 +83,19 @@
   hosts: docker_containers
   become_method: ansible.builtin.su
   gather_facts: true
+  pre_tasks:
+    # TODO: Remove this workaround once legacy roles are updated to use ansible_facts (see #50).
+    - name: Set compatibility facts for legacy roles
+      ansible.builtin.set_fact:
+        ansible_architecture: "{{ ansible_facts.architecture }}"
+        ansible_distribution: "{{ ansible_facts.distribution }}"
+        ansible_distribution_release: "{{ ansible_facts.distribution_release }}"
+        ansible_env: "{{ ansible_facts.env }}"
+        ansible_os_family: "{{ ansible_facts.os_family }}"
+        ansible_system: "{{ ansible_facts.system }}"
+        ansible_user_dir: "{{ ansible_facts.user_dir }}"
+        ansible_user_id: "{{ ansible_facts.user_id }}"
+        ansible_user_uid: "{{ ansible_facts.user_uid }}"
   tags: always
   vars:
     controller_python: '{{ ansible_playbook_python }}'
