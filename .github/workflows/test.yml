@@ -64,7 +64,9 @@ jobs:
             ~/.ansible/roles
             ~/.ansible/collections
       - name: Install Ansible Galaxy requirements
-        run: ansible-galaxy install -r requirements.yml
+        run: |
+          ansible-galaxy role install -r requirements.yml
+          ansible-galaxy collection install -r requirements.yml
       - name: Install Ansible Galaxy local requirements
         run: |
           jinja2 requirements-local.yml.j2 -D "pwd=$PWD" -o requirements-local.yml

@@ -5,7 +5,9 @@ collections:
   - name: community.general  # Required for from_ini and supervisorctl modules.
     version: '>=10.6.0'  # Required by community.general.from_ini filter.
   - name: community.windows
+    version: '>=2.0.0'
   - name: ansible.windows
+    version: '>=2.0.0'
 roles:
   - name: ea31337.metatrader
     scm: git
