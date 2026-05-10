@@ -71,7 +71,7 @@ on:
 jobs:
   cogni-ai-agent:
     name: Run Cogni AI agent
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-noble
     permissions:
       contents: write
       id-token: write
@@ -140,7 +140,7 @@ jobs:
             || inputs.prompt }}
   cogni-ai-summary:
     name: Generate Session Summary
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-noble
     needs: cogni-ai-agent
     if: always()
     permissions:

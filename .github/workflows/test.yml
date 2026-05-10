@@ -41,7 +41,7 @@ concurrency:
 jobs:
   test:
     name: Test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-noble
     steps:
       - uses: actions/checkout@v6
       - name: Set up Python

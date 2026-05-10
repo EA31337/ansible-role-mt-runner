@@ -15,7 +15,7 @@ on:
       - .devcontainer/requirements.txt
 jobs:
   copilot-setup-steps:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-noble
     timeout-minutes: 120
     permissions:
       contents: read
