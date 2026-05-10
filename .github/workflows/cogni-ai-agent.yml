@@ -11,8 +11,28 @@ on:
     types: [opened, reopened]
   pull_request_review_comment:
     types: [created]
+  workflow_call:
+    inputs:
+      agent:
+        default: cogni-ai-architect
+        description: Agent to use.
+        required: false
+        type: string
   workflow_dispatch:
     inputs:
+      agent:
+        default: cogni-ai-architect
+        description: Agent to use.
+        options:
+          - cogni-ai-architect
+          - cogni-ai-brain-ops
+          - cogni-ai-code-reviewer
+          - cogni-ai-devops
+          - cogni-ai-manager
+          - cogni-ai-plan-reviewer
+          - default
+        required: false
+        type: choice
       model:
         default: opencode/gemini-3-flash
         description: Model to use for OpenCode
@@ -73,10 +93,10 @@ jobs:
         run: python -m pip install --user -r .devcontainer/requirements.txt
       - name: Ensure local bin on PATH
         run: echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-      # See: <https://github.com/Cogni-AI-OU/cogni-ai-agent-action>
       - name: Run Cogni AI Agent
         uses: Cogni-AI-OU/cogni-ai-agent-action@main
         with:
+          agent: ${{ inputs.agent || 'cogni-ai-architect' }}
           model: ${{ inputs.model || 'opencode/gemini-3-flash' }}
           opencode-api-key: ${{ secrets.OPENCODE_API_KEY }}  # <https://opencode.ai/auth>
           permissions: |-
