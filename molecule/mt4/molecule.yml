@@ -33,9 +33,6 @@ platforms:
   - name: ubuntu-noble
     image: ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-noble
     init: true
-  - name: ubuntu-latest
-    image: ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-latest
-    init: true
 provisioner:
   config_options:
     defaults:

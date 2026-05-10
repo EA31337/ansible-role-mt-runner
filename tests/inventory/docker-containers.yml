@@ -3,10 +3,6 @@ all:
   children:
     docker_containers:
       hosts:
-        mt-runner-on-ubuntu-latest:
-          ansible_connection: docker
-          ansible_host: mt-runner-on-ubuntu-latest
-          ansible_python_interpreter: /usr/bin/python3
         mt-runner-on-ubuntu-noble:
           ansible_connection: docker
           ansible_host: mt-runner-on-ubuntu-noble
