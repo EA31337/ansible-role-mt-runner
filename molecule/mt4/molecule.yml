@@ -19,7 +19,7 @@ lint: |
   ansible-lint
 platforms:
   - name: debian-latest
-    image: debian:latest
+    image: ghcr.io/ea31337/ansible-role-xvfb:1.0.4-debian-latest
     init: true
   - env:
       MT_RUNNER_MT4_LOGIN: ${MT_RUNNER_MT4_LOGIN:-12345}
@@ -27,11 +27,11 @@ platforms:
       MT_RUNNER_MT4_SERVER: ${MT_RUNNER_MT4_SERVER:-MetaQuotes-Demo}
       WINEDLLOVERRIDES: mscoree,mshtml=,winebrowser.exe=,dbghelp=n
     groups: [mt4]
-    image: ubuntu:jammy
+    image: ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-jammy
     name: ubuntu-jammy
     init: true
   - name: ubuntu-noble
-    image: ubuntu:noble
+    image: ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-noble
     init: true
 provisioner:
   config_options:
