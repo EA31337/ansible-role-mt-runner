@@ -73,9 +73,9 @@ For project overview and install instructions, see [README.md](README.md).
 
 | Container | Image | Notes |
 | --------- | ----- | ----- |
-| `debian-latest` | `ghcr.io/ea31337/ansible-role-xvfb:1.0.4-debian-latest` | Wine/Xvfb-enabled image |
-| `ubuntu-jammy` | `ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-jammy` | Wine/Xvfb-enabled image |
-| `ubuntu-noble` | `ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-noble` | Wine/Xvfb-enabled image |
+| `debian-latest` | `ghcr.io/ea31337/ansible-role-wine:1.0.4-debian-latest` | Wine-enabled image |
+| `ubuntu-jammy` | `ghcr.io/ea31337/ansible-role-wine:1.0.4-ubuntu-jammy` | Wine-enabled image |
+| `ubuntu-noble` | `ghcr.io/ea31337/ansible-role-wine:1.0.4-ubuntu-noble` | Wine-enabled image |
 ### Running Tests
 
 ```bash
