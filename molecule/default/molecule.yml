@@ -46,12 +46,14 @@ provisioner:
       # Ensure collections installed to ./collections are found by ansible-playbook.
       collections_path: >-
         ${MOLECULE_PROJECT_DIRECTORY}/collections:~/.ansible/collections:/usr/share/ansible/collections
+      display_ok_hosts: false
+      display_skipped_hosts: false
       host_key_checking: false
-      # Use the built-in ansible.builtin.default callback with YAML result_format for output
+      # Use the condensed unixy callback.
       remote_tmp: /tmp/.ansible-tmp-$${USER}
       result_format: yaml
-      stdout_callback: ansible.builtin.default
-      verbosity: ${ANSIBLE_VERBOSITY:-2}
+      stdout_callback: community.general.unixy
+      verbosity: ${ANSIBLE_VERBOSITY:-0}
   env:
     ANSIBLE_FORCE_COLOR: '1'
     ANSIBLE_LOAD_CALLBACK_PLUGINS: '1'
@@ -62,6 +64,8 @@ provisioner:
         wine_release: stable
     host_vars:
       ubuntu-jammy:
+        wine_version: '10.0'
+      ubuntu-noble:
         wine_version: '10.0'
   ssh_connection:
     pipelining: true
