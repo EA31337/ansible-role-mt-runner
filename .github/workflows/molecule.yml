@@ -48,7 +48,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [ubuntu-noble]
+        platform: [ubuntu-latest]
         scenario: [default, mt4, mt5-ea]
     steps:
       - uses: actions/checkout@v6
