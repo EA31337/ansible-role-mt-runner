@@ -38,9 +38,9 @@ Run all Molecule scenarios and report results as a table.
 
 | Container | Image | Notes |
 | --- | --- | --- |
-| `debian-latest` | `debian:latest` | Uses `apt` |
-| `ubuntu-jammy` | `ubuntu:jammy` | Uses `apt` |
-| `ubuntu-noble` | `ubuntu:noble` | Uses `apt` |
+| `debian-latest` | `ghcr.io/ea31337/ansible-role-xvfb:1.0.4-debian-latest` | Uses `apt` |
+| `ubuntu-jammy` | `ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-jammy` | Uses `apt` |
+| `ubuntu-noble` | `ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-noble` | Uses `apt` |
 
 ## Results Template
 
