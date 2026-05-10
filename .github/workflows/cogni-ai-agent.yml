@@ -30,7 +30,6 @@ on:
           - cogni-ai-devops
           - cogni-ai-manager
           - cogni-ai-plan-reviewer
-          - default
         required: false
         type: choice
       model:
@@ -72,6 +71,8 @@ jobs:
   cogni-ai-agent:
     name: Run Cogni AI agent
     runs-on: ubuntu-latest
+    env:
+      COGN_AI_AGENT: ${{ github.event.inputs.agent || inputs.agent || 'cogni-ai-architect' }}
     permissions:
       contents: write
       id-token: write
@@ -96,7 +97,7 @@ jobs:
       - name: Run Cogni AI Agent
         uses: Cogni-AI-OU/cogni-ai-agent-action@main
         with:
-          agent: ${{ inputs.agent || 'cogni-ai-architect' }}
+          agent: ${{ env.COGN_AI_AGENT }}
           model: ${{ inputs.model || 'opencode/gemini-3-flash' }}
           opencode-api-key: ${{ secrets.OPENCODE_API_KEY }}  # <https://opencode.ai/auth>
           permissions: |-

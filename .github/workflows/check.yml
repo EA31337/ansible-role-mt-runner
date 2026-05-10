@@ -4,9 +4,23 @@ name: Check
 # yamllint disable-line rule:truthy
 on:
   pull_request:
-    paths-ignore: [.devcontainer/**, .github/*.json]
+    paths-ignore:
+      - .devcontainer/**
+      - .github/*.json
+      - '**.cfg'
+      - '**.md'
+      - .*
+      - '!.github/workflows/**'
+      - LICENSE
   push:
-    paths-ignore: [.devcontainer/**, .github/*.json]
+    paths-ignore:
+      - .devcontainer/**
+      - .github/*.json
+      - '**.cfg'
+      - '**.md'
+      - .*
+      - '!.github/workflows/**'
+      - LICENSE
   schedule:
     - cron: 0 0 * * 1  # Run every Monday at 00:00 UTC
   workflow_call:

@@ -15,6 +15,7 @@ on:
       - '**.cfg'
       - '**.md'
       - .*
+      - '!.github/workflows/**'
       - LICENSE
       - Pipfile*
       - requirements-local.yml.j2
@@ -31,6 +32,7 @@ on:
       - '**.cfg'
       - '**.md'
       - .*
+      - '!.github/workflows/**'
       - LICENSE
       - Pipfile*
       - requirements-local.yml.j2
