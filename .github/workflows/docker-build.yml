@@ -14,7 +14,7 @@ jobs:
     permissions:
       contents: read
       packages: write
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -84,8 +84,4 @@ jobs:
           - arch: linux/amd64
             image: ubuntu:noble
             is_default: true
-            platform: ubuntu-latest
-          - arch: linux/amd64
-            image: ubuntu:noble
-            is_default: false
             platform: ubuntu-noble
