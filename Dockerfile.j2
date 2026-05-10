@@ -52,7 +52,7 @@ COPY README.md .
 # Create a local playbook to apply the role
 RUN ansible-galaxy role install -r requirements.yml && \
     ansible-galaxy collection install -r requirements.yml --upgrade && \
-    printf -- "---\n- hosts: localhost\n  connection: local\n  roles:\n    - role: .\n" > /tmp/playbook.yml && \
+    printf -- "---\n- hosts: localhost\n  connection: local\n  roles:\n    - role: /etc/ansible/roles/ea31337.mt_runner\n" > /tmp/playbook.yml && \
     ansible-playbook /tmp/playbook.yml -e mt_runner_run_terminal=false && \
     rm /tmp/playbook.yml && \
     { [ ! -f /usr/bin/apt-get ] || { \
