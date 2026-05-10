@@ -53,7 +53,11 @@
   pre_tasks:
     - name: Bootstrap Python in container
       ansible.builtin.raw: |
+        if [ -x /usr/bin/python3 ]; then
+          exit 0
+        fi
         if command -v python3 >/dev/null 2>&1; then
+          ln -sf "$(command -v python3)" /usr/bin/python3
           exit 0
         fi
         if command -v apt-get >/dev/null 2>&1; then
