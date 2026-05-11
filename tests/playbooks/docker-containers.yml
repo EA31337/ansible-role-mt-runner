@@ -10,8 +10,7 @@
       or ((ansible_facts | default({})).env | default({})).UID | default(0) | int != 0
       or (
         ((ansible_facts | default({})).env | default({})).USER
-        | default(((ansible_facts | default({})).env | default({})).LOGNAME | default('root'))
-        != 'root'
+        | default(((ansible_facts | default({})).env | default({})).LOGNAME | default('root')) != 'root'
       )
     }}
 
