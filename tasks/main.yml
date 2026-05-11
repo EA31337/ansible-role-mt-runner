@@ -5,7 +5,7 @@
     - name: Install winbind package (Debian/Ubuntu)
       ansible.builtin.apt:
         allow_unauthenticated: true
-        install_recommends: "{{ wine_install_recommends | bool }}"
+        install_recommends: "{{ 'yes' if wine_install_recommends else 'no' }}"
         name: [winbind]
         state: present
         update_cache: true
@@ -125,7 +125,6 @@
   async: '{{ mt_runner_timeout }}'
   poll: 0
   changed_when: false
-  when: mt_runner_run_terminal | bool
   ansible.builtin.command:
     argv:
       - '{{ mt_runner_cmd_prefix }}'
@@ -147,14 +146,13 @@
     WINEDEBUG: warn-all,fixme-all,-alsa,-ole,-toolbar
   register: cmd_terminal_async
 - name: Check for terminal log
-  when: mt_runner_run_terminal | bool
   block:
     - name: Wait for the terminal log file to be created
       ansible.builtin.wait_for:
         delay: 30
         path: |-
           {{ mt_runner_mt_path ~ '/logs/' ~ ('%Y%m%d' |
-             strftime(lookup('pipe', 'date +%s') | int)) }}.log
+             strftime(ansible_facts.date_time.epoch | default(lookup('pipe', 'date +%s')) | int)) }}.log
         sleep: 10
         state: present
         timeout: 240
@@ -177,7 +175,6 @@
       register: cmd_iconv_res
       when: (mt_runner_mt_version | int) == 5
 - name: Wait for test results
-  when: mt_runner_run_terminal | bool
   block:
     - name: Wait until terminal exits
       ansible.builtin.async_status:

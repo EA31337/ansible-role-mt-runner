@@ -11,7 +11,6 @@ on:
       - .github/workflows/check.yml
       - .github/workflows/cogni-ai-agent.yml
       - .github/workflows/copilot-setup-steps.yml
-      - .github/workflows/galaxy-publish.yml
       - .github/workflows/molecule.yml
       - '**.cfg'
       - '**.md'
@@ -28,7 +27,6 @@ on:
       - .github/workflows/check.yml
       - .github/workflows/cogni-ai-agent.yml
       - .github/workflows/copilot-setup-steps.yml
-      - .github/workflows/galaxy-publish.yml
       - .github/workflows/molecule.yml
       - '**.cfg'
       - '**.md'
@@ -64,9 +62,7 @@ jobs:
             ~/.ansible/roles
             ~/.ansible/collections
       - name: Install Ansible Galaxy requirements
-        run: |
-          ansible-galaxy role install -r requirements.yml
-          ansible-galaxy collection install -r requirements.yml
+        run: ansible-galaxy install -r requirements.yml
       - name: Install Ansible Galaxy local requirements
         run: |
           jinja2 requirements-local.yml.j2 -D "pwd=$PWD" -o requirements-local.yml
