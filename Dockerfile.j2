@@ -53,20 +53,21 @@ COPY README.md .
 # Create a local playbook to apply the role
 RUN ansible-galaxy role install -r requirements.yml && \
     ansible-galaxy collection install -r requirements.yml --upgrade && \
-    printf -- "---\n- hosts: localhost\n  connection: local\n  roles:\n    - role: /etc/ansible/roles/ea31337.mt_runner\n" > /tmp/playbook.yml && \
-    ansible-playbook /tmp/playbook.yml -e mt_runner_run_terminal=false && \
+    printf -- "---\n- hosts: localhost\n  connection: local\n  roles:\n    - role: /etc/ansible/roles/ea31337.mt_runner\n      mt_runner_run_terminal: false\n" > /tmp/playbook.yml && \
+    ansible-playbook /tmp/playbook.yml && \
     rm /tmp/playbook.yml && \
-    { [ ! -f /usr/bin/apt-get ] || { \
-    export SUDO_FORCE_REMOVE=yes && \
-    apt-get update && \
-    apt-get purge -y --auto-remove \
-        ansible \
-        git \
-        python3-pip \
-        python3-setuptools \
-        python3-wheel && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*; }; }
+    if [ -f /usr/bin/apt-get ]; then \
+        export SUDO_FORCE_REMOVE=yes && \
+        apt-get update && \
+        apt-get purge -y --auto-remove \
+            ansible \
+            git \
+            python3-pip \
+            python3-setuptools \
+            python3-wheel && \
+        apt-get clean && \
+        rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*; \
+    fi
 
 # Default CMD
 CMD ["wine", "--version"]

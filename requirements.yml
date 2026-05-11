@@ -1,11 +1,11 @@
 ---
 collections:
   - name: ansible.posix  # Required for profile_tasks callback plugin.
+  - name: ansible.windows
   - name: community.docker
   - name: community.general  # Required for from_ini and supervisorctl modules.
     version: '>=10.6.0'  # Required by community.general.from_ini filter.
   - name: community.windows
-  - name: ansible.windows
 roles:
   - name: ea31337.metatrader
     scm: git

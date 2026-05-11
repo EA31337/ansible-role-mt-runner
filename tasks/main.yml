@@ -122,7 +122,7 @@
         url: '{{ item.url }}'
       loop: '{{ mt_runner_get_url_list }}'
 - name: Runs terminal
-  when: mt_runner_run_terminal | default(true) | bool
+  when: mt_runner_run_terminal | bool
   async: '{{ mt_runner_timeout }}'
   poll: 0
   changed_when: false
@@ -147,7 +147,7 @@
     WINEDEBUG: warn-all,fixme-all,-alsa,-ole,-toolbar
   register: cmd_terminal_async
 - name: Check for terminal log
-  when: mt_runner_run_terminal | default(true) | bool
+  when: mt_runner_run_terminal | bool
   block:
     - name: Wait for the terminal log file to be created
       ansible.builtin.wait_for:
@@ -177,7 +177,7 @@
       register: cmd_iconv_res
       when: (mt_runner_mt_version | int) == 5
 - name: Wait for test results
-  when: mt_runner_run_terminal | default(true) | bool
+  when: mt_runner_run_terminal | bool
   block:
     - name: Wait until terminal exits
       ansible.builtin.async_status:
