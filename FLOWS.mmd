@@ -2,7 +2,7 @@
 flowchart TD
     DocRef>"See README.md for full role documentation"]
 
-    subgraph CI_Pipeline [CI Pipeline Matrix]
+    subgraph CI_Pipeline [CI Pipeline]
         direction TB
         CI_Trigger(["GitHub Actions Trigger"]) --> CI_Check["Run Check (Linters)"]
         CI_Check --> CI_Test["Run Test (Docker)"]
@@ -17,7 +17,7 @@ flowchart TD
         Molecule_Matrix --> CI_Complete(["CI Success"])
     end
 
-    subgraph Molecule_Testing_Flow [Molecule Testing Sequence]
+    subgraph Molecule_Testing_Flow [Molecule Testing Flow]
         direction TB
         M_Start["molecule test -s <scenario>"] --> M_Destroy["molecule destroy"]
         M_Destroy --> M_Syntax["molecule syntax"]
@@ -29,7 +29,7 @@ flowchart TD
         M_Verify --> M_Destroy_Final["molecule destroy"]
     end
 
-    subgraph Ansible_Role_Execution [Ansible Role Execution Flow]
+    subgraph Ansible_Role_Execution [Ansible Role Execution]
         direction TB
         Start(["`Start (**tasks/main.yml**)`"]) --> OSCheck1{"Is OS Windows?"}
         OSCheck1 --|No|--> InstallWinbind["Install winbind (Debian/Ubuntu)"]
