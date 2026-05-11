@@ -49,12 +49,8 @@
       vars:
         # Use system Python with requests installed for controller-side Docker modules.
         ansible_python_interpreter: '{{ controller_python }}'
-    - name: Install Python 3 on Ubuntu/Debian
-      ansible.builtin.raw: |
-        test -e "{{ ansible_python_interpreter }}" || \
-        (apt-get update -y -qq && apt-get install -y -qq python3 python3-pip)
-      changed_when: false
-      when: container_image is search("ubuntu") or container_image is search("debian")
+    - name: Install Python 3 for Ansible
+      ansible.builtin.include_tasks: tasks/install-python.yml
     - name: Gather facts
       ansible.builtin.setup:
     - name: Run diagnostics
@@ -82,8 +78,14 @@
 - name: Install ea31337.mt_runner role on all containers
   hosts: docker_containers
   become_method: ansible.builtin.su
-  gather_facts: true
+  gather_facts: false
   pre_tasks:
+    - name: Install Python 3 for Ansible
+      ansible.builtin.include_tasks: tasks/install-python.yml
+
+    - name: Gather facts
+      ansible.builtin.setup:
+
     # TODO: Remove this workaround once legacy roles are updated to use ansible_facts (see #50).
     - name: Set compatibility facts for legacy roles
       ansible.builtin.set_fact:
