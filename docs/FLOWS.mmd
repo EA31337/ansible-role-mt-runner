@@ -32,16 +32,16 @@ flowchart TD
     subgraph Ansible_Role_Execution [Ansible_Role_Execution]
         direction TB
         Start(["`Start (**tasks/main.yml**)`"]) --> OSCheck1{"Is OS Windows?"}
-        OSCheck1 --|No|--> InstallWinbind["Install winbind (Debian/Ubuntu)"]
-        OSCheck1 --|Yes|--> QueryPath["Query MT Platform Path"]
+        OSCheck1 -->|No| InstallWinbind["Install winbind (Debian/Ubuntu)"]
+        OSCheck1 -->|Yes| QueryPath["Query MT Platform Path"]
         InstallWinbind --> QueryPath
         QueryPath --> OSCheck2{"Is OS Windows?"}
-        OSCheck2 --|No|--> ConvertPaths["Convert paths to Unix via winepath"]
-        OSCheck2 --|Yes|--> CreateTesterIni["Create tester.ini"]
+        OSCheck2 -->|No| ConvertPaths["Convert paths to Unix via winepath"]
+        OSCheck2 -->|Yes| CreateTesterIni["Create tester.ini"]
         ConvertPaths --> CreateTesterIni
         CreateTesterIni --> OSCheck3{"Is OS Windows?"}
-        OSCheck3 --|No|--> Cleanup["Clean-up: Kill terminal processes & remove old logs"]
-        OSCheck3 --|Yes|--> EnsureDirs["Ensure destination directories exist"]
+        OSCheck3 -->|No| Cleanup["Clean-up: Kill terminal processes & remove old logs"]
+        OSCheck3 -->|Yes| EnsureDirs["Ensure destination directories exist"]
         Cleanup --> EnsureDirs
         EnsureDirs --> DownloadFiles["Download specified files (get_url)"]
         DownloadFiles --> RunTerminal["Run MT terminal (Async)"]
