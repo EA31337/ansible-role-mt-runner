@@ -51,10 +51,3 @@ flowchart TD
         WaitExit --> PrintFinalLog["Print final terminal log file"]
         PrintFinalLog --> End(["Flush Handlers (Complete)"])
     end
-
-    %% Link to the doc ref
-    Start -.- DocRef
-
-    %% Connect flows
-    CI_Molecule -.-> M_Start
-    M_Converge -.-> Start
