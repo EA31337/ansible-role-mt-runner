@@ -9,7 +9,9 @@ Pipfile.lock
 requirements-local.yml.j2
 # README.md (removed from ignore as it is used in Dockerfile)
 LICENSE
-AGENTS.md
+*.md
+!README.md
+*.mmd
 .ansible-lint
 .markdownlint.yaml
 .pre-commit-config.yaml
