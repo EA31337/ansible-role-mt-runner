@@ -252,7 +252,7 @@ If network requests fail during molecule tests:
 ## References
 
 - Project documentation: [README.md](README.md)
-- Project canonical facts: [FACTS.mmd](FACTS.mmd)
-- Project flow logic: [FLOWS.mmd](FLOWS.mmd)
+- Project canonical facts: [docs/FACTS.mmd](docs/FACTS.mmd)
+- Project flow logic: [docs/FLOWS.mmd](docs/FLOWS.mmd)
 - Org baseline: <https://github.com/Cogni-AI-OU/.github/blob/main/AGENTS.md>
 - Agents.md standard: <https://agents.md/>

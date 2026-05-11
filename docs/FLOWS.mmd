@@ -2,12 +2,12 @@
 flowchart TD
     DocRef>"See README.md for full role documentation"]
 
-    subgraph CI_Pipeline [CI Pipeline]
+    subgraph CI_Pipeline [CI_Pipeline]
         direction TB
         CI_Trigger(["GitHub Actions Trigger"]) --> CI_Check["Run Check (Linters)"]
         CI_Check --> CI_Test["Run Test (Docker)"]
         CI_Test --> CI_Molecule["Run Molecule Matrix"]
-        subgraph Molecule_Matrix [Molecule Matrix]
+        subgraph Molecule_Matrix [Molecule_Matrix]
             direction LR
             M_Debian["debian-latest"]
             M_Jammy["ubuntu-jammy"]
@@ -17,7 +17,7 @@ flowchart TD
         Molecule_Matrix --> CI_Complete(["CI Success"])
     end
 
-    subgraph Molecule_Testing_Flow [Molecule Testing Flow]
+    subgraph Molecule_Testing_Flow [Molecule_Testing_Flow]
         direction TB
         M_Start["molecule test -s <scenario>"] --> M_Destroy["molecule destroy"]
         M_Destroy --> M_Syntax["molecule syntax"]
@@ -29,7 +29,7 @@ flowchart TD
         M_Verify --> M_Destroy_Final["molecule destroy"]
     end
 
-    subgraph Ansible_Role_Execution [Ansible Role Execution]
+    subgraph Ansible_Role_Execution [Ansible_Role_Execution]
         direction TB
         Start(["`Start (**tasks/main.yml**)`"]) --> OSCheck1{"Is OS Windows?"}
         OSCheck1 --|No|--> InstallWinbind["Install winbind (Debian/Ubuntu)"]
