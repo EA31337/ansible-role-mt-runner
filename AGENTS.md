@@ -21,6 +21,8 @@ For project overview and install instructions, see [README.md](README.md).
 | Path | Purpose |
 | ---- | ------- |
 | `tasks/main.yml` | Role entry point; manages MetaTrader runner |
+| `docs/FACTS.mmd` | Project canonical facts (Mindmap) |
+| `docs/FLOWS.mmd` | Project flow logic (Flowchart) |
 | `molecule/default/molecule.yml` | Default Molecule scenario config |
 | `molecule/default/converge.yml` | Converge playbook (all scenarios) |
 | `molecule/default/create.yml` | Custom Docker create (proxy CA injection) |
