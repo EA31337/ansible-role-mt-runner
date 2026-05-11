@@ -5,7 +5,7 @@
   connection: local
   gather_facts: false
   vars:
-    mt_runner_no_log: "{{ ansible_verbosity | default(0) < 1 }}"
+    mt_runner_no_log: '{{ ansible_verbosity | default(0) < 1 }}'
     # Use controller Python (Ansible's interpreter)
     ansible_python_interpreter: '{{ ansible_playbook_python }}'
   tasks:
@@ -14,7 +14,7 @@
         cmd: '{{ ansible_playbook_python }} -m pip install docker>=7.1 requests'
       register: pip_install_result
       changed_when: pip_install_result.rc == 0 and 'Successfully installed' in pip_install_result.stdout
-      no_log: "{{ mt_runner_no_log | default(ansible_verbosity | default(0) < 1) }}"
+      no_log: '{{ mt_runner_no_log | default(ansible_verbosity | default(0) < 1) }}'
     - name: Discover proxy CA certificates on the host
       ansible.builtin.set_fact:
         host_ca_certs: >-
@@ -61,7 +61,7 @@
           loop: "{{ molecule_yml.platforms | selectattr('dockerfile', 'defined') | list }}"
           loop_control:
             label: '{{ item.name }}'
-          no_log: "{{ mt_runner_no_log | default(ansible_verbosity | default(0) < 1) }}"
+          no_log: '{{ mt_runner_no_log | default(ansible_verbosity | default(0) < 1) }}'
     - name: Ensure test containers are running
       community.docker.docker_container:
         name: '{{ item.name }}'
@@ -90,7 +90,7 @@
       # Allow enough time for image pulls/builds in constrained CI environments.
       async: 7200
       poll: 0
-      no_log: "{{ mt_runner_no_log | default(ansible_verbosity | default(0) < 1) }}"
+      no_log: '{{ mt_runner_no_log | default(ansible_verbosity | default(0) < 1) }}'
     - name: Wait for container(s) creation to complete
       ansible.builtin.async_status:
         jid: '{{ item.ansible_job_id }}'

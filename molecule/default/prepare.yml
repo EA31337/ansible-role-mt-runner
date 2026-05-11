@@ -3,7 +3,7 @@
   hosts: all
   gather_facts: false
   vars:
-    mt_runner_no_log: "{{ ansible_verbosity | default(0) < 1 }}"
+    mt_runner_no_log: '{{ ansible_verbosity | default(0) < 1 }}'
   tasks:
     - name: Bootstrap Python and Sudo
       ansible.builtin.raw: |

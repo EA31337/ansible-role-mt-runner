@@ -1,0 +1,53 @@
+%% Flowchart for ea31337.mt_runner role execution
+flowchart TD
+    DocRef>"See README.md for full role documentation"]
+
+    subgraph CI_Pipeline [CI_Pipeline]
+        direction TB
+        CI_Trigger(["GitHub Actions Trigger"]) --> CI_Check["Run Check (Linters)"]
+        CI_Check --> CI_Test["Run Test (Docker)"]
+        CI_Test --> CI_Molecule["Run Molecule Matrix"]
+        subgraph Molecule_Matrix [Molecule_Matrix]
+            direction LR
+            M_Debian["debian-latest"]
+            M_Jammy["ubuntu-jammy"]
+            M_Noble["ubuntu-noble"]
+        end
+        CI_Molecule --> Molecule_Matrix
+        Molecule_Matrix --> CI_Complete(["CI Success"])
+    end
+
+    subgraph Molecule_Testing_Flow [Molecule_Testing_Flow]
+        direction TB
+        M_Start["molecule test -s <scenario>"] --> M_Destroy["molecule destroy"]
+        M_Destroy --> M_Syntax["molecule syntax"]
+        M_Syntax --> M_Create["molecule create"]
+        M_Create --> M_Prepare["molecule prepare"]
+        M_Prepare --> M_Converge["molecule converge"]
+        M_Converge --> M_Idempotence["molecule idempotence"]
+        M_Idempotence --> M_Verify["molecule verify"]
+        M_Verify --> M_Destroy_Final["molecule destroy"]
+    end
+
+    subgraph Ansible_Role_Execution [Ansible_Role_Execution]
+        direction TB
+        Start(["`Start (**tasks/main.yml**)`"]) --> OSCheck1{"Is OS Windows?"}
+        OSCheck1 -->|No| InstallWinbind["Install winbind (Debian/Ubuntu)"]
+        OSCheck1 -->|Yes| QueryPath["Query MT Platform Path"]
+        InstallWinbind --> QueryPath
+        QueryPath --> OSCheck2{"Is OS Windows?"}
+        OSCheck2 -->|No| ConvertPaths["Convert paths to Unix via winepath"]
+        OSCheck2 -->|Yes| CreateTesterIni["Create tester.ini"]
+        ConvertPaths --> CreateTesterIni
+        CreateTesterIni --> OSCheck3{"Is OS Windows?"}
+        OSCheck3 -->|No| Cleanup["Clean-up: Kill terminal processes & remove old logs"]
+        OSCheck3 -->|Yes| EnsureDirs["Ensure destination directories exist"]
+        Cleanup --> EnsureDirs
+        EnsureDirs --> DownloadFiles["Download specified files (get_url)"]
+        DownloadFiles --> RunTerminal["Run MT terminal (Async)"]
+        RunTerminal --> WaitLog["Wait for terminal log to be created"]
+        WaitLog --> PrintLog["Print initial log file"]
+        PrintLog --> WaitExit["Wait until terminal process exits"]
+        WaitExit --> PrintFinalLog["Print final terminal log file"]
+        PrintFinalLog --> End(["Flush Handlers (Complete)"])
+    end
