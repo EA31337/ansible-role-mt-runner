@@ -1,0 +1,52 @@
+%% Project Facts for ea31337.mt_runner
+%% Note: Keep items in alphabetical order.
+mindmap
+  "ea31337.mt_runner"
+    Architecture
+      Collections
+        ansible.posix
+        community.docker
+        community.general
+    Context
+      Driver
+        Docker Molecule
+      "Python 3.10+"
+      Supported_OS
+        Debian
+        Ubuntu
+    Ecosystem
+      Base_Images
+        "ghcr.io/ea31337/ansible-role-xvfb:1.0.4-debian-latest"
+        "ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-jammy"
+        "ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-noble"
+      License
+        "GNU GPL v3"
+      Network
+        Required_Hosts
+          cdn.mql5.com
+          dl.winehq.org
+          download.mql5.com
+          galaxy.ansible.com
+          github.com
+          mt5-trade.metaquotes.net
+          raw.githubusercontent.com
+          trade.mql5.com
+          web.archive.org
+          www.mql5.com
+      Tools
+        Linters
+          actionlint
+          ansible-lint
+          markdownlint
+          yamllint
+    Testing
+      Framework
+        Molecule
+      Platforms
+        debian-latest
+        ubuntu-jammy
+        ubuntu-noble
+      Scenarios
+        default
+        mt4
+        mt5-ea
