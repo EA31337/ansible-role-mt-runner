@@ -196,14 +196,17 @@
     - name: Capture terminal errors
       ansible.builtin.set_fact:
         terminal_errors: >-
-          {{ (res_terminal_logs.stdout | default([]) | join('')
+          {{ (res_terminal_logs.stdout | default('')
           | regex_search(mt_runner_terminal_errors_regex)) | default([]) }}
+      when: res_terminal_logs.stdout is defined
     - name: Checks for errors in the terminal log
       ansible.builtin.fail:
         msg: |
           Error found in terminal log file: {{ task_wait_for_terminal_logs.path }}
           Error: {{ terminal_errors }}
-      when: terminal_errors | default([]) | length > 0
+      when:
+        - terminal_errors is defined
+        - terminal_errors | default([]) | length > 0
 - name: Wait for test results
   when: mt_runner_run_terminal | bool
   block:
@@ -234,9 +237,11 @@
     - name: Capture terminal errors
       ansible.builtin.set_fact:
         terminal_errors: >-
-          {{ (res_terminal_logs.stdout | default([]) | join('')
+          {{ (res_terminal_logs.stdout | default('')
           | regex_search(mt_runner_terminal_errors_regex)) | default([]) }}
-      when: task_wait_for_terminal_logs.path is defined
+      when:
+        - task_wait_for_terminal_logs.path is defined
+        - res_terminal_logs.stdout is defined
     - name: Checks for errors in the terminal log
       ansible.builtin.fail:
         msg: |
@@ -244,6 +249,7 @@
           Error: {{ terminal_errors }}
       when:
         - task_wait_for_terminal_logs.path is defined
+        - terminal_errors is defined
         - terminal_errors | default([]) | length > 0
 
 - name: Process test results

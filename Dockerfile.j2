@@ -18,22 +18,25 @@ RUN nix-channel --update && \
 {% else %}
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    ansible \
     ca-certificates \
     cabextract \
     curl \
     fontconfig \
     git \
+    gnupg \
+    gnupg2 \
+    lsb-release \
     p7zip-full \
     python3 \
     python3-apt \
-    lsb-release \
     python3-pip \
     python3-setuptools \
     python3-wheel \
     sudo \
     unzip \
+    wget \
     xvfb \
+    && python3 -m pip install --upgrade pip \
     && (pip3 install --no-cache-dir "ansible-core>=2.14" --break-system-packages || \
         pip3 install --no-cache-dir "ansible-core>=2.14") \
     && rm -rf /var/lib/apt/lists/*
@@ -51,16 +54,15 @@ COPY requirements.yml .
 COPY README.md .
 
 # Create a local playbook to apply the role
-RUN ansible-galaxy role install -r requirements.yml && \
+RUN ansible-galaxy role install -r requirements.yml --force && \
     ansible-galaxy collection install -r requirements.yml --upgrade && \
     printf -- "---\n- hosts: localhost\n  connection: local\n  roles:\n    - role: /etc/ansible/roles/ea31337.mt_runner\n      mt_runner_run_terminal: false\n" > /tmp/playbook.yml && \
-    ansible-playbook /tmp/playbook.yml && \
+    ANSIBLE_PYTHON_INTERPRETER=auto_silent ansible-playbook /tmp/playbook.yml && \
     rm /tmp/playbook.yml && \
     if [ -f /usr/bin/apt-get ]; then \
         export SUDO_FORCE_REMOVE=yes && \
         apt-get update && \
         apt-get purge -y --auto-remove \
-            ansible \
             git \
             python3-pip \
             python3-setuptools \
