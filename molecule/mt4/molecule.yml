@@ -18,8 +18,14 @@ lint: |
   molecule syntax
   ansible-lint
 platforms:
-  - name: debian-latest
-    image: ghcr.io/ea31337/ansible-role-wine:1.0.4-debian-latest
+  - env:
+      MT_RUNNER_MT4_LOGIN: ${MT_RUNNER_MT4_LOGIN:-12345}
+      MT_RUNNER_MT4_PASSWORD: ${MT_RUNNER_MT4_PASSWORD:-SETME}
+      MT_RUNNER_MT4_SERVER: ${MT_RUNNER_MT4_SERVER:-MetaQuotes-Demo}
+      WINEDLLOVERRIDES: mscoree,mshtml=,winebrowser.exe=,dbghelp=n
+    groups: [mt4]
+    image: ${MOLECULE_IMAGE_DEBIAN:-ghcr.io/ea31337/ansible-role-wine:1.0.4-debian-latest}
+    name: debian-latest
     init: true
   - env:
       MT_RUNNER_MT4_LOGIN: ${MT_RUNNER_MT4_LOGIN:-12345}
@@ -27,11 +33,17 @@ platforms:
       MT_RUNNER_MT4_SERVER: ${MT_RUNNER_MT4_SERVER:-MetaQuotes-Demo}
       WINEDLLOVERRIDES: mscoree,mshtml=,winebrowser.exe=,dbghelp=n
     groups: [mt4]
-    image: ghcr.io/ea31337/ansible-role-wine:1.0.4-ubuntu-jammy
+    image: ${MOLECULE_IMAGE_UBUNTU_JAMMY:-ghcr.io/ea31337/ansible-role-wine:1.0.4-ubuntu-jammy}
     name: ubuntu-jammy
     init: true
-  - name: ubuntu-noble
-    image: ghcr.io/ea31337/ansible-role-wine:1.0.4-ubuntu-noble
+  - env:
+      MT_RUNNER_MT4_LOGIN: ${MT_RUNNER_MT4_LOGIN:-12345}
+      MT_RUNNER_MT4_PASSWORD: ${MT_RUNNER_MT4_PASSWORD:-SETME}
+      MT_RUNNER_MT4_SERVER: ${MT_RUNNER_MT4_SERVER:-MetaQuotes-Demo}
+      WINEDLLOVERRIDES: mscoree,mshtml=,winebrowser.exe=,dbghelp=n
+    groups: [mt4]
+    image: ${MOLECULE_IMAGE_UBUNTU_NOBLE:-ghcr.io/ea31337/ansible-role-wine:1.0.4-ubuntu-noble}
+    name: ubuntu-noble
     init: true
 provisioner:
   config_options:

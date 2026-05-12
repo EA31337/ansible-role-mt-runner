@@ -66,13 +66,20 @@
     mt_runner_no_log: '{{ ansible_verbosity | default(0) < 1 }}'
     controller_python: '{{ ansible_playbook_python }}'
     container_image_map:
-      mt-runner-on-debian-latest: ghcr.io/ea31337/ansible-role-wine:1.0.4-debian-latest
-      mt-runner-on-ubuntu-jammy: ghcr.io/ea31337/ansible-role-wine:1.0.4-ubuntu-jammy
-      mt-runner-on-ubuntu-noble: ghcr.io/ea31337/ansible-role-wine:1.0.4-ubuntu-noble
+      mt-runner-on-debian-latest: >-
+        {{ lookup('env', 'MOLECULE_IMAGE_DEBIAN')
+           | default('ghcr.io/ea31337/ansible-role-wine:1.0.4-debian-latest', true) }}
+      mt-runner-on-ubuntu-jammy: >-
+        {{ lookup('env', 'MOLECULE_IMAGE_UBUNTU_JAMMY')
+           | default('ghcr.io/ea31337/ansible-role-wine:1.0.4-ubuntu-jammy', true) }}
+      mt-runner-on-ubuntu-noble: >-
+        {{ lookup('env', 'MOLECULE_IMAGE_UBUNTU_NOBLE')
+           | default('ghcr.io/ea31337/ansible-role-wine:1.0.4-ubuntu-noble', true) }}
     container_image: >-
       {{
         container_image_map[inventory_hostname]
-        | default('ghcr.io/ea31337/ansible-role-wine:1.0.4-ubuntu-noble')
+        | default(lookup('env', 'MOLECULE_IMAGE_UBUNTU_NOBLE')
+          | default('ghcr.io/ea31337/ansible-role-wine:1.0.4-ubuntu-noble', true))
       }}
 - name: Install ea31337.mt_runner role on all containers
   hosts: docker_containers
