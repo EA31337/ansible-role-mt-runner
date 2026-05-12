@@ -25,7 +25,9 @@
           beautifulsoup4 chardet docker>=7.1 requests
       when: pip_install_result.rc != 0
       register: pip_install_result_fallback
-      changed_when: pip_install_result_fallback.rc == 0 and 'Successfully installed' in pip_install_result_fallback.stdout
+      changed_when: >-
+        pip_install_result_fallback.rc == 0
+        and 'Successfully installed' in pip_install_result_fallback.stdout
       no_log: '{{ mt_runner_no_log | default(ansible_verbosity | default(0) < 1) }}'
     - name: Discover proxy CA certificates on the host
       ansible.builtin.set_fact:
@@ -42,7 +44,7 @@
     - name: Prepare build context for custom images and CA certificates
       when:
         - (molecule_yml.platforms | selectattr('dockerfile', 'defined') | list |
-          length > 0) or (host_ca_certs | length > 0)
+          length > 0) or (host_ca_certs | default([], true) | length > 0)
       block:
         - name: Ensure build context directory exists
           ansible.builtin.file:
@@ -91,7 +93,7 @@
         volumes: >-
           {{
             ([molecule_ephemeral_directory ~ '/ca-certificates:/usr/local/share/ca-certificates:ro']
-              if host_ca_certs | length > 0 else []) +
+              if host_ca_certs | default([], true) | length > 0 else []) +
             ['/tmp/ansible-tmp-' ~ item.name ~ ':/root/.ansible/tmp',
              '/tmp/cache-' ~ item.name ~ ':/root/.cache']
           }}

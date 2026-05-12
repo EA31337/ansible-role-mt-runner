@@ -36,9 +36,8 @@ RUN apt-get update && \
     unzip \
     wget \
     xvfb \
-    && python3 -m pip install --upgrade pip --break-system-packages \
-    && (pip3 install --no-cache-dir "ansible-core>=2.14" beautifulsoup4 chardet --break-system-packages || \
-        pip3 install --no-cache-dir "ansible-core>=2.14" beautifulsoup4 chardet) \
+    && (python3 -m pip install --no-cache-dir "ansible-core>=2.14" beautifulsoup4 chardet --break-system-packages || \
+        python3 -m pip install --no-cache-dir "ansible-core>=2.14" beautifulsoup4 chardet) \
     && rm -rf /var/lib/apt/lists/*
 {% endif %}
 
