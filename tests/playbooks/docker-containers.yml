@@ -11,8 +11,7 @@
       or (
         ((ansible_facts | default({})).env | default({})).USER
         | default(((ansible_facts | default({})).env | default({})).LOGNAME | default('root'))
-        != 'root'
-      )
+      ) != 'root'
     }}
 
   # Use su as become_method as sudo is not available in all containers.
@@ -30,7 +29,7 @@
           - /tmp/ansible-tmp-{{ inventory_hostname }}:/root/.ansible/tmp
           - /tmp/cache-{{ inventory_hostname }}:/root/.cache
       delegate_to: localhost
-      no_log: "{{ mt_runner_no_log | default(ansible_verbosity | default(0) < 1) }}"
+      no_log: '{{ mt_runner_no_log | default(ansible_verbosity | default(0) < 1) }}'
       vars:
         # Use system Python with requests installed for controller-side Docker modules.
         ansible_python_interpreter: '{{ controller_python }}'
@@ -44,17 +43,13 @@
       changed_when: false
       delay: 2
       delegate_to: localhost
-      no_log: "{{ mt_runner_no_log | default(ansible_verbosity | default(0) < 1) }}"
+      no_log: '{{ mt_runner_no_log | default(ansible_verbosity | default(0) < 1) }}'
       retries: 10
       vars:
         # Use system Python with requests installed for controller-side Docker modules.
         ansible_python_interpreter: '{{ controller_python }}'
-    - name: Install Python 3 on Ubuntu/Debian
-      ansible.builtin.raw: |
-        test -e "{{ ansible_python_interpreter }}" || \
-        (apt-get update -y -qq && apt-get install -y -qq python3 python3-pip)
-      changed_when: false
-      when: container_image is search("ubuntu") or container_image is search("debian")
+    - name: Install Python 3 for Ansible
+      ansible.builtin.include_tasks: tasks/install-python.yml
     - name: Gather facts
       ansible.builtin.setup:
     - name: Run diagnostics
@@ -64,11 +59,11 @@
         name: [python3, python3-pip, python3-setuptools]
         state: present
         update_cache: true
-      no_log: "{{ mt_runner_no_log | default(ansible_verbosity | default(0) < 1) }}"
+      no_log: '{{ mt_runner_no_log | default(ansible_verbosity | default(0) < 1) }}'
       when: container_image is search("ubuntu") or container_image is search("debian")
   tags: always
   vars:
-    mt_runner_no_log: "{{ ansible_verbosity | default(0) < 1 }}"
+    mt_runner_no_log: '{{ ansible_verbosity | default(0) < 1 }}'
     controller_python: '{{ ansible_playbook_python }}'
     container_image_map:
       mt-runner-on-debian-latest: ghcr.io/ea31337/ansible-role-wine:1.0.4-debian-latest
@@ -82,20 +77,26 @@
 - name: Install ea31337.mt_runner role on all containers
   hosts: docker_containers
   become_method: ansible.builtin.su
-  gather_facts: true
+  gather_facts: false
   pre_tasks:
+    - name: Install Python 3 for Ansible
+      ansible.builtin.include_tasks: tasks/install-python.yml
+
+    - name: Gather facts
+      ansible.builtin.setup:
+
     # TODO: Remove this workaround once legacy roles are updated to use ansible_facts (see #50).
     - name: Set compatibility facts for legacy roles
       ansible.builtin.set_fact:
-        ansible_architecture: "{{ ansible_facts.architecture }}"
-        ansible_distribution: "{{ ansible_facts.distribution }}"
-        ansible_distribution_release: "{{ ansible_facts.distribution_release }}"
-        ansible_env: "{{ ansible_facts.env }}"
-        ansible_os_family: "{{ ansible_facts.os_family }}"
-        ansible_system: "{{ ansible_facts.system }}"
-        ansible_user_dir: "{{ ansible_facts.user_dir }}"
-        ansible_user_id: "{{ ansible_facts.user_id }}"
-        ansible_user_uid: "{{ ansible_facts.user_uid }}"
+        ansible_architecture: '{{ ansible_facts.architecture }}'
+        ansible_distribution: '{{ ansible_facts.distribution }}'
+        ansible_distribution_release: '{{ ansible_facts.distribution_release }}'
+        ansible_env: '{{ ansible_facts.env }}'
+        ansible_os_family: '{{ ansible_facts.os_family }}'
+        ansible_system: '{{ ansible_facts.system }}'
+        ansible_user_dir: '{{ ansible_facts.user_dir }}'
+        ansible_user_id: '{{ ansible_facts.user_id }}'
+        ansible_user_uid: '{{ ansible_facts.user_uid }}'
   tags: always
   vars:
     controller_python: '{{ ansible_playbook_python }}'
@@ -132,4 +133,4 @@
         state: stopped
       delegate_to: localhost
       failed_when: false
-      no_log: "{{ mt_runner_no_log | default(ansible_verbosity | default(0) < 1) }}"
+      no_log: '{{ mt_runner_no_log | default(ansible_verbosity | default(0) < 1) }}'

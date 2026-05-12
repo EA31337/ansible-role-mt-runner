@@ -14,6 +14,7 @@ on:
       - .github/workflows/test.yml
       - '**.cfg'
       - '**.md'
+      - '**.mmd'
       - .*
       - LICENSE
       - Pipfile*
@@ -30,6 +31,7 @@ on:
       - .github/workflows/test.yml
       - '**.cfg'
       - '**.md'
+      - '**.mmd'
       - .*
       - LICENSE
       - Pipfile*
@@ -44,11 +46,11 @@ permissions:
 jobs:
   test:
     name: Test
-    runs-on: ${{ matrix.platform }}
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        platform: [ubuntu-latest]
+        platform: [ubuntu-noble]
         scenario: [default, mt4, mt5-ea]
     steps:
       - uses: actions/checkout@v6

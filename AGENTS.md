@@ -21,6 +21,8 @@ For project overview and install instructions, see [README.md](README.md).
 | Path | Purpose |
 | ---- | ------- |
 | `tasks/main.yml` | Role entry point; manages MetaTrader runner |
+| `docs/FACTS.mmd` | Project canonical facts (Mindmap) |
+| `docs/FLOWS.mmd` | Project flow logic (Flowchart) |
 | `molecule/default/molecule.yml` | Default Molecule scenario config |
 | `molecule/default/converge.yml` | Converge playbook (all scenarios) |
 | `molecule/default/create.yml` | Custom Docker create (proxy CA injection) |
@@ -76,6 +78,7 @@ For project overview and install instructions, see [README.md](README.md).
 | `debian-latest` | `ghcr.io/ea31337/ansible-role-wine:1.0.4-debian-latest` | Wine-enabled image |
 | `ubuntu-jammy` | `ghcr.io/ea31337/ansible-role-wine:1.0.4-ubuntu-jammy` | Wine-enabled image |
 | `ubuntu-noble` | `ghcr.io/ea31337/ansible-role-wine:1.0.4-ubuntu-noble` | Wine-enabled image |
+
 ### Running Tests
 
 ```bash
@@ -251,5 +254,7 @@ If network requests fail during molecule tests:
 ## References
 
 - Project documentation: [README.md](README.md)
+- Project canonical facts: [docs/FACTS.mmd](docs/FACTS.mmd)
+- Project flow logic: [docs/FLOWS.mmd](docs/FLOWS.mmd)
 - Org baseline: <https://github.com/Cogni-AI-OU/.github/blob/main/AGENTS.md>
 - Agents.md standard: <https://agents.md/>
