@@ -13,11 +13,24 @@
     - name: Ensure Python dependencies are installed on controller
       ansible.builtin.command:
         cmd: >-
-          {{ ansible_playbook_python }} -m pip install docker>=7.1 requests
+          {{ ansible_playbook_python }} -m pip install
+          beautifulsoup4 chardet docker>=7.1 requests --break-system-packages
       register: pip_install_result
+      failed_when: false
       changed_when: >-
         pip_install_result.rc == 0
         and 'Successfully installed' in pip_install_result.stdout
+      no_log: '{{ mt_runner_no_log | default(ansible_verbosity | default(0) < 1) }}'
+    - name: Ensure Python dependencies are installed on controller (fallback)
+      ansible.builtin.command:
+        cmd: >-
+          {{ ansible_playbook_python }} -m pip install
+          beautifulsoup4 chardet docker>=7.1 requests
+      when: pip_install_result.rc != 0
+      register: pip_install_result_fallback
+      changed_when: >-
+        pip_install_result_fallback.rc == 0
+        and 'Successfully installed' in pip_install_result_fallback.stdout
       no_log: '{{ mt_runner_no_log | default(ansible_verbosity | default(0) < 1) }}'
   tasks:
     - name: Stop and remove test containers

@@ -191,13 +191,13 @@
       changed_when: false
       failed_when:
         - res_terminal_logs.rc is defined
-        - res_terminal_logs.rc != 0 or (res_terminal_logs.stderr | default('') | length > 0)
+        - res_terminal_logs.rc != 0 or (res_terminal_logs.stderr | default('', true) | length > 0)
       register: res_terminal_logs
     - name: Capture terminal errors
       ansible.builtin.set_fact:
         terminal_errors: >-
-          {{ (res_terminal_logs.stdout | default('')
-          | regex_search(mt_runner_terminal_errors_regex)) | default([]) }}
+          {{ (res_terminal_logs.stdout | default('', true)
+          | regex_search(mt_runner_terminal_errors_regex)) | default([], true) }}
       when: res_terminal_logs.stdout is defined
     - name: Checks for errors in the terminal log
       ansible.builtin.fail:
@@ -206,7 +206,7 @@
           Error: {{ terminal_errors }}
       when:
         - terminal_errors is defined
-        - terminal_errors | default([]) | length > 0
+        - terminal_errors | length > 0
 - name: Wait for test results
   when: mt_runner_run_terminal | bool
   block:
@@ -231,14 +231,14 @@
       changed_when: false
       failed_when:
         - res_terminal_logs.rc is defined
-        - res_terminal_logs.rc != 0 or (res_terminal_logs.stderr | default('') | length > 0)
+        - res_terminal_logs.rc != 0 or (res_terminal_logs.stderr | default('', true) | length > 0)
       register: res_terminal_logs
       when: task_wait_for_terminal_logs.path is defined
     - name: Capture terminal errors
       ansible.builtin.set_fact:
         terminal_errors: >-
-          {{ (res_terminal_logs.stdout | default('')
-          | regex_search(mt_runner_terminal_errors_regex)) | default([]) }}
+          {{ (res_terminal_logs.stdout | default('', true)
+          | regex_search(mt_runner_terminal_errors_regex)) | default([], true) }}
       when:
         - task_wait_for_terminal_logs.path is defined
         - res_terminal_logs.stdout is defined
@@ -250,7 +250,7 @@
       when:
         - task_wait_for_terminal_logs.path is defined
         - terminal_errors is defined
-        - terminal_errors | default([]) | length > 0
+        - terminal_errors | length > 0
 
 - name: Process test results
   when: cmd_terminal_async_status is finished
