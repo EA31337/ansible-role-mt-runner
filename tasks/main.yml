@@ -162,19 +162,30 @@
     - name: Prints terminal log file (MT4)
       ansible.builtin.command:
         cmd: cat "{{ task_wait_for_terminal_logs.path }}"
+      register: cmd_cat_res
       changed_when: false
+      when: (mt_runner_mt_version | int) == 4
+    - name: Show terminal log (MT4)
+      ansible.builtin.debug:
+        var: cmd_cat_res.stdout_lines
       when: (mt_runner_mt_version | int) == 4
     - name: Prints terminal log file (MT5)
       ansible.builtin.command:
-        cmd: iconv -f utf-16 -t utf-8 "{{ task_wait_for_terminal_logs.path }}"
+        cmd: >-
+          python3 -c "import sys; print(open(sys.argv[1], 'rb').read().decode('utf-16'))"
+          "{{ task_wait_for_terminal_logs.path }}"
       changed_when: false
       failed_when: |
-        cmd_iconv_res.stderr | length > 0
+        cmd_iconv_res.rc != 0
         or ("exit with code -" in cmd_iconv_res.stdout)
         or ("not found" in cmd_iconv_res.stdout)
         or ("tester didn't start" in cmd_iconv_res.stdout)
         or ("tester not started" in cmd_iconv_res.stdout)
       register: cmd_iconv_res
+      when: (mt_runner_mt_version | int) == 5
+    - name: Show terminal log (MT5)
+      ansible.builtin.debug:
+        var: cmd_iconv_res.stdout_lines
       when: (mt_runner_mt_version | int) == 5
 - name: Wait for test results
   when: mt_runner_run_terminal | bool
@@ -191,19 +202,34 @@
     - name: Prints final terminal log file (MT4)
       ansible.builtin.command:
         cmd: cat "{{ task_wait_for_terminal_logs.path }}"
+      register: cmd_cat_res
       changed_when: false
+      when:
+        - (mt_runner_mt_version | int) == 4
+        - task_wait_for_terminal_logs.path is defined
+    - name: Show final terminal log (MT4)
+      ansible.builtin.debug:
+        var: cmd_cat_res.stdout_lines
       when:
         - (mt_runner_mt_version | int) == 4
         - task_wait_for_terminal_logs.path is defined
     - name: Prints final terminal log file (MT5)
       ansible.builtin.command:
-        cmd: iconv -f utf-16 -t utf-8 "{{ task_wait_for_terminal_logs.path }}"
+        cmd: >-
+          python3 -c "import sys; print(open(sys.argv[1], 'rb').read().decode('utf-16'))"
+          "{{ task_wait_for_terminal_logs.path }}"
       changed_when: false
       failed_when: |
-        cmd_iconv_res.stderr | length > 0
+        cmd_iconv_res.rc != 0
         or ('tester not started' in cmd_iconv_res.stdout)
         or ('not found' in cmd_iconv_res.stdout)
       register: cmd_iconv_res
+      when:
+        - (mt_runner_mt_version | int) == 5
+        - task_wait_for_terminal_logs.path is defined
+    - name: Show final terminal log (MT5)
+      ansible.builtin.debug:
+        var: cmd_iconv_res.stdout_lines
       when:
         - (mt_runner_mt_version | int) == 5
         - task_wait_for_terminal_logs.path is defined
