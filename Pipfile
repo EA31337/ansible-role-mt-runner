@@ -9,6 +9,8 @@ pipenv = "*"
 molecule = "*"
 molecule-docker = "*"
 requests = "==2.31.0"
+beautifulsoup4 = "*"
+chardet = "*"
 
 [dev-packages]
 

@@ -4,7 +4,8 @@
 ansible
 ansible-lint
 argcomplete>=1.9.4
-bs4
+beautifulsoup4
+chardet
 docker>=7.1
 jinja2-cli
 molecule
