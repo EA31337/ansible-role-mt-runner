@@ -2,16 +2,27 @@
 - name: Converge
   hosts: all
   gather_facts: true
-  tasks:
-    - name: Include main role
-      ansible.builtin.import_role:
-        name: ea31337.mt_runner
+  pre_tasks:
+    # TODO: Remove this workaround once legacy roles are updated to use ansible_facts (see #50).
+    - name: Set compatibility facts for legacy roles
+      ansible.builtin.set_fact:
+        ansible_architecture: '{{ ansible_facts.architecture }}'
+        ansible_distribution: '{{ ansible_facts.distribution }}'
+        ansible_distribution_release: '{{ ansible_facts.distribution_release }}'
+        ansible_env: '{{ ansible_facts.env }}'
+        ansible_os_family: '{{ ansible_facts.os_family }}'
+        ansible_system: '{{ ansible_facts.system }}'
+        ansible_user_dir: '{{ ansible_facts.user_dir }}'
+        ansible_user_id: '{{ ansible_facts.user_id }}'
+        ansible_user_uid: '{{ ansible_facts.user_uid }}'
+  roles:
+    - role: ea31337.mt_runner
       vars:
         mt_runner_bt_mt4_config:
-          Login: "{{ ansible_facts.env.MT_RUNNER_MT4_LOGIN }}"
-          Password: "{{ ansible_facts.env.MT_RUNNER_MT4_PASSWORD }}"
+          Login: "{{ lookup('env', 'MT_RUNNER_MT4_LOGIN') | default('12345', true) }}"
+          Password: "{{ lookup('env', 'MT_RUNNER_MT4_PASSWORD') | default('SETME', true) }}"
           Profile: default
-          Server: "{{ ansible_facts.env.MT_RUNNER_MT4_SERVER | default('MetaQuotes-Demo') }}"
+          Server: "{{ lookup('env', 'MT_RUNNER_MT4_SERVER') | default('MetaQuotes-Demo', true) }}"
           TestExpert: MACD Sample.ex4
           TestFromDate: 2020.01.01
           TestModel: 1

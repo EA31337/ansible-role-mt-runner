@@ -1,11 +1,13 @@
+---
+# noqa: schema[meta]
 # Documentation: https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html
 # Note: Ensure the list is sorted alphabetically.
----
 dependencies:
   - name: ea31337.metatrader
+    role: ea31337.metatrader
     scm: git
     src: https://github.com/EA31337/ansible-role-metatrader.git
-    version: dev
+    version: master
 galaxy_info:
   author: kenorb
   company: EA31337 Ltd
@@ -26,25 +28,11 @@ galaxy_info:
     - windows
     - wine
   license: GPL-3.0-or-later
-  min_ansible_version: "2.7"
+  min_ansible_version: '2.7'
   namespace: ea31337
   platforms:
-    - name: Alpine
-      versions:
-        - all
     - name: Debian
-      versions:
-        - all
-        - bullseye
-        - buster
-        - stretch
-    # - name: NixOS
-    #   versions:
-    #     - all
+      versions: [all, bullseye, bookworm]
     - name: Ubuntu
-      versions:
-        - all
-        - bionic
-        - focal
-        - xenial
+      versions: [all, focal, jammy, noble]
   role_name: mt_runner

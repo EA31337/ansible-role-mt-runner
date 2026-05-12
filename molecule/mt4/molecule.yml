@@ -8,8 +8,8 @@ dependency:
   options:
     ignore-certs: false
     ignore-errors: false
-    role-file: requirements.yml
-    requirements-file: requirements.yml
+    role-file: ${MOLECULE_PROJECT_DIRECTORY}/requirements.yml
+    requirements-file: ${MOLECULE_PROJECT_DIRECTORY}/requirements.yml
 driver:
   name: docker
 lint: |
@@ -19,42 +19,61 @@ lint: |
   ansible-lint
   # flake8
 platforms:
+  - name: debian-latest
+    image: ghcr.io/ea31337/ansible-role-xvfb:1.0.4-debian-latest
+    init: true
   - env:
-      MT_RUNNER_MT4_LOGIN: "${MT_RUNNER_MT4_LOGIN:-12345}"
-      MT_RUNNER_MT4_PASSWORD: "${MT_RUNNER_MT4_PASSWORD:-SETME}"
-      MT_RUNNER_MT4_SERVER: "${MT_RUNNER_MT4_SERVER:-MetaQuotes-Demo}"
-      WINEDLLOVERRIDES: "mscoree,mshtml=,winebrowser.exe=,dbghelp=n"
-    groups:
-      - mt4
-    image: ubuntu:jammy
+      MT_RUNNER_MT4_LOGIN: ${MT_RUNNER_MT4_LOGIN:-12345}
+      MT_RUNNER_MT4_PASSWORD: ${MT_RUNNER_MT4_PASSWORD:-SETME}
+      MT_RUNNER_MT4_SERVER: ${MT_RUNNER_MT4_SERVER:-MetaQuotes-Demo}
+      WINEDLLOVERRIDES: mscoree,mshtml=,winebrowser.exe=,dbghelp=n
+    groups: [mt4]
+    image: ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-jammy
     name: ubuntu-jammy
+    init: true
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+  - name: ubuntu-noble
+    image: ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-noble
+    init: true
     privileged: true
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
 provisioner:
   config_options:
     defaults:
+      # Some molecule-docker playbooks use `when: (lookup('env', 'HOME'))` which
+      # can be broken in sandboxed environments. This option allows Molecule
+      # to skip those tasks instead of failing when it encounters broken conditionals
+      # in its create/destroy playbooks (e.g. `when: (lookup('env', 'HOME'))`).
+      # See: https://github.com/ansible-community/molecule-plugins/issues/295
+      allow_broken_conditionals: true
+      inject_facts_as_vars: false
+      callbacks_enabled: ansible.posix.profile_tasks
+      # Ensure collections installed to ./collections are found by ansible-playbook.
+      collections_path: >-
+        ${MOLECULE_PROJECT_DIRECTORY}/collections:~/.ansible/collections:/usr/share/ansible/collections
+      display_ok_hosts: false
+      display_skipped_hosts: false
       host_key_checking: false
-      # Use the built-in 'ansible.builtin.default' callback with YAML result_format
+      # Use the condensed unixy callback.
       remote_tmp: /tmp/.ansible-tmp-$${USER}
       result_format: yaml
-      stdout_callback: ansible.builtin.default
-      verbosity: "${ANSIBLE_VERBOSITY:-2}"
+      stdout_callback: community.general.unixy
+      verbosity: ${ANSIBLE_VERBOSITY:-0}
   env:
-    ANSIBLE_FORCE_COLOR: "1"
-    ANSIBLE_LOAD_CALLBACK_PLUGINS: "1"
+    ANSIBLE_FORCE_COLOR: '1'
+    ANSIBLE_LOAD_CALLBACK_PLUGINS: '1'
   inventory:
     group_vars:
       all:
         wine_install_winetricks: true
         wine_release: stable
     host_vars:
-      alpine-latest:
-        wine_version: '10.0'
-      nixos-latest:
-        ansible_python_interpreter: /root/.nix-profile/bin/python3
-        wine_version: '10.0'
       ubuntu-jammy:
+        wine_version: '10.0'
+      ubuntu-noble:
         wine_version: '10.0'
   ssh_connection:
     pipelining: true
@@ -64,7 +83,20 @@ provisioner:
     force-handlers: true
   playbooks:
     converge: converge.yml
-    prepare: ../default/prepare.yml
-    verify: ../default/verify.yml
+    create: ${MOLECULE_PROJECT_DIRECTORY}/molecule/default/create.yml
+    destroy: ${MOLECULE_PROJECT_DIRECTORY}/molecule/default/destroy.yml
+    prepare: ${MOLECULE_PROJECT_DIRECTORY}/molecule/default/prepare.yml
+    verify: ${MOLECULE_PROJECT_DIRECTORY}/molecule/default/verify.yml
+scenario:
+  name: mt4
+  test_sequence:
+    - dependency
+    - destroy
+    - syntax
+    - create
+    - prepare
+    - converge
+    - verify
+    - destroy
 verifier:
   name: ansible

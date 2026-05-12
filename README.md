@@ -9,6 +9,11 @@
 
 Ansible role to run tests using MT platform.
 
+## Documentation
+
+- [docs/FACTS.mmd](docs/FACTS.mmd): Project facts and canonical state (Mindmap).
+- [docs/FLOWS.mmd](docs/FLOWS.mmd): Flow logic of the role (Flowchart).
+
 ## Requirements
 
 This role requires:
@@ -17,9 +22,7 @@ This role requires:
 - Python
 - Administrative/root access on target hosts
 - One of the following operating systems:
-  - Alpine Linux
   - Debian/Ubuntu
-  - NixOS or systems with Nix package manager
 
 ## Install
 

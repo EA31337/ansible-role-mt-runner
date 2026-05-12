@@ -1,4 +1,3 @@
-# Collections requirements for molecule mt4 scenario.
 ---
 collections:
   - name: community.general

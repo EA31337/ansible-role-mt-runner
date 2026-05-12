@@ -1,5 +1,7 @@
 .ansible
 ansible-role-*
+ca-certificates/
+collections
 *.bak
 .cache
 collections/
@@ -12,3 +14,7 @@ __pycache__
 requirements-local.yml
 *.swp
 *.verb
+/.github/agents/
+/.github/instructions/
+/.github/skills/
+roles/

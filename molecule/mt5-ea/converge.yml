@@ -2,25 +2,36 @@
 - name: Converge
   hosts: all
   gather_facts: true
-  tasks:
-    - name: Include main role
-      ansible.builtin.import_role:
-        name: ea31337.mt_runner
+  pre_tasks:
+    # TODO: Remove this workaround once legacy roles are updated to use ansible_facts (see #50).
+    - name: Set compatibility facts for legacy roles
+      ansible.builtin.set_fact:
+        ansible_architecture: '{{ ansible_facts.architecture }}'
+        ansible_distribution: '{{ ansible_facts.distribution }}'
+        ansible_distribution_release: '{{ ansible_facts.distribution_release }}'
+        ansible_env: '{{ ansible_facts.env }}'
+        ansible_os_family: '{{ ansible_facts.os_family }}'
+        ansible_system: '{{ ansible_facts.system }}'
+        ansible_user_dir: '{{ ansible_facts.user_dir }}'
+        ansible_user_id: '{{ ansible_facts.user_id }}'
+        ansible_user_uid: '{{ ansible_facts.user_uid }}'
+  roles:
+    - role: ea31337.mt_runner
       vars:
         # noqa: var-naming[no-role-prefix]
         metatrader_version: 5
         mt_runner_bt_mt5_config:
           Common:
-            Login: "{{ ansible_facts.env.MT_RUNNER_MT5_LOGIN }}"
-            Password: "{{ ansible_facts.env.MT_RUNNER_MT5_PASSWORD }}"
-            Server: "{{ ansible_facts.env.MT_RUNNER_MT5_SERVER | default('MetaQuotes-Demo') }}"
+            Login: "{{ lookup('env', 'MT_RUNNER_MT5_LOGIN') | default('12345', true) }}"
+            Password: "{{ lookup('env', 'MT_RUNNER_MT5_PASSWORD') | default('SETME', true) }}"
+            Server: "{{ lookup('env', 'MT_RUNNER_MT5_SERVER') | default('MetaQuotes-Demo', true) }}"
           Tester:
             Deposit: 10000
             ExecutionMode: 0
             Expert: EA31337-Libre-v1.013.ex5
             FromDate: 2024.01.01
             Leverage: 1:500
-            Login: "{{ ansible_facts.env.MT_RUNNER_MT5_LOGIN }}"
+            Login: "{{ lookup('env', 'MT_RUNNER_MT5_LOGIN') | default('12345', true) }}"
             Model: 1
             Period: M15
             Report: report.html
@@ -29,5 +40,5 @@
             Symbol: EURUSD
             ToDate: 2024.01.11
         mt_runner_get_url_list:
-          - dest: "{{ mt_runner_mt_path }}/MQL5/Experts"
+          - dest: '{{ mt_runner_mt_path }}/MQL5/Experts'
             url: https://github.com/EA31337/EA31337-Libre/releases/download/v1.013/EA31337-Libre-v1.013.ex5
