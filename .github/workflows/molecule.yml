@@ -91,14 +91,14 @@ jobs:
           molecule_options: ${{ runner.debug == '1' && '--verbose' || '' }}
           molecule_working_dir: .
       - if: always()
-        name: Summarize Molecule report
+        name: Fix permissions and summarize Molecule report
         env:
           REPORT: molecule-${{ matrix.scenario }}-report.html
           SCENARIO: ${{ matrix.scenario }}
         run: |
+          # Fix permissions of directories and files created by Molecule in a container.
+          sudo chown -R "$USER:$USER" roles collections "$REPORT" 2>/dev/null || true
           if [ -f "$REPORT" ]; then
-            # Fix permissions (the file might be owned by root if created in a container).
-            sudo chown "$USER:$USER" "$REPORT" || true
             {
               printf "## Molecule Summary - %s\n\n" "$SCENARIO"
               printf "### Play Recap\n"
