@@ -1,0 +1,9 @@
+---
+all:
+  children:
+    docker_containers:
+      hosts:
+        wine-on-package-image:
+          ansible_connection: docker
+          ansible_host: wine-on-package-image
+          ansible_python_interpreter: /usr/bin/python3

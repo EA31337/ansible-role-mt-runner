@@ -1,0 +1,73 @@
+# Dockerfile for ea31337.mt_runner Ansible role
+FROM {{ docker_image | default('ubuntu:noble') }}
+
+LABEL org.opencontainers.image.source=https://github.com/EA31337/ansible-role-mt-runner
+LABEL org.opencontainers.image.description="MetaTrader runner container based on ea31337.mt_runner Ansible role"
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install Ansible and dependencies
+{% if 'alpine' in (docker_image | default('ubuntu:noble')) %}
+RUN grep -E '^[^#].*/main$' /etc/apk/repositories | sed 's/main$/community/' >> /etc/apk/repositories && \
+    apk update && \
+    apk add --no-cache ansible bash ca-certificates cabextract curl fontconfig gawk git p7zip python3 sudo ttf-freefont unzip xauth xvfb-run && \
+    update-ca-certificates
+{% elif 'nixos' in (docker_image | default('ubuntu:noble')) %}
+RUN nix-channel --update && \
+    nix-env -iA nixpkgs.ansible nixpkgs.git nixpkgs.p7zip nixpkgs.procps nixpkgs.python3 nixpkgs.python3Packages.pip nixpkgs.sudo
+{% else %}
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    ansible \
+    ca-certificates \
+    cabextract \
+    curl \
+    fontconfig \
+    git \
+    p7zip-full \
+    python3 \
+    python3-apt \
+    lsb-release \
+    python3-pip \
+    python3-setuptools \
+    python3-wheel \
+    sudo \
+    unzip \
+    xvfb \
+    && (pip3 install --no-cache-dir "ansible-core>=2.14" --break-system-packages || \
+        pip3 install --no-cache-dir "ansible-core>=2.14") \
+    && rm -rf /var/lib/apt/lists/*
+{% endif %}
+
+# Copy the role into the container
+WORKDIR /etc/ansible/roles/ea31337.mt_runner
+COPY defaults/ defaults/
+COPY meta/ meta/
+COPY tasks/ tasks/
+COPY templates/ templates/
+COPY vars/ vars/
+COPY ansible.cfg .
+COPY requirements.yml .
+COPY README.md .
+
+# Create a local playbook to apply the role
+RUN ansible-galaxy role install -r requirements.yml && \
+    ansible-galaxy collection install -r requirements.yml --upgrade && \
+    printf -- "---\n- hosts: localhost\n  connection: local\n  roles:\n    - role: /etc/ansible/roles/ea31337.mt_runner\n      mt_runner_run_terminal: false\n" > /tmp/playbook.yml && \
+    ansible-playbook /tmp/playbook.yml && \
+    rm /tmp/playbook.yml && \
+    if [ -f /usr/bin/apt-get ]; then \
+        export SUDO_FORCE_REMOVE=yes && \
+        apt-get update && \
+        apt-get purge -y --auto-remove \
+            ansible \
+            git \
+            python3-pip \
+            python3-setuptools \
+            python3-wheel && \
+        apt-get clean && \
+        rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*; \
+    fi
+
+# Default CMD
+CMD ["wine", "--version"]
