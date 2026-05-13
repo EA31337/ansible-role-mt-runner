@@ -17,6 +17,7 @@ lint: |
   yamllint .
   molecule syntax
   ansible-lint
+  # flake8
 platforms:
   - name: debian-latest
     image: ghcr.io/ea31337/ansible-role-xvfb:1.0.4-debian-latest
@@ -30,9 +31,15 @@ platforms:
     image: ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-jammy
     name: ubuntu-jammy
     init: true
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
   - name: ubuntu-noble
     image: ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-noble
     init: true
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
 provisioner:
   config_options:
     defaults:

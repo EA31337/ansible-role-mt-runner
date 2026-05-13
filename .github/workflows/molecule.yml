@@ -64,6 +64,10 @@ jobs:
             .devcontainer/requirements.txt
             Pipfile*
           python-version: '3.12'
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r .devcontainer/requirements.txt
       - name: Cache Ansible Galaxy collections
         uses: actions/cache@v5
         with:
@@ -75,6 +79,7 @@ jobs:
         env:
           ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
           ANSIBLE_COLLECTIONS_PATH: collections
+          ANSIBLE_DISPLAY_FAILED_STDERR: '1'
           ANSIBLE_FORCE_COLOR: '1'
           ANSIBLE_STDOUT_CALLBACK: ${{ runner.debug == '1' && 'debug' || 'community.general.unixy' }}
           ANSIBLE_VERBOSITY: '0'
