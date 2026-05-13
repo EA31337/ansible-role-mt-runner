@@ -253,7 +253,10 @@
         - terminal_errors | string | length > 0
 
 - name: Process test results
-  when: cmd_terminal_async_status is finished
+  when:
+    - mt_runner_run_terminal | bool
+    - cmd_terminal_async_status is defined
+    - cmd_terminal_async_status is finished
   block:
     - name: Store temporary report path in the mt_report_temp_path variable
       ansible.builtin.set_fact:
