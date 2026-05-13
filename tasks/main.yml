@@ -146,11 +146,12 @@
   poll: 0
   changed_when: false
   ansible.builtin.command:
-    argv:
-      - '{{ mt_runner_cmd_prefix }}'
-      - '{{ mt_runner_mt_terminal_path }}'
-      - /portable
-      - "{{ '/config:tester.ini' if (mt_runner_mt_version | int) == 5 else 'tester.ini' }}"
+    argv: >-
+      {{
+        [mt_runner_cmd_prefix, mt_runner_mt_terminal_path]
+        + (mt_runner_cmd_args | default('/portable', true) | split(' '))
+        + [('/config:tester.ini' if (mt_runner_mt_version | int) == 5 else 'tester.ini')]
+      }}
   args:
     chdir: '{{ mt_runner_mt_path }}'
   environment:
