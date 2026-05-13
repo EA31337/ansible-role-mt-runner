@@ -16,7 +16,7 @@ lint: |
   yamllint .
   molecule syntax
   ansible-lint
-  # flake8
+  flake8 .
 platforms:
   - name: debian-latest
     image: ghcr.io/ea31337/ansible-role-xvfb:1.0.4-debian-latest
