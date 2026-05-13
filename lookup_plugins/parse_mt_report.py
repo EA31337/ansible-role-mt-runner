@@ -593,7 +593,7 @@ def main(input_file_path, output_file_path, include_titles = False, type = None,
 class LookupModule(LookupBase):
     # Expecting the same list of arguments as the "main" function.
     def run(self, terms, variables=None, **kwargs):
-        if len(terms) < 3:
+        if len(terms) != 3:
             raise AnsibleError('parse_mt_report requires exactly 3 parameters to be passed:\n1) input file path\n2) type of file: "orders"|"deals"|"header"|"opt"\n3) include titles?')
         (input_file_path, type, include_titles) = terms
         return [main(input_file_path, '', include_titles, type, True)]
