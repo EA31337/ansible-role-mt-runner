@@ -31,7 +31,7 @@
       "ghcr.io/devcontainers-contrib/features/actionlint:1": {},
       "ghcr.io/devcontainers-contrib/features/node-asdf:0": {},
       "ghcr.io/devcontainers-extra/features/pipx-package:1": {},
-      "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+      "ghcr.io/devcontainers/features/docker-in-docker:3": {},
       "ghcr.io/devcontainers/features/python:1": {},
       "ghcr.io/guiyomh/features/vim:0": {},
       "ghcr.io/jungaretti/features/make:1": {},
