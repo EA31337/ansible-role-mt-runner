@@ -13,8 +13,11 @@ RUN grep -E '^[^#].*/main$' /etc/apk/repositories | sed 's/main$/community/' >> 
     apk add --no-cache ansible bash ca-certificates cabextract curl fontconfig gawk git p7zip python3 sudo ttf-freefont unzip xauth xvfb-run && \
     update-ca-certificates
 {% elif 'nixos' in (docker_image | default('ubuntu:noble')) %}
+# Note: Do not install 'nixpkgs.git' here: it collides with the 'git-minimal'
+# pulled in by 'nixpkgs.ansible', which fails the profile build with a file
+# conflict on 'libexec/git-core/git-init'.
 RUN nix-channel --update && \
-    nix-env -iA nixpkgs.ansible nixpkgs.git nixpkgs.p7zip nixpkgs.procps nixpkgs.python3 nixpkgs.python3Packages.pip nixpkgs.sudo
+    nix-env -iA nixpkgs.ansible nixpkgs.p7zip nixpkgs.procps nixpkgs.python3 nixpkgs.python3Packages.pip nixpkgs.sudo
 {% else %}
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
