@@ -257,6 +257,7 @@ If network requests fail during molecule tests:
 
 - Refer to <https://gh.io/copilot/firewall-config> for agent firewall setup.
 - Do not work around blocked URLs; request allowlisting instead.
+- Document required hosts in `.github/FIREWALL.md`.
 
 ### Required Hosts
 
