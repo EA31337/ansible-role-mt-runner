@@ -23,9 +23,9 @@ platforms:
     image: ghcr.io/ea31337/ansible-role-xvfb:1.0.4-debian-latest
     init: true
   - env:
-      MT_RUNNER_MT4_LOGIN: ${MT_RUNNER_MT4_LOGIN:-12345}
-      MT_RUNNER_MT4_PASSWORD: ${MT_RUNNER_MT4_PASSWORD:-SETME}
-      MT_RUNNER_MT4_SERVER: ${MT_RUNNER_MT4_SERVER:-MetaQuotes-Demo}
+      MT_RUNNER_MT4_LOGIN: '${MT_RUNNER_MT4_LOGIN:-12345}'
+      MT_RUNNER_MT4_PASSWORD: '${MT_RUNNER_MT4_PASSWORD:-SETME}'
+      MT_RUNNER_MT4_SERVER: '${MT_RUNNER_MT4_SERVER:-MetaQuotes-Demo}'
       WINEDLLOVERRIDES: mscoree,mshtml=,winebrowser.exe=,dbghelp=n
     groups:
       - mt4
