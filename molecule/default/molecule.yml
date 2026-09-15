@@ -17,8 +17,13 @@ lint: |
   molecule syntax
   ansible-lint
   # flake8
+# Platform names follow the `<role>-<scenario>-<platform>` convention so the
+# Docker containers (named after the platform) stay unique across roles and
+# scenarios. Molecule's Docker driver names each container exactly after its
+# platform, so generic names such as `debian-latest` collide with concurrent
+# Molecule runs of other roles or scenarios.
 platforms:
-  - name: mt-runner-debian-latest
+  - name: mt-runner-default-debian-latest
     image: ghcr.io/ea31337/ansible-role-xvfb:1.0.4-debian-latest
     init: true
   - env:
@@ -29,12 +34,12 @@ platforms:
     groups:
       - mt5
     image: ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-jammy
-    name: mt-runner-ubuntu-jammy
+    name: mt-runner-default-ubuntu-jammy
     init: true
     privileged: true
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
-  - name: mt-runner-ubuntu-noble
+  - name: mt-runner-default-ubuntu-noble
     image: ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-noble
     init: true
     privileged: true
@@ -71,9 +76,9 @@ provisioner:
         wine_install_winetricks: true
         wine_release: stable
     host_vars:
-      mt-runner-ubuntu-jammy:
+      mt-runner-default-ubuntu-jammy:
         wine_version: '10.0'
-      mt-runner-ubuntu-noble:
+      mt-runner-default-ubuntu-noble:
         wine_version: '10.0'
   ssh_connection:
     pipelining: true
