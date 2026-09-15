@@ -152,4 +152,4 @@ mt_runner_no_log: '{{ ansible_verbosity | default(0) < 1 }}'
 mt_runner_run_terminal: true
 mt_runner_timeout: 2400
 wine_install_recommends: false
-xvfb_display: !!str ":0"
+xvfb_display: :0

@@ -7,7 +7,8 @@
       (connection_user | default('root')) != 'root'
       or (ansible_facts | default({})).user_id | default('root') != 'root'
       or (ansible_facts | default({})).user_uid | default(0) | int != 0
-      or ((ansible_facts | default({})).env | default({})).UID | default(0) | int != 0
+      or ((ansible_facts | default({})).env | default({})).UID | default(0) | int
+    != 0
       or (
         ((ansible_facts | default({})).env | default({})).USER
         | default(((ansible_facts | default({})).env | default({})).LOGNAME | default('root'))
@@ -81,11 +82,10 @@
   pre_tasks:
     - name: Install Python 3 for Ansible
       ansible.builtin.include_tasks: tasks/install-python.yml
-
     - name: Gather facts
       ansible.builtin.setup:
 
-    # TODO: Remove this workaround once legacy roles are updated to use ansible_facts (see #50).
+    # TODO: Remove this workaround once legacy roles are updated to use ansible_facts (see  # 50).
     - name: Set compatibility facts for legacy roles
       ansible.builtin.set_fact:
         ansible_architecture: '{{ ansible_facts.architecture }}'

@@ -32,14 +32,12 @@ platforms:
     name: ubuntu-jammy
     init: true
     privileged: true
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    volumes: [/sys/fs/cgroup:/sys/fs/cgroup:rw]
   - name: ubuntu-noble
     image: ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-noble
     init: true
     privileged: true
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    volumes: [/sys/fs/cgroup:/sys/fs/cgroup:rw]
 provisioner:
   config_options:
     defaults:

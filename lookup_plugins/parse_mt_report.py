@@ -10,104 +10,91 @@ import argparse
 import chardet
 import xml.etree.ElementTree as ET
 
+
 def parse_spread(value):
     # return e.g., "Current" and "30" from such pattern: "Current (30)". Current and 30 may change.
     # Regular expression pattern to extract values
-    pattern = r'(\w+)\s*\((\d+)\)'
+    pattern = r"(\w+)\s*\((\d+)\)"
     match = re.match(pattern, value)
     if match:
-        return {
-            "type": match[1],
-            "value": convert_value(match[2])
-        }
+        return {"type": match[1], "value": convert_value(match[2])}
 
-    pattern = r'(\d+)'
+    pattern = r"(\d+)"
     match = re.match(pattern, value)
     if match:
-        return {
-            "type": 'Unset',
-            "value": convert_value(match[1])
-        }
+        return {"type": "Unset", "value": convert_value(match[1])}
 
-    raise AnsibleError("Could not parse spread value for parse_spread()! Passed: \"%s\"" % value)
+    raise AnsibleError('Could not parse spread value for parse_spread()! Passed: "%s"' % value)
+
 
 def parse_symbol(value):
     # Return first letters from the value until space or end of line.
-    return re.match(r'([A-Z]+)', value)[1]
+    return re.match(r"([A-Z]+)", value)[1]
+
 
 def parse_period(value):
     # Regular expression pattern to extract values
-    pattern = r'(\w+)\s*\((\d{4}\.\d{2}\.\d{2})\s*-\s*(\d{4}\.\d{2}\.\d{2})\)'
+    pattern = r"(\w+)\s*\((\d{4}\.\d{2}\.\d{2})\s*-\s*(\d{4}\.\d{2}\.\d{2})\)"
 
     if match := re.match(pattern, value):
-        return {
-            "period": match[1],
-            "date_start": match[2],
-            "date_end": match[3]
-        }
+        return {"period": match[1], "date_start": match[2], "date_end": match[3]}
 
-    # If no match, try to to use this pattern: 1 Minute (M1) 2023.01.13 00:00 - 2023.01.23 23:59 (2023.01.13 - 2023.01.24)
+    # If no match, try to use this pattern:
+    # 1 Minute (M1) 2023.01.13 00:00 - 2023.01.23 23:59 (2023.01.13 - 2023.01.24)
     # For period it would be M1, for date_start it would be 2023.01.13, for date end it would be 2023.01.23.
-    pattern = r'.*?\((\w+)\)\s+(\d{4}\.\d{2}\.\d{2}).*?\-\s+(\d{4}\.\d{2}\.\d{2})'
+    pattern = r".*?\((\w+)\)\s+(\d{4}\.\d{2}\.\d{2}).*?\-\s+(\d{4}\.\d{2}\.\d{2})"
 
     if match := re.match(pattern, value):
-        return {
-            "period": match[1],
-            "date_start": match[2],
-            "date_end": match[3]
-        }
+        return {"period": match[1], "date_start": match[2], "date_end": match[3]}
 
-    raise AnsibleError("Could not parse period for parse_period()! Passed: \"%s\"" % value)
+    raise AnsibleError('Could not parse period for parse_period()! Passed: "%s"' % value)
+
 
 def parse_val_prc(value):
-    match = re.match(r'(-*\d+(\.\d+)*)\s+\((-*\d+(\.\d+)*)%\)', value)
+    match = re.match(r"(-*\d+(\.\d+)*)\s+\((-*\d+(\.\d+)*)%\)", value)
     if match:
-        return {
-            "value": convert_value(match.group(1)),
-            "percentage": convert_value(match.group(3))
-        }
+        return {"value": convert_value(match.group(1)), "percentage": convert_value(match.group(3))}
     else:
-        raise AnsibleError("Could not parse value for parse_val_prc()! Passed: \"%s\"" % value)
+        raise AnsibleError('Could not parse value for parse_val_prc()! Passed: "%s"' % value)
+
 
 def parse_prc_val(value):
-    match = re.match(r'(-*\d+(\.\d+)*)%\s+\((-*\d+(\.\d+)*)\)', value)
+    match = re.match(r"(-*\d+(\.\d+)*)%\s+\((-*\d+(\.\d+)*)\)", value)
     if match:
-        return {
-            "value": convert_value(match[3]),
-            "percentage": convert_value(match[1])
-        }
-    raise AnsibleError("Could not parse value for parse_prc_val()! Passed: \"%s\"" % value)
+        return {"value": convert_value(match[3]), "percentage": convert_value(match[1])}
+    raise AnsibleError('Could not parse value for parse_prc_val()! Passed: "%s"' % value)
+
 
 def parse_val_of(value):
-    match = re.match(r'(-*\d+(\.\d+)*)\s+\((-*\d+(\.\d+)*)\)', value)
+    match = re.match(r"(-*\d+(\.\d+)*)\s+\((-*\d+(\.\d+)*)\)", value)
     if match:
-        return {
-            "value": convert_value(match.group(1)),
-            "of": convert_value(match.group(3))
-        }
+        return {"value": convert_value(match.group(1)), "of": convert_value(match.group(3))}
     else:
-        raise AnsibleError("Could not parse value for parse_val_of()! Passed: \"%s\"" % value)
+        raise AnsibleError('Could not parse value for parse_val_of()! Passed: "%s"' % value)
+
 
 def parse_val_diff(value):
-    if match := re.match(r'(-*\d+(\.\d+)*)\s+\((-*\d+(\.\d+)*)\)', value):
+    if match := re.match(r"(-*\d+(\.\d+)*)\s+\((-*\d+(\.\d+)*)\)", value):
         return {"value": convert_value(match[1]), "diff": convert_value(match[3])}
-    raise AnsibleError("Could not parse value for parse_val_diff()! Passed: \"%s\"" % value)
+    raise AnsibleError('Could not parse value for parse_val_diff()! Passed: "%s"' % value)
+
 
 def parse_time(value):
-    match = re.match(r'(\d+):(\d+):(\d+)', value)
+    match = re.match(r"(\d+):(\d+):(\d+)", value)
     if match:
         return {
             "h": convert_value(match.group(1)),
             "m": convert_value(match.group(2)),
-            "s": convert_value(match.group(3))
+            "s": convert_value(match.group(3)),
         }
     else:
-        raise AnsibleError("Could not parse time for parse_time()! Passed: \"%s\"" % value)
+        raise AnsibleError('Could not parse time for parse_time()! Passed: "%s"' % value)
+
 
 def convert_value(value):
-    if value.lower() == 'true':
+    if value.lower() == "true":
         return True
-    elif value.lower() == 'false':
+    elif value.lower() == "false":
         return False
     try:
         return int(value.replace(" ", "").replace("%", ""))
@@ -118,24 +105,27 @@ def convert_value(value):
             # Return the original string if conversion fails.
             return value
 
+
 def extract_header_table(html_content):
     # Detecting whether it's MT4 report. We need to check if html_content string contains "Modelling Quality" text.
     is_mt4 = "Modelling quality" in html_content
 
     soup = BeautifulSoup(html_content, "html.parser")
     # Find the table with the specified div content.
-    table = soup.find_all('table')[0]
+    table = soup.find_all("table")[0]
 
     rows = []
 
     if is_mt4:
         # Extract expert advisor name from the table. It's the first sibling of the div above Strategy Tester Report.
-        expert_name = soup.find('b', string="Strategy Tester Report").find_parent('div').find_next_sibling('div').text.strip()
+        expert_name = (
+            soup.find("b", string="Strategy Tester Report").find_parent("div").find_next_sibling("div").text.strip()
+        )
         rows.append(["Expert:", expert_name])
 
     # Extract pairs of td values.
-    for tr in table.find_all('tr'):
-        tds = tr.find_all('td')
+    for tr in table.find_all("tr"):
+        tds = tr.find_all("td")
         values = [col.text.strip() for col in tds]
         rows.append(values)
 
@@ -143,12 +133,10 @@ def extract_header_table(html_content):
 
     # Extracting settings.
 
-    now_inputs = False
-
     i = -1
 
     while True:
-        i += 1 # Note we start from -1.
+        i += 1  # Note we start from -1.
 
         if i >= len(rows):
             break
@@ -160,10 +148,10 @@ def extract_header_table(html_content):
             continue
 
         key = rows[i][0]
-        value = rows[i][1] if len(rows[i]) > 1 else ''
+        value = rows[i][1] if len(rows[i]) > 1 else ""
 
         # Remove trailing spaces and colons from the key.
-        key = key.rstrip(':').strip().lower()
+        key = key.rstrip(":").strip().lower()
 
         # Expert
         if key == "expert":
@@ -190,7 +178,7 @@ def extract_header_table(html_content):
                     # End of inputs.
                     break
 
-                (input_key, input_value) = rows[input_i][1].split("=")
+                input_key, input_value = rows[input_i][1].split("=")
                 data["inputs"][input_key] = convert_value(input_value)
 
             i = input_i
@@ -201,7 +189,7 @@ def extract_header_table(html_content):
             for k in range(0, len(values)):
                 if values[k] == "":
                     continue
-                (input_key, input_value) = values[k].split("=")
+                input_key, input_value = values[k].split("=")
                 data["inputs"][input_key.strip()] = convert_value(input_value)
         # Currency ?
         elif key == "currency":
@@ -226,13 +214,13 @@ def extract_header_table(html_content):
             data["bars"] = convert_value(value)
             data["ticks"] = convert_value(rows[i][3])
             data["symbols"] = convert_value(rows[i][5])
-        elif key == "bars in test": # MT4
+        elif key == "bars in test":  # MT4
             data["bars"] = convert_value(value)
             data["ticks"] = convert_value(rows[i][3])
             data["modelling_quality"] = convert_value(rows[i][5])
             # @todo
             data["symbols"] = 1
-        # Mismached charts errors (MT4 only)
+        # Mismatched charts errors (MT4 only)
         elif key == "mismatched charts errors":
             data["mismatched_charts_errors"] = convert_value(value)
         # Total Net Profit
@@ -247,7 +235,7 @@ def extract_header_table(html_content):
                 data["balance_drawdown_absolute"] = convert_value(rows[i][3])
                 data["equity_drawdown_absolute"] = convert_value(rows[i][5])
 
-        # Gross Profit (for MT4 is's a part of Total Net Profit)
+        # Gross Profit (for MT4 it's a part of Total Net Profit)
         # Balance Drawdown Maximal (MT5 here)
         # Equity Drawdown Maximal (MT5 here)
         elif key == "gross profit":
@@ -261,7 +249,7 @@ def extract_header_table(html_content):
             data["balance_drawdown_absolute"] = convert_value(value)
             data["balance_drawdown_maximal"] = parse_val_prc(rows[i][3])
             data["balance_drawdown_relative"] = parse_prc_val(rows[i][5])
-        # Gross Loss (for MT4 is's a part of Total Net Profit)
+        # Gross Loss (for MT4 it's a part of Total Net Profit)
         # Balance Drawdown Relative ?
         # Equity Drawdown Relative ?
         elif key == "gross loss":
@@ -353,13 +341,13 @@ def extract_header_table(html_content):
             data["maximal_position_holding_time"] = parse_time(rows[i][3])
             data["average_position_holding_time"] = parse_time(rows[i][5])
         else:
-            pass # Skip row.
+            pass  # Skip row.
 
     return data
 
 
 def extract_orders_table(html_content):
-    re_orders = re.findall(pattern='Orders<.*?Comment</b>.*?</td>.*?</tr>(.*?)<tr>', string=html_content, flags=re.S)
+    re_orders = re.findall(pattern="Orders<.*?Comment</b>.*?</td>.*?</tr>(.*?)<tr>", string=html_content, flags=re.S)
     if not re_orders or len(re_orders[0]) == 0:
         # If no orders found, return empty list.
         return []
@@ -376,21 +364,51 @@ def extract_orders_table(html_content):
             break
 
         # Stop/Loss, Take/Profil columns.
-        volume = columns[4].split(" / ");
+        volume = columns[4].split(" / ")
         stop_loss = volume[0] if len(volume) > 0 else ""
         take_profit = volume[0] if len(volume) > 0 else ""
 
-        data.append([columns[0], columns[1], columns[2], columns[3], stop_loss, take_profit, columns[5], columns[6], columns[7], columns[8], columns[9], columns[10]])
+        data.append(
+            [
+                columns[0],
+                columns[1],
+                columns[2],
+                columns[3],
+                stop_loss,
+                take_profit,
+                columns[5],
+                columns[6],
+                columns[7],
+                columns[8],
+                columns[9],
+                columns[10],
+            ]
+        )
 
     return data
 
+
 def extract_deals_table_mt4(html_content, unified=False):
     if unified:
-        column_titles = ["Time", "Deal", "Symbol", "Type", "Direction", "Volume", "Price", "Order", "Commission", "Swap", "Profit", "Balance", "Comment"]
+        column_titles = [
+            "Time",
+            "Deal",
+            "Symbol",
+            "Type",
+            "Direction",
+            "Volume",
+            "Price",
+            "Order",
+            "Commission",
+            "Swap",
+            "Profit",
+            "Balance",
+            "Comment",
+        ]
     else:
         column_titles = ["Deal", "Time", "Type", "Order", "Size", "Price", "S / L", "T / P", "Profit", "Balance"]
 
-    re_deals = re.findall(pattern='<td>Balance</td>.*?</tr>\s*(.*?)\s*</table>', string=html_content, flags=re.S)
+    re_deals = re.findall(pattern=r"<td>Balance</td>.*?</tr>\s*(.*?)\s*</table>", string=html_content, flags=re.S)
 
     if not re_deals or len(re_deals[0]) == 0:
         # If no deals found, return empty list.
@@ -416,23 +434,55 @@ def extract_deals_table_mt4(html_content, unified=False):
             swap = ""
             comment = ""
 
-            # ........................0..., 1..., 2.......3...., 4........, 5....., 6...., 7...., 8........., 9..., 10...., 11....., 12
-            # The order we expect is: Time, Deal, Symbol, Type,  Direction, Volume, Price, Order, Commission, Swap, Profit, Balance, Comment.
+            # 0..., 1..., 2.......3...., 4........, 5....., 6...., 7...., 8........., 9..., 10...., 11....., 12
+            # The order we expect is: Time, Deal, Symbol, Type, Direction, Volume, Price, Order,
+            # Commission, Swap, Profit, Balance, Comment.
             # The order we get is:    Deal, Time, Type,   Order, Size,      Price,  S / L, T / P, Profit,     Balance.
-            data.append([columns[1], columns[0], symbol, columns[2], direction, volume, columns[5], columns[3], commission, swap, columns[8], columns[9], comment])
+            data.append(
+                [
+                    columns[1],
+                    columns[0],
+                    symbol,
+                    columns[2],
+                    direction,
+                    volume,
+                    columns[5],
+                    columns[3],
+                    commission,
+                    swap,
+                    columns[8],
+                    columns[9],
+                    comment,
+                ]
+            )
         else:
             data.append(columns)
 
     return (column_titles, data)
 
-def extract_deals_table_mt5(html_content):
-    column_titles = ["Time", "Deal", "Symbol", "Type", "Direction", "Volume", "Price", "Order", "Commission", "Swap", "Profit", "Balance", "Comment"]
 
-    re_deals = re.findall(pattern='Deals<.*?Comment</b>.*?</td>.*?</tr>(.*?)<tr>', string=html_content, flags=re.S)
+def extract_deals_table_mt5(html_content):
+    column_titles = [
+        "Time",
+        "Deal",
+        "Symbol",
+        "Type",
+        "Direction",
+        "Volume",
+        "Price",
+        "Order",
+        "Commission",
+        "Swap",
+        "Profit",
+        "Balance",
+        "Comment",
+    ]
+
+    re_deals = re.findall(pattern="Deals<.*?Comment</b>.*?</td>.*?</tr>(.*?)<tr>", string=html_content, flags=re.S)
 
     if not re_deals or len(re_deals[0]) == 0:
         # If no deals found, return empty list.
-        return (columns, [])
+        return (column_titles, [])
 
     html_content = "<div>" + re_deals[0] + "</div>"
     soup = BeautifulSoup(html_content, "html.parser")
@@ -446,6 +496,7 @@ def extract_deals_table_mt5(html_content):
 
     return (column_titles, data)
 
+
 def write_to_csv(data, output_file, include_titles=True, type=None, return_string=False):
     # Detecting whether it's MT4 report. We need to check if html_content string contains "Modelling Quality" text.
     is_mt4 = "Modelling quality" in data
@@ -456,22 +507,37 @@ def write_to_csv(data, output_file, include_titles=True, type=None, return_strin
     else:
         csvfile = open(output_file, "w", newline="", encoding="utf-8")
 
-    writer = csv.writer(csvfile, )
+    writer = csv.writer(
+        csvfile,
+    )
 
     if is_mt4 and type == "orders":
         # Orders are only available in MT5. We change the type implicitly to deals for MT4.
         type = "deals"
 
     if type == "orders":
-        columns = ["Open Time", "Order", "Symbol", "Type", "Volume 1", "Volume 2", "Price", "Stop / Loss", "Take / Profit", "Time", "State", "Comment"]
+        columns = [
+            "Open Time",
+            "Order",
+            "Symbol",
+            "Type",
+            "Volume 1",
+            "Volume 2",
+            "Price",
+            "Stop / Loss",
+            "Take / Profit",
+            "Time",
+            "State",
+            "Comment",
+        ]
         rows = extract_orders_table(data)
     elif type == "deals":
         if is_mt4:
-            (columns, rows) = extract_deals_table_mt4(data, unified=False)
+            columns, rows = extract_deals_table_mt4(data, unified=False)
         else:
-            (columns, rows) = extract_deals_table_mt5(data)
+            columns, rows = extract_deals_table_mt5(data)
     elif type == "opt":
-        (columns, rows) = data
+        columns, rows = data
     else:
         raise AnsibleError("Invalid --type passed!")
 
@@ -485,6 +551,7 @@ def write_to_csv(data, output_file, include_titles=True, type=None, return_strin
         return csvfile.getvalue()
     else:
         csvfile.close()
+
 
 def write_to_json(html_content, output_file, type, return_string=False):
     if return_string:
@@ -504,6 +571,7 @@ def write_to_json(html_content, output_file, type, return_string=False):
     else:
         jsonfile.close()
 
+
 def write_opt(content, output_file, include_titles, return_string=False):
     # Detecting whether it's MT5 report. We need to check if html_content string contains "<?xml" text.
     is_mt5 = "<?xml" in content
@@ -513,28 +581,49 @@ def write_opt(content, output_file, include_titles, return_string=False):
     else:
         return write_opt_mt4(content, output_file, include_titles, return_string=return_string)
 
+
 def write_opt_mt5(content, output_file, include_titles, return_string=False):
     tree = ET.ElementTree(ET.fromstring(content))
     root = tree.getroot()
 
     # Define namespaces.
-    ns = {'ss': 'urn:schemas-microsoft-com:office:spreadsheet'}
+    ns = {"ss": "urn:schemas-microsoft-com:office:spreadsheet"}
 
     # Find the Table element.
-    table = root.find('.//ss:Table', ns)
+    table = root.find(".//ss:Table", ns)
 
     if table is None:
-        return write_to_csv([["Pass", "Result", "Profit", "Expected Payoff", "Profit Factor", "Recovery Factor", "Sharpe Ratio", "Custom", "Equity DD %"], []], output_file, include_titles, "opt", return_string=return_string)
+        return write_to_csv(
+            [
+                [
+                    "Pass",
+                    "Result",
+                    "Profit",
+                    "Expected Payoff",
+                    "Profit Factor",
+                    "Recovery Factor",
+                    "Sharpe Ratio",
+                    "Custom",
+                    "Equity DD %",
+                ],
+                [],
+            ],
+            output_file,
+            include_titles,
+            "opt",
+            return_string=return_string,
+        )
     else:
         # Extract column names
-        columns = [cell.find('./ss:Data', ns).text for cell in table.find('./ss:Row', ns)]
+        columns = [cell.find("./ss:Data", ns).text for cell in table.find("./ss:Row", ns)]
 
         data = []
-        for row in sorted(table.findall('./ss:Row', ns)[1:], key=lambda x: float(x.find('./ss:Cell/ss:Data', ns).text)):
-            row_data = [cell.find('./ss:Data', ns).text for cell in row]
+        for row in sorted(table.findall("./ss:Row", ns)[1:], key=lambda x: float(x.find("./ss:Cell/ss:Data", ns).text)):
+            row_data = [cell.find("./ss:Data", ns).text for cell in row]
             data.append(row_data)
 
         return write_to_csv([columns, data], output_file, include_titles, "opt", return_string=return_string)
+
 
 def write_opt_mt4(html_content, output_file, include_titles, return_string=False):
     column_titles = ["Pass", "Profit", "Total Trades", "Profit Factor", "Expected Payoff", "Drawdown $", "Drawdown %"]
@@ -554,8 +643,9 @@ def write_opt_mt4(html_content, output_file, include_titles, return_string=False
 
     return write_to_csv([column_titles, data], output_file, include_titles, "opt", return_string=return_string)
 
-def main(input_file_path, output_file_path, include_titles = False, type = None, return_string=False):
-    if type == None:
+
+def main(input_file_path, output_file_path, include_titles=False, type=None, return_string=False):
+    if type is None:
         raise AnsibleError("Type (--type parameter) is not set!")
 
     if type in ["orders", "deals", "header", "opt"]:
@@ -563,7 +653,7 @@ def main(input_file_path, output_file_path, include_titles = False, type = None,
             # Report file could be in UTF-16LE or UTF-8 encoding.
             with open(input_file_path, "rb") as f:
                 raw_data = f.read()
-                detected_encoding = chardet.detect(raw_data)['encoding']
+                detected_encoding = chardet.detect(raw_data)["encoding"]
             try:
                 html_content = raw_data.decode(detected_encoding)
             except Exception as e:
@@ -573,7 +663,9 @@ def main(input_file_path, output_file_path, include_titles = False, type = None,
 
             if type in ["orders", "deals", "header"] and "Strategy Tester Report" not in html_content:
                 raise AnsibleError("Wrong file passed. It's not an MT report file!")
-            elif type in ["opt"] and ("Optimization Report" not in html_content and "Tester Optimizator Results" not in html_content):
+            elif type in ["opt"] and (
+                "Optimization Report" not in html_content and "Tester Optimizator Results" not in html_content
+            ):
                 raise AnsibleError("Wrong file passed. It's not an MT optimization report file!")
 
         except FileNotFoundError:
@@ -590,36 +682,45 @@ def main(input_file_path, output_file_path, include_titles = False, type = None,
 
     raise ValueError('Incorrect type passed. Allowed value: "orders" OR "deals" OR "header" OR "opt".')
 
+
 class LookupModule(LookupBase):
     # Expecting the same list of arguments as the "main" function.
     def run(self, terms, variables=None, **kwargs):
         if len(terms) != 3:
-            raise AnsibleError('parse_mt_report requires exactly 3 parameters to be passed:\n1) input file path\n2) type of file: "orders"|"deals"|"header"|"opt"\n3) include titles?')
-        (input_file_path, type, include_titles) = terms
-        return [main(input_file_path, '', include_titles, type, True)]
+            raise AnsibleError(
+                "parse_mt_report requires exactly 3 parameters to be passed:\n"
+                "1) input file path\n"
+                '2) type of file: "orders"|"deals"|"header"|"opt"\n'
+                "3) include titles?"
+            )
+        input_file_path, type, include_titles = terms
+        return [main(input_file_path, "", include_titles, type, True)]
+
 
 if __name__ == "__main__":
-        parser = argparse.ArgumentParser(description="Parse MT report and extract data.")
-        parser.add_argument("input_file_path", help="Path to the input file.")
-        parser.add_argument("--out", help="Path to the output file. When not passed, string will be returned.")
-        parser.add_argument("--type", choices=["orders", "deals", "header", "opt"], required=True, help="Type of data to extract.")
-        parser.add_argument("--titles", action="store_true", help="Include titles in the output.")
+    parser = argparse.ArgumentParser(description="Parse MT report and extract data.")
+    parser.add_argument("input_file_path", help="Path to the input file.")
+    parser.add_argument("--out", help="Path to the output file. When not passed, string will be returned.")
+    parser.add_argument(
+        "--type", choices=["orders", "deals", "header", "opt"], required=True, help="Type of data to extract."
+    )
+    parser.add_argument("--titles", action="store_true", help="Include titles in the output.")
 
-        args = parser.parse_args()
+    args = parser.parse_args()
 
-        try:
-            result = main(
-                input_file_path=args.input_file_path,
-                output_file_path=args.out,
-                include_titles=args.titles,
-                type=args.type,
-                return_string=not args.out
-            )
-            if not args.out:
-                print(result)
-        except Exception as e:
-            print(f"Error: {e}", file=sys.stderr)
-            sys.exit(1)
+    try:
+        result = main(
+            input_file_path=args.input_file_path,
+            output_file_path=args.out,
+            include_titles=args.titles,
+            type=args.type,
+            return_string=not args.out,
+        )
+        if not args.out:
+            print(result)
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
 
 # Testing:
 # lm = LookupModule()
