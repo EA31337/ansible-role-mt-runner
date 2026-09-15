@@ -51,7 +51,7 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-          - mt-runner-ubuntu-noble
+          - ubuntu-noble
         scenario:
           - default
           - mt4
@@ -79,6 +79,17 @@ jobs:
           path: |
             roles
             collections
+      - name: Filter molecule platforms to ${{ matrix.platform }}
+        # yq is pre-installed on ubuntu-latest GitHub-hosted runners.
+        run: |
+          SCENARIO="${{ matrix.scenario }}"
+          PLATFORM="${{ matrix.platform }}"
+          MOL_FILE="molecule/${SCENARIO}/molecule.yml"
+          yq -i \
+            ".platforms = [.platforms[] | select(.name | test(\"-${PLATFORM}$\"))]" \
+            "$MOL_FILE"
+          echo "Filtered platforms:"
+          yq '.platforms[].name' "$MOL_FILE"
       - uses: gofrolist/molecule-action@v2
         env:
           ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
