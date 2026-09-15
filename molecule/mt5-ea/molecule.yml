@@ -18,7 +18,7 @@ lint: |
   ansible-lint
   flake8 .
 platforms:
-  - name: debian-latest
+  - name: mt-runner-debian-latest
     image: ghcr.io/ea31337/ansible-role-xvfb:1.0.4-debian-latest
     init: true
   - env:
@@ -29,12 +29,12 @@ platforms:
     groups:
       - mt5
     image: ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-jammy
-    name: ubuntu-jammy
+    name: mt-runner-ubuntu-jammy
     init: true
     privileged: true
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
-  - name: ubuntu-noble
+  - name: mt-runner-ubuntu-noble
     image: ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-noble
     init: true
     privileged: true
@@ -71,9 +71,9 @@ provisioner:
         wine_install_winetricks: true
         wine_release: stable
     host_vars:
-      ubuntu-jammy:
+      mt-runner-ubuntu-jammy:
         wine_version: '10.0'
-      ubuntu-noble:
+      mt-runner-ubuntu-noble:
         wine_version: '10.0'
   ssh_connection:
     pipelining: true

@@ -77,9 +77,13 @@ For project overview and install instructions, see [README.md](README.md).
 
 | Container | Image | Notes |
 | --------- | ----- | ----- |
-| `debian-latest` | `ghcr.io/ea31337/ansible-role-xvfb:1.0.4-debian-latest` | Wine/Xvfb-enabled image |
-| `ubuntu-jammy` | `ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-jammy` | Wine/Xvfb-enabled image |
-| `ubuntu-noble` | `ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-noble` | Wine/Xvfb-enabled image |
+| `mt-runner-debian-latest` | `ghcr.io/ea31337/ansible-role-xvfb:1.0.4-debian-latest` | Wine/Xvfb-enabled image |
+| `mt-runner-ubuntu-jammy` | `ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-jammy` | Wine/Xvfb-enabled image |
+| `mt-runner-ubuntu-noble` | `ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-noble` | Wine/Xvfb-enabled image |
+
+Platform names are prefixed with the role name (`mt-runner-`) because Molecule's Docker
+driver names each container exactly after its platform. Generic names such as
+`debian-latest` would collide with concurrent Molecule runs of other roles.
 
 ### Running Tests
 
@@ -99,7 +103,7 @@ pipenv run molecule test
 pipenv run molecule test -s default
 
 # Single platform in a scenario
-pipenv run molecule test -s default --platform-name ubuntu-noble
+pipenv run molecule test -s default --platform-name mt-runner-ubuntu-noble
 
 # Step-by-step debugging (useful for troubleshooting)
 pipenv run molecule destroy -s default              # clean up any leftover state
@@ -120,11 +124,11 @@ For CI or automated environments, use timeouts:
 
 ```bash
 # Test a single platform with timeout (15 minutes)
-timeout 900 pipenv run molecule test -s default --platform-name ubuntu-noble
+timeout 900 pipenv run molecule test -s default --platform-name mt-runner-ubuntu-noble
 
 # If converge fails, debug interactively:
-pipenv run molecule create -s default --platform-name ubuntu-noble
-pipenv run molecule converge -s default --platform-name ubuntu-noble
+pipenv run molecule create -s default --platform-name mt-runner-ubuntu-noble
+pipenv run molecule converge -s default --platform-name mt-runner-ubuntu-noble
 # (inspect container state, then clean up)
 pipenv run molecule destroy -s default
 ```

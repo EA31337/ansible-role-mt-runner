@@ -38,9 +38,13 @@ Run all Molecule scenarios and report results as a table.
 
 | Container | Image | Notes |
 | --- | --- | --- |
-| `debian-latest` | `ghcr.io/ea31337/ansible-role-xvfb:1.0.4-debian-latest` | Uses `apt` |
-| `ubuntu-jammy` | `ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-jammy` | Uses `apt` |
-| `ubuntu-noble` | `ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-noble` | Uses `apt` |
+| `mt-runner-debian-latest` | `ghcr.io/ea31337/ansible-role-xvfb:1.0.4-debian-latest` | Uses `apt` |
+| `mt-runner-ubuntu-jammy` | `ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-jammy` | Uses `apt` |
+| `mt-runner-ubuntu-noble` | `ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-noble` | Uses `apt` |
+
+Platform names are prefixed with the role name (`mt-runner-`) because Molecule's Docker
+driver names each container exactly after its platform. Generic names such as
+`debian-latest` would collide with concurrent Molecule runs of other roles.
 
 ## Results Template
 
@@ -51,9 +55,9 @@ Use PASS for pass, FAIL for fail, SKIP for skipped.
 
 | Platform | create | prepare | converge | idempotence | verify |
 | --- | :---: | :---: | :---: | :---: | :---: |
-| `debian-latest` | | | | | |
-| `ubuntu-jammy` | | | | | |
-| `ubuntu-noble` | | | | | |
+| `mt-runner-debian-latest` | | | | | |
+| `mt-runner-ubuntu-jammy` | | | | | |
+| `mt-runner-ubuntu-noble` | | | | | |
 
 ## Troubleshooting
 
