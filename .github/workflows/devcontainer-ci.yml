@@ -4,10 +4,16 @@ name: Development Containers (CI)
 # yamllint disable-line rule:truthy
 on:
   pull_request:
-    paths: [.devcontainer/**, .github/workflows/devcontainer-ci.yml]
+    paths:
+      - .devcontainer/**
+      - .github/workflows/devcontainer-ci.yml
   push:
-    branches: [dev, main]
-    paths: [.devcontainer/**, .github/workflows/devcontainer-ci.yml]
+    branches:
+      - dev
+      - main
+    paths:
+      - .devcontainer/**
+      - .github/workflows/devcontainer-ci.yml
   schedule:
     - cron: 0 0 * * 1  # Run every Monday at 00:00 UTC
   workflow_dispatch:

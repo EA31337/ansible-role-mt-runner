@@ -6,7 +6,8 @@
       ansible.builtin.apt:
         allow_unauthenticated: true
         install_recommends: "{{ 'yes' if wine_install_recommends else 'no' }}"
-        name: [winbind]
+        name:
+          - winbind
         state: present
         update_cache: true
       become: true
@@ -120,7 +121,8 @@
         path: '{{ item.path }}'
         state: absent
       loop: '{{ mt_old_logs.files }}'
-      tags: [molecule-idempotence-notest]
+      tags:
+        - molecule-idempotence-notest
 - name: Ensures specified files are present
   block:
     - name: Ensures destination directories are present
@@ -187,8 +189,7 @@
       changed_when: false
       failed_when:
         - res_terminal_logs.rc is defined
-        - res_terminal_logs.rc != 0 or (res_terminal_logs.stderr | default('', true)
-          | string | length > 0)
+        - res_terminal_logs.rc != 0 or (res_terminal_logs.stderr | default('', true) | string | length > 0)
       register: res_terminal_logs
     - name: Capture terminal errors
       ansible.builtin.set_fact:
@@ -228,8 +229,7 @@
       changed_when: false
       failed_when:
         - res_terminal_logs.rc is defined
-        - res_terminal_logs.rc != 0 or (res_terminal_logs.stderr | default('', true)
-          | string | length > 0)
+        - res_terminal_logs.rc != 0 or (res_terminal_logs.stderr | default('', true) | string | length > 0)
       register: res_terminal_logs
       when: task_wait_for_terminal_logs.path is defined
     - name: Capture terminal errors
@@ -258,8 +258,7 @@
     - name: Store temporary report path in the mt_report_temp_path variable
       ansible.builtin.set_fact:
         mt_report_temp_path: "{{ ansible_env.TMPDIR | default('/tmp') }}/mt5_report.html"
-    - name: Store temporary optimization report path in the mt_opt_report_temp_path
-        variable
+    - name: Store temporary optimization report path in the mt_opt_report_temp_path variable
       ansible.builtin.set_fact:
         mt_opt_report_temp_path: "{{ ansible_env.TMPDIR | default('/tmp') }}/mt5_opt_report.html"
     - name: Fetch the report file to control node

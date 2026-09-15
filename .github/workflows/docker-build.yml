@@ -4,7 +4,8 @@ name: Docker Build
 on:
   pull_request:
   push:
-    branches-ignore: [master]
+    branches-ignore:
+      - master
   workflow_dispatch:
 jobs:
   build:
@@ -25,8 +26,7 @@ jobs:
       - name: Cache pip
         uses: actions/cache@v5
         with:
-          key: ${{ runner.os }}-pip-${{ hashFiles('.devcontainer/requirements.txt')
-            }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('.devcontainer/requirements.txt') }}
           path: ~/.cache/pip
           restore-keys: |
             ${{ runner.os }}-pip-

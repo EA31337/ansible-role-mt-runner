@@ -57,7 +57,10 @@
       ansible.builtin.include_tasks: ../../tasks/diagnostics.yml
     - name: Install Python packages for Ubuntu/Debian
       ansible.builtin.apt:
-        name: [python3, python3-pip, python3-setuptools]
+        name:
+          - python3
+          - python3-pip
+          - python3-setuptools
         state: present
         update_cache: true
       no_log: '{{ mt_runner_no_log | default(ansible_verbosity | default(0) < 1) }}'

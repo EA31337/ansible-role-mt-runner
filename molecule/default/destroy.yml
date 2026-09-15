@@ -4,7 +4,8 @@
   hosts: localhost
   connection: local
   gather_facts: false
-  collections: [community.docker]
+  collections:
+    - community.docker
   vars:
     mt_runner_no_log: '{{ ansible_verbosity | default(0) < 1 }}'
     # Use controller Python (Ansible's interpreter)
