@@ -2,8 +2,19 @@
 - name: Converge
   hosts: all
   gather_facts: true
+  vars:
+    # Opt-in: assign a unique X display per host when MOLECULE_XVFB_DISPLAY_BASE
+    # is set. Required when containers share the host network namespace
+    # (MOLECULE_DOCKER_NETWORK=host) and the host already runs an X server on :0.
+    # Usage: MOLECULE_XVFB_DISPLAY_BASE=90 molecule test
+    xvfb_display: >-
+      {{ (lookup('env', 'MOLECULE_XVFB_DISPLAY_BASE') | default('', true) | length
+      > 0)
+         | ternary(':' ~ (lookup('env', 'MOLECULE_XVFB_DISPLAY_BASE') | int +
+                          (groups['all'] | list).index(inventory_hostname)), ':0')
+      }}
   pre_tasks:
-    # TODO: Remove this workaround once legacy roles are updated to use ansible_facts (see #50).
+    # TODO: Remove this workaround once legacy roles are updated to use ansible_facts (see  # 50).
     - name: Set compatibility facts for legacy roles
       ansible.builtin.set_fact:
         ansible_architecture: '{{ ansible_facts.architecture }}'
