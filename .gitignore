@@ -13,6 +13,7 @@ collections/
 __pycache__
 requirements-local.yml
 *.swp
+.venv/
 *.verb
 /.github/agents/
 /.github/instructions/
