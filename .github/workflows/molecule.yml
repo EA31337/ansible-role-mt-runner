@@ -50,8 +50,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [ubuntu-noble]
-        scenario: [default, mt4, mt5-ea]
+        platform:
+          - ubuntu-noble
+        scenario:
+          - default
+          - mt4
+          - mt5-ea
     steps:
       - uses: actions/checkout@v6
         with:
@@ -64,6 +68,10 @@ jobs:
             .devcontainer/requirements.txt
             Pipfile*
           python-version: '3.12'
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r .devcontainer/requirements.txt
       - name: Cache Ansible Galaxy collections
         uses: actions/cache@v5
         with:
@@ -71,10 +79,22 @@ jobs:
           path: |
             roles
             collections
+      - name: Filter molecule platforms to ${{ matrix.platform }}
+        # yq is pre-installed on ubuntu-latest GitHub-hosted runners.
+        run: |
+          SCENARIO="${{ matrix.scenario }}"
+          PLATFORM="${{ matrix.platform }}"
+          MOL_FILE="molecule/${SCENARIO}/molecule.yml"
+          yq -i \
+            ".platforms = [.platforms[] | select(.name | test(\"-${PLATFORM}$\"))]" \
+            "$MOL_FILE"
+          echo "Filtered platforms:"
+          yq '.platforms[].name' "$MOL_FILE"
       - uses: gofrolist/molecule-action@v2
         env:
           ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
-          ANSIBLE_COLLECTIONS_PATH: collections
+          ANSIBLE_COLLECTIONS_PATH: ${{ github.workspace }}/collections
+          ANSIBLE_DISPLAY_FAILED_STDERR: '1'
           ANSIBLE_FORCE_COLOR: '1'
           ANSIBLE_STDOUT_CALLBACK: ${{ runner.debug == '1' && 'debug' || 'community.general.unixy' }}
           ANSIBLE_VERBOSITY: '0'
@@ -119,7 +139,7 @@ jobs:
           fi
       - if: always()
         name: Upload Molecule report artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           if-no-files-found: warn
           name: molecule-${{ matrix.scenario }}-${{ matrix.platform }}-report

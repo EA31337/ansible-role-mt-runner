@@ -9,9 +9,9 @@ flowchart TD
         CI_Test --> CI_Molecule["Run Molecule Matrix"]
         subgraph Molecule_Matrix [Molecule_Matrix]
             direction LR
-            M_Debian["debian-latest"]
-            M_Jammy["ubuntu-jammy"]
-            M_Noble["ubuntu-noble"]
+            M_Default["mt-runner-default-*"]
+            M_MT4["mt-runner-mt4-*"]
+            M_MT5EA["mt-runner-mt5-ea-*"]
         end
         CI_Molecule --> Molecule_Matrix
         Molecule_Matrix --> CI_Complete(["CI Success"])

@@ -141,6 +141,7 @@ mt_runner_bt_mt5_config:
     UseLocal: 1
     UseRemote:
     Visual: 0
+mt_runner_cmd_args: /portable /skipupdate
 mt_runner_cmd_prefix: wine
 mt_runner_get_url_list: []
 mt_runner_mt_version: '{{ metatrader_version | default(5) | int }}'
@@ -151,4 +152,4 @@ mt_runner_no_log: '{{ ansible_verbosity | default(0) < 1 }}'
 mt_runner_run_terminal: true
 mt_runner_timeout: 2400
 wine_install_recommends: false
-xvfb_display: !!str ":0"
+xvfb_display: :0

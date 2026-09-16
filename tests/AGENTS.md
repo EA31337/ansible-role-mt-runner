@@ -1,0 +1,206 @@
+# Docker Tests
+
+Agent guidance for the standalone Docker test playbooks in `tests/`.
+
+These are the non-Molecule test path: they start real distro containers, install the role into each,
+and are what the `Test` CI workflow runs. For the Molecule path, see
+[../molecule/AGENTS.md](../molecule/AGENTS.md).
+
+## Layout
+
+| Path | Purpose |
+| --- | --- |
+| `inventory/docker-containers.yml` | Three-host distro matrix (debian-latest, ubuntu-jammy, ubuntu-noble) |
+| `inventory/test-docker.yml` | Single host `wine-on-package-image` backed by the published GHCR image |
+| `playbooks/docker-containers.yml` | Starts the containers, then installs the role on each |
+| `playbooks/test-docker.yml` | Pulls the published GHCR image, then installs the role |
+| `playbooks/tasks/install-python.yml` | Bootstraps Python 3 in the container; shared with Molecule `prepare` |
+
+Both inventories use `ansible_connection: docker`, so the containers are addressed by name over the
+Docker socket rather than SSH.
+
+The distro matrix does not pull plain distro images: each host maps to a published xvfb image
+(`ghcr.io/ea31337/ansible-role-xvfb:1.0.4-<platform>`), which already carries Wine and Xvfb.
+
+## Running Tests
+
+Run everything through `pipenv`, matching [../molecule/AGENTS.md](../molecule/AGENTS.md):
+
+```bash
+# Install/refresh dependencies from Pipfile.lock (first run)
+pipenv sync
+
+# Distro matrix (pulls images, ~2 min)
+pipenv run ansible-playbook -i tests/inventory/docker-containers.yml tests/playbooks/docker-containers.yml
+
+# Published GHCR image (~1 min)
+pipenv run ansible-playbook -i tests/inventory/test-docker.yml tests/playbooks/test-docker.yml
+```
+
+Syntax check only (what CI runs first):
+
+```bash
+pipenv run ansible-playbook --syntax-check \
+  -i tests/inventory/docker-containers.yml tests/playbooks/docker-containers.yml
+```
+
+`pipenv` auto-detects the project's `.venv` directory (see `is_venv_in_project` in pipenv's
+`project.py`), so `pipenv run <cmd>` and `.venv/bin/<cmd>` resolve to the same interpreter. Prefer
+`pipenv run` - it does not depend on the caller's `PATH` or on the venv being activated.
+
+### Why pipenv
+
+`Pipfile.lock` pins the exact versions the tests were validated against (`ansible-core 2.17.9`,
+`ansible-compat 25.1.4`, `molecule 25.3.1`, `molecule-docker 2.1.0`), so `pipenv sync` reproduces the
+environment deterministically. Installing `ansible`/`ansible-lint` ad hoc instead pulls the latest
+`ansible-core` (2.21.x), which is a different runtime than CI uses.
+
+`pipenv` does **not** provide `ansible-lint` - it is not in the `Pipfile`. Run lint via
+`pre-commit run ansible-lint -a`, or install it separately.
+
+## Prerequisites
+
+- Docker daemon reachable and a working default bridge (see the troubleshooting entry below).
+- Ansible collections installed: `ansible-galaxy collection install -r requirements.yml`
+  (`ansible.posix`, `ansible.windows >= 2.0.0`, `community.docker`, `community.general >= 10.6.0`,
+  `community.windows >= 2.0.0`).
+- The role resolvable as `ea31337.mt_runner`. The playbooks use `ansible.builtin.import_role`, which
+  resolves from `~/.ansible/roles/` - not from the working tree. Symlink it for development:
+
+    ```bash
+    ln -vs "$PWD" ~/.ansible/roles/ea31337.mt_runner
+    ```
+
+- The role dependencies `ea31337.metatrader`, `ea31337.wine`, and `ea31337.xvfb` installed as well,
+  since `meta/main.yml` pulls them in.
+
+## What the Playbooks Do
+
+`docker-containers.yml` runs two plays:
+
+1. **Configure Docker container** - starts each container with `sleep infinity` plus bind mounts for
+   `/root/.ansible/tmp` and `/root/.cache`, waits for it to be running, bootstraps Python 3 via
+   `tasks/install-python.yml`, gathers facts, runs `tasks/diagnostics.yml`, and installs the extra
+   Ubuntu/Debian Python packages.
+2. **Install ea31337.mt_runner role** - bootstraps Python again, gathers facts, sets compatibility
+   facts for the legacy dependency roles, applies the role with an MT5 tester config, then stops the
+   containers.
+
+`test-docker.yml` is the same shape but against the single published image, bootstraps Python with an
+inline `raw` task instead of `install-python.yml`, disables the terminal run
+(`mt_runner_run_terminal: false`), and removes the container at the end.
+
+The `Test Docker` workflow (`.github/workflows/test-docker.yml`) exists but its job is disabled
+(`if: ${{ fromJSON('false') }}`), so `test-docker.yml` is not exercised in CI.
+
+## Verifying the Result
+
+The playbooks only *install* the role - they never assert that the runner actually worked, so a green
+run does not by itself prove the role works. Check the container directly:
+
+```bash
+docker exec mt-runner-on-ubuntu-noble find /root/.wine -iname 'terminal*.exe'
+docker exec mt-runner-on-ubuntu-noble ls /root/.wine/drive_c/Program\ Files
+```
+
+The role resolves the platform directory itself and stores it in `mt_runner_mt_path`; the tester
+config is written to `{{ mt_runner_mt_path }}/tester.ini`.
+
+### Idempotency
+
+`AGENTS.md` requires idempotent tasks, but running `docker-containers.yml` twice is **not** a valid
+idempotency check, and the second run can never report `changed=0`. Two things guarantee changes:
+
+- **`Stop Docker containers`** (post-task) unconditionally stops the containers, so it reports
+  `changed` on every run.
+- **A container restart resets running services.** The next run's pre-tasks start the containers
+  again, so anything started as a process is no longer running. This role depends on
+  `ea31337.metatrader`, which pulls in `ea31337.xvfb`; three tasks in its `tasks/supervisord.yml` are
+  gated on `supervisord_status.rc != 0` and so re-fire: `Remove stale supervisor socket if not
+  running`, `Remove stale supervisor pid if not running`, and `Start supervisord daemon`.
+
+To test idempotency, keep the containers up between runs and apply the role twice. The stop post-task
+inherits the play's `tags: always`, so `--skip-tags` cannot drop it without dropping the whole play;
+use a probe playbook that omits it and confirm the second run reports `changed=0`:
+
+```yaml
+---
+- name: Idempotency check
+  hosts: docker_containers
+  gather_facts: true
+  vars:
+    controller_python: '{{ ansible_playbook_python }}'
+  tasks:
+    - name: Installs ea31337.mt_runner role
+      ansible.builtin.import_role:
+        name: ea31337.mt_runner
+```
+
+```bash
+# The playbook leaves the containers stopped, so start them first.
+docker start mt-runner-on-ubuntu-noble
+
+# Run 1 may change the xvfb start-up tasks; run 2 must report changed=0.
+pipenv run ansible-playbook -i tests/inventory/docker-containers.yml /tmp/idempotency.yml
+pipenv run ansible-playbook -i tests/inventory/docker-containers.yml /tmp/idempotency.yml
+```
+
+## Troubleshooting Matrix
+
+### `ansible-lint` cannot resolve `community.docker.*`
+
+> `syntax-check[unknown-module]: couldn't resolve module/action 'community.docker.docker_image'`
+
+- **Root cause**: a stale, empty `.ansible/collections/ansible_collections/community/docker`
+  directory shadows the real collection. This is the blocker documented in the root `AGENTS.md`.
+- **Check**: `ls -la .ansible/collections/ansible_collections/community/docker/` - if it contains
+  only an empty `roles/` directory, this is the cause.
+- **Fix**: `rm -rf .ansible/collections/ansible_collections/community/docker`. `.ansible` is
+  gitignored and holds no tracked files, so this is safe.
+
+### Docker bridge has no gateway (containers cannot reach the network)
+
+> `apk update` / `apt-get update` fails, or `getent hosts` returns nothing, while the host resolves
+> and routes fine.
+
+- **Root cause**: `docker0`'s address does not match the `bridge` network's configured gateway, so
+  containers get a default route pointing at an address that is not on the bridge.
+- **Check**: `ip -4 addr show docker0` vs
+  `docker network inspect bridge --format '{{range .IPAM.Config}}{{.Subnet}} {{.Gateway}}{{end}}'`.
+  If the gateway from the second command is missing from the first, the bridge is broken.
+- **Fix**: `sudo systemctl restart docker` recreates `docker0` with the configured gateway. This
+  stops running containers, including an in-flight test run.
+- **Note**: `docker0` may carry more than one address. As long as the gateway reported by
+  `docker network inspect bridge` is present on `docker0`, the bridge works even if the subnet
+  differs from `bip` in `/etc/docker/daemon.json`.
+
+### `community.general does not support Ansible version 2.17.9`
+
+> `[WARNING]: Collection community.general does not support Ansible version 2.17.9`
+
+- **Root cause**: the installed `community.general` expects a newer `ansible-core` than the one
+  pinned in `Pipfile.lock` (2.17.9).
+- **Impact**: warning only; the tests pass. Do not "fix" it by upgrading `ansible-core` ad hoc - that
+  diverges from the pinned environment CI uses.
+
+### `molecule` fails with `FileNotFoundError: 'ansible-config'`
+
+> Running a venv binary directly (`.venv/bin/molecule`) raises
+> `FileNotFoundError: [Errno 2] No such file or directory: 'ansible-config'`.
+
+- **Root cause**: `ansible_compat` shells out to `ansible-config` by name. Invoking the binary
+  directly does not put the venv's `bin` on `PATH`, so the lookup fails.
+- **Fix**: use `pipenv run molecule ...` - pipenv prepends the venv's `bin` to `PATH`. Activating
+  the venv (`source .venv/bin/activate`) works too. This is the main reason to prefer `pipenv run`
+  over calling `.venv/bin/*` directly.
+
+### `pipenv` warns that Python 3.10 was not found
+
+> `Warning: Python 3.10 was not found on your system...`
+
+- **Root cause**: `Pipfile` pins `python_version = "3.10"`, but the project `.venv` was created with
+  a different Python version.
+- **Impact**: harmless when `.venv` already exists, because pipenv reuses it. Only relevant when
+  creating a fresh environment.
+- **Fix**: install Python 3.10 (`pyenv`/`asdf`), or create the venv explicitly with
+  `python3 -m venv .venv` and use `pipenv run` / `.venv/bin` directly.

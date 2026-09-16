@@ -16,22 +16,35 @@ lint: |
   yamllint .
   molecule syntax
   ansible-lint
+  # flake8
+# Platform names follow the `<role>-<scenario>-<platform>` convention so the
+# Docker containers (named after the platform) stay unique across roles and
+# scenarios. Molecule's Docker driver names each container exactly after its
+# platform, so generic names such as `debian-latest` collide with concurrent
+# Molecule runs of other roles or scenarios.
 platforms:
-  - name: debian-latest
+  - name: mt-runner-default-debian-latest
     image: ghcr.io/ea31337/ansible-role-xvfb:1.0.4-debian-latest
     init: true
   - env:
-      MT_RUNNER_MT5_LOGIN: ${MT_RUNNER_MT5_LOGIN:-12345}
-      MT_RUNNER_MT5_PASSWORD: ${MT_RUNNER_MT5_PASSWORD:-SETME}
-      MT_RUNNER_MT5_SERVER: ${MT_RUNNER_MT5_SERVER:-MetaQuotes-Demo}
+      MT_RUNNER_MT5_LOGIN: '${MT_RUNNER_MT5_LOGIN:-12345}'
+      MT_RUNNER_MT5_PASSWORD: '${MT_RUNNER_MT5_PASSWORD:-SETME}'
+      MT_RUNNER_MT5_SERVER: '${MT_RUNNER_MT5_SERVER:-MetaQuotes-Demo}'
       WINEDLLOVERRIDES: mscoree,mshtml=,winebrowser.exe=,dbghelp=n
-    groups: [mt5]
+    groups:
+      - mt5
     image: ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-jammy
-    name: ubuntu-jammy
+    name: mt-runner-default-ubuntu-jammy
     init: true
-  - name: ubuntu-noble
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+  - name: mt-runner-default-ubuntu-noble
     image: ghcr.io/ea31337/ansible-role-xvfb:1.0.4-ubuntu-noble
     init: true
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
 provisioner:
   config_options:
     defaults:
@@ -63,9 +76,9 @@ provisioner:
         wine_install_winetricks: true
         wine_release: stable
     host_vars:
-      ubuntu-jammy:
+      mt-runner-default-ubuntu-jammy:
         wine_version: '10.0'
-      ubuntu-noble:
+      mt-runner-default-ubuntu-noble:
         wine_version: '10.0'
   ssh_connection:
     pipelining: true
