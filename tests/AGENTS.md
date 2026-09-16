@@ -108,13 +108,41 @@ config is written to `{{ mt_runner_mt_path }}/tester.ini`.
 
 ### Idempotency
 
-`AGENTS.md` requires idempotent tasks. Because `docker-containers.yml` does not recreate containers,
-running it twice against the same containers is a valid idempotency check - the second run must
-report `changed=0`:
+`AGENTS.md` requires idempotent tasks, but running `docker-containers.yml` twice is **not** a valid
+idempotency check, and the second run can never report `changed=0`. Two things guarantee changes:
+
+- **`Stop Docker containers`** (post-task) unconditionally stops the containers, so it reports
+  `changed` on every run.
+- **A container restart resets running services.** The next run's pre-tasks start the containers
+  again, so anything started as a process is no longer running. This role depends on
+  `ea31337.metatrader`, which pulls in `ea31337.xvfb`; three tasks in its `tasks/supervisord.yml` are
+  gated on `supervisord_status.rc != 0` and so re-fire: `Remove stale supervisor socket if not
+  running`, `Remove stale supervisor pid if not running`, and `Start supervisord daemon`.
+
+To test idempotency, keep the containers up between runs and apply the role twice. The stop post-task
+inherits the play's `tags: always`, so `--skip-tags` cannot drop it without dropping the whole play;
+use a probe playbook that omits it and confirm the second run reports `changed=0`:
+
+```yaml
+---
+- name: Idempotency check
+  hosts: docker_containers
+  gather_facts: true
+  vars:
+    controller_python: '{{ ansible_playbook_python }}'
+  tasks:
+    - name: Installs ea31337.mt_runner role
+      ansible.builtin.import_role:
+        name: ea31337.mt_runner
+```
 
 ```bash
-pipenv run ansible-playbook -i tests/inventory/docker-containers.yml tests/playbooks/docker-containers.yml
-pipenv run ansible-playbook -i tests/inventory/docker-containers.yml tests/playbooks/docker-containers.yml
+# The playbook leaves the containers stopped, so start them first.
+docker start mt-runner-on-ubuntu-noble
+
+# Run 1 may change the xvfb start-up tasks; run 2 must report changed=0.
+pipenv run ansible-playbook -i tests/inventory/docker-containers.yml /tmp/idempotency.yml
+pipenv run ansible-playbook -i tests/inventory/docker-containers.yml /tmp/idempotency.yml
 ```
 
 ## Troubleshooting Matrix
