@@ -65,6 +65,11 @@ For project overview and install instructions, see [README.md](README.md).
 - It uses Molecule for testing and ansible-lint for linting.
 - It depends on `community.docker` and `community.general` collections.
 
+## Docker Tests
+
+The standalone Docker test playbooks in `tests/`, how to run them via `pipenv`, and
+their troubleshooting matrix live in [tests/AGENTS.md](tests/AGENTS.md).
+
 ## Molecule Testing
 
 Molecule scenarios, the platform matrix, how to run the tests, and Molecule-specific
